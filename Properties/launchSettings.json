@@ -13,14 +13,6 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Production"
       }
-    },
-    "HHMS_Application (Executable)": {
-      "commandName": "Executable",
-      "executablePath": "$(TargetPath)",
-      "workingDirectory": "$(TargetDir)",
-      "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
-      }
     }
   }
 }
