@@ -16,13 +16,16 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+# But allow debugging configuration files
+!.vs/launch.vs.json
 
 # User-specific files
 *.rsuser
 *.suo
-*.user
 *.userosscache
 *.sln.docstates
+# But allow project debug configuration
+!*.csproj.user
 
 # Rider
 .idea/

@@ -1,0 +1,30 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "HHMS_Application.csproj",
+      "projectTarget": "HHMS_Application.exe",
+      "name": "HHMS_Application.exe (Debug)",
+      "args": [],
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "currentDir": "${workspaceFolder}",
+      "debugType": "mixed"
+    },
+    {
+      "type": "default",
+      "project": "HHMS_Application.csproj",
+      "projectTarget": "HHMS_Application.exe",
+      "name": "HHMS_Application.exe (Release)",
+      "args": [],
+      "env": {
+        "DOTNET_ENVIRONMENT": "Production"
+      },
+      "currentDir": "${workspaceFolder}",
+      "debugType": "auto"
+    }
+  ]
+}
