@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Integration - HHMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .loading { color: #007bff; }
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            HHMS API Integration Test
+        </h1>
+        
+        <!-- API Status Card -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">API Connection Status</h2>
+            <div id="api-status" class="loading">Testing API connection...</div>
+            <div id="api-config" class="text-sm text-gray-600 mt-2"></div>
+        </div>
+
+        <!-- Test Dashboard API -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">Dashboard API Test</h2>
+            <button onclick="testDashboardAPI()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Test Dashboard Endpoints
+            </button>
+            <div id="dashboard-result" class="result-box mt-4" style="display:none;"></div>
+        </div>
+
+        <!-- Test Staff API -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">Staff API Test</h2>
+            <button onclick="testStaffAPI()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Test Staff Endpoints
+            </button>
+            <div id="staff-result" class="result-box mt-4" style="display:none;"></div>
+        </div>
+
+        <!-- Test TCode API -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">TCode API Test</h2>
+            <button onclick="testTCodeAPI()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                Test TCode Endpoints
+            </button>
+            <div id="tcode-result" class="result-box mt-4" style="display:none;"></div>
+        </div>
+
+        <!-- Test User API -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">User API Test</h2>
+            <button onclick="testUserAPI()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                Test User Endpoints
+            </button>
+            <div id="user-result" class="result-box mt-4" style="display:none;"></div>
+        </div>
+        
+        <!-- Database Connection Info -->
+        <div class="test-card">
+            <h2 class="text-xl font-semibold mb-4">Database Connection</h2>
+            <p class="text-sm text-gray-600">
+                API connects to SQL Server database: <strong>HHMS_NgoaiNgu68</strong><br>
+                Connection string uses LocalDB for development.<br>
+                Database is automatically seeded with sample data on first run.
+            </p>
+        </div>
+    </div>
+
+    <!-- Load API Client -->
+    <script src="js/api-client.js"></script>
+    
+    <script>
+        // Display API configuration
+        document.getElementById('api-config').innerHTML = `
+            API Base URL: ${API_CONFIG.BASE_URL}<br>
+            Timeout: ${API_CONFIG.TIMEOUT}ms
+        `;
+
+        // Test API connection
+        async function testAPIConnection() {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/dashboard/summary`);
+                if (response.ok) {
+                    document.getElementById('api-status').innerHTML = '<span class="success">✓ API is connected and responding</span>';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = `<span class="error">✗ API connection failed: ${error.message}</span>`;
+            }
+        }
+
+        // Test Dashboard API
+        async function testDashboardAPI() {
+            const resultDiv = document.getElementById('dashboard-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Testing dashboard endpoints...\n';
+
+            const tests = [
+                { name: 'Dashboard Metrics', method: () => apiClient.getDashboardMetrics() },
+                { name: 'Dashboard Summary', method: () => apiClient.getDashboardSummary() },
+                { name: 'Daily Activities', method: () => apiClient.getDailyActivities() },
+                { name: 'Upcoming Classes', method: () => apiClient.getUpcomingClasses() },
+                { name: 'Pending Requests', method: () => apiClient.getPendingRequests() }
+            ];
+
+            for (const test of tests) {
+                try {
+                    const result = await test.method();
+                    if (result.success) {
+                        resultDiv.innerHTML += `✓ ${test.name}: SUCCESS\n`;
+                        resultDiv.innerHTML += `  Data: ${JSON.stringify(result.data, null, 2)}\n\n`;
+                    } else {
+                        resultDiv.innerHTML += `✗ ${test.name}: FAILED - ${result.error}\n\n`;
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML += `✗ ${test.name}: ERROR - ${error.message}\n\n`;
+                }
+            }
+        }
+
+        // Test Staff API
+        async function testStaffAPI() {
+            const resultDiv = document.getElementById('staff-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Testing staff endpoints...\n';
+
+            try {
+                const result = await apiClient.getStaff({ page: 1, pageSize: 5 });
+                if (result.success) {
+                    resultDiv.innerHTML += `✓ Get Staff: SUCCESS\n`;
+                    resultDiv.innerHTML += `  Total records: ${result.data.totalCount}\n`;
+                    resultDiv.innerHTML += `  Staff list: ${JSON.stringify(result.data.data, null, 2)}\n\n`;
+                } else {
+                    resultDiv.innerHTML += `✗ Get Staff: FAILED - ${result.error}\n\n`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `✗ Get Staff: ERROR - ${error.message}\n\n`;
+            }
+        }
+
+        // Test TCode API
+        async function testTCodeAPI() {
+            const resultDiv = document.getElementById('tcode-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Testing TCode endpoints...\n';
+
+            try {
+                const result = await apiClient.getTCodes('admin');
+                if (result.success) {
+                    resultDiv.innerHTML += `✓ Get TCodes: SUCCESS\n`;
+                    resultDiv.innerHTML += `  TCode count: ${result.data.length}\n`;
+                    resultDiv.innerHTML += `  TCodes: ${JSON.stringify(result.data, null, 2)}\n\n`;
+                } else {
+                    resultDiv.innerHTML += `✗ Get TCodes: FAILED - ${result.error}\n\n`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `✗ Get TCodes: ERROR - ${error.message}\n\n`;
+            }
+        }
+
+        // Test User API
+        async function testUserAPI() {
+            const resultDiv = document.getElementById('user-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Testing user endpoints...\n';
+
+            try {
+                const result = await apiClient.getUserInfo();
+                if (result.success) {
+                    resultDiv.innerHTML += `✓ Get User Info: SUCCESS\n`;
+                    resultDiv.innerHTML += `  User: ${JSON.stringify(result.data, null, 2)}\n\n`;
+                } else {
+                    resultDiv.innerHTML += `✗ Get User Info: FAILED - ${result.error}\n\n`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `✗ Get User Info: ERROR - ${error.message}\n\n`;
+            }
+        }
+
+        // Test API connection on page load
+        window.addEventListener('DOMContentLoaded', testAPIConnection);
+    </script>
+</body>
+</html>

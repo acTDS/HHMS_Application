@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Link Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Load API Client -->
+    <script src="js/api-client.js"></script>
     <style>
         /* General font and background color settings */
         body {
@@ -955,8 +957,8 @@
     </div>
 
     <script>
-        // BASE_API_URL: This constant is no longer used as API calls have been removed.
-        const BASE_API_URL = 'http://localhost:3000/api'; 
+        // BASE_API_URL: Updated to point to the actual API
+        const BASE_API_URL = 'https://localhost:7000/api'; // Updated API URL
 
         // Get reference to the loading overlay
         const fullScreenLoadingOverlay = document.getElementById('fullScreenLoadingOverlay');
@@ -1494,38 +1496,67 @@
         }
 
         /**
-         * Fetches dashboard data from mock data based on user role.
+         * Fetches dashboard data from API or fallback to mock data.
          * @param {string} role - User role (e.g., 'default', 'teacher', 'hr').
          */
-        function fetchDashboardData(role) {
-            // Directly use mock data as there's no API
-            const mockMetrics = [
-                { "title": "Tổng số học sinh", "value": "1200", "change": "+5%" },
-                { "title": "Lớp học đang hoạt động", "value": "45", "change": "+2" },
-                { "title": "Tỷ lệ tham gia", "value": "92%", "change": "-1%" }
-                // Removed "Doanh thu hàng tháng" metric
-            ];
-            renderMetrics(mockMetrics);
+        async function fetchDashboardData(role) {
+            try {
+                // Try to fetch from API first
+                const [metricsResult, activitiesResult, classesResult, requestsResult] = await Promise.all([
+                    apiClient.getDashboardMetrics(),
+                    apiClient.getDailyActivities(),
+                    apiClient.getUpcomingClasses(),
+                    apiClient.getPendingRequests()
+                ]);
 
-            const mockDailyActivities = [
-                { "icon": "📝", "details": "Học sinh Nguyễn Văn A nộp bài tập.", "time": "10:30 AM" },
-                { "icon": "📞", "details": "Giáo viên Trần Thị B gọi điện cho phụ huynh.", "time": "09:00 AM" }
-            ];
-            renderActivityList('dailyActivitiesCard', mockDailyActivities, 'activity');
+                // Render metrics
+                if (metricsResult.success && metricsResult.data) {
+                    renderMetrics(metricsResult.data);
+                    console.log('Metrics loaded from API');
+                } else {
+                    renderMetrics(MOCK_DATA.metrics);
+                    console.log('Using fallback metrics data');
+                }
 
-            const mockUpcomingActivities = [
-                { "title": "Tiếng Anh Giao Tiếp Cấp Tốc", "instructor": "GV. Lê Thị C", "schedule": "Thứ 3, 18:00 - 20:00", "students": "25 học sinh" },
-                { "title": "Luyện Thi IELTS", "instructor": "GV. Phạm Văn D", "schedule": "Thứ 5, 19:00 - 21:00", "students": "18 học sinh" }
-            ];
-            renderActivityList('upcomingActivitiesCard', mockUpcomingActivities, 'class');
+                // Render activities
+                if (activitiesResult.success && activitiesResult.data) {
+                    renderActivityList('dailyActivitiesCard', activitiesResult.data, 'activity');
+                    console.log('Activities loaded from API');
+                } else {
+                    renderActivityList('dailyActivitiesCard', MOCK_DATA.activities, 'activity');
+                    console.log('Using fallback activities data');
+                }
 
-            const mockPendingRequests = [
-                { "details": "Yêu cầu đổi lịch học từ học sinh E.", "time": "Hôm nay, 11:00 AM" },
-                { "details": "Yêu cầu cấp lại chứng chỉ cho học sinh F.", "time": "Hôm qua, 03:00 PM" }
-            ];
-            renderActivityList('pendingRequestsSection', mockPendingRequests, 'request');
+                // Render upcoming classes
+                if (classesResult.success && classesResult.data) {
+                    renderActivityList('upcomingActivitiesCard', classesResult.data, 'class');
+                    console.log('Classes loaded from API');
+                } else {
+                    renderActivityList('upcomingActivitiesCard', MOCK_DATA.classes, 'class');
+                    console.log('Using fallback classes data');
+                }
 
-            showCustomMessageBox('Đang hiển thị dữ liệu bảng điều khiển từ dữ liệu giả định.');
+                // Render pending requests
+                if (requestsResult.success && requestsResult.data) {
+                    renderActivityList('pendingRequestsSection', requestsResult.data, 'request');
+                    console.log('Requests loaded from API');
+                } else {
+                    renderActivityList('pendingRequestsSection', MOCK_DATA.requests, 'request');
+                    console.log('Using fallback requests data');
+                }
+
+                showCustomMessageBox('Dữ liệu dashboard đã được tải từ API thành công.');
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                
+                // Fallback to mock data
+                renderMetrics(MOCK_DATA.metrics);
+                renderActivityList('dailyActivitiesCard', MOCK_DATA.activities, 'activity');
+                renderActivityList('upcomingActivitiesCard', MOCK_DATA.classes, 'class');
+                renderActivityList('pendingRequestsSection', MOCK_DATA.requests, 'request');
+                
+                showCustomMessageBox('Không thể kết nối API, đang sử dụng dữ liệu dự phòng.');
+            }
         }
 
 
@@ -1555,23 +1586,41 @@
         }
 
         /**
-         * Fetches user information from mock data.
+         * Fetches user information from API or fallback to mock data.
          */
-        function fetchUserInfo() {
-            const employeeNameSpan = document.getElementById('employeeName');
-            const employeeTitleSpan = document.getElementById('employeeTitle');
-
-            // Directly use mock data as there's no API
-            const mockUserData = {
-                "name": "Người dùng Demo",
-                "title": "Quản lý",
-                "role": "admin" // Default to 'admin' for mock data to show more T-codes
-            };
-            employeeNameSpan.textContent = mockUserData.name;
-            employeeTitleSpan.textContent = mockUserData.title;
-            currentUserRole = mockUserData.role; // Set current user role
-            document.body.dataset.userRole = currentUserRole; // Set role for dashboard logic
-            showCustomMessageBox('Đang hiển thị thông tin người dùng từ dữ liệu giả định.');
+        async function fetchUserInfo() {
+            try {
+                const result = await apiClient.getUserInfo();
+                
+                if (result.success && result.data) {
+                    const userData = result.data;
+                    const employeeNameSpan = document.getElementById('employeeName');
+                    const employeeTitleSpan = document.getElementById('employeeTitle');
+                    
+                    employeeNameSpan.textContent = userData.name;
+                    employeeTitleSpan.textContent = userData.title;
+                    currentUserRole = userData.role; // Set current user role
+                    document.body.dataset.userRole = currentUserRole; // Set role for dashboard logic
+                    
+                    console.log('User info loaded from API:', userData);
+                    showCustomMessageBox('Thông tin người dùng đã được tải từ API.');
+                } else {
+                    throw new Error('API returned unsuccessful result');
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                
+                // Fallback to mock data
+                const employeeNameSpan = document.getElementById('employeeName');
+                const employeeTitleSpan = document.getElementById('employeeTitle');
+                
+                employeeNameSpan.textContent = MOCK_DATA.user.name;
+                employeeTitleSpan.textContent = MOCK_DATA.user.title;
+                currentUserRole = MOCK_DATA.user.role;
+                document.body.dataset.userRole = currentUserRole;
+                
+                showCustomMessageBox('Không thể kết nối API, đang sử dụng thông tin người dùng dự phòng.');
+            }
         }
 
         /**
@@ -1579,14 +1628,18 @@
          */
         async function initializeDashboard() {
             updateCurrentDate();
-            showFullScreenLoading(); // Show loading while mock data is processed
-            // Use setTimeout to simulate asynchronous loading of data
-            setTimeout(() => {
-                fetchUserInfo(); // Get user info from mock data
-                fetchDashboardData(currentUserRole); // Get dashboard data from mock data
-                fetchTCodes(); // Get T-codes from mock data
-                hideFullScreenLoading(); // Hide loading after mock data is loaded
-            }, 500); // Simulate a small delay for loading
+            showFullScreenLoading(); // Show loading while data is processed
+            
+            try {
+                await fetchUserInfo(); // Get user info from API
+                await fetchDashboardData(currentUserRole); // Get dashboard data from API
+                await fetchTCodes(); // Get T-codes from API
+                hideFullScreenLoading(); // Hide loading after data is loaded
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                hideFullScreenLoading();
+                showCustomMessageBox('Lỗi khi khởi tạo dashboard. Một số dữ liệu có thể không hiển thị chính xác.');
+            }
         }
 
         // Call main initialization function when page is loaded
