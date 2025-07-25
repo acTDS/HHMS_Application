@@ -1,6 +1,5 @@
 
 CREATE DATABASE HHMS_NgoaiNgu68;
-END
 GO
 
 USE HHMS_NgoaiNgu68;
@@ -57,14 +56,31 @@ CREATE TABLE Department (
     DepartmentCode NVARCHAR(20) UNIQUE NOT NULL,
     DepartmentName NVARCHAR(255) NOT NULL,
     Description NVARCHAR(500),
-    ManagerStaffName NVARCHAR(255),
+    ManagerStaffName NVARCHAR(255), -- Legacy field, will be replaced by ManagerEmployeeId
+    ManagerEmployeeId INT, -- Reference to actual Staff record
     StaffQuota INT DEFAULT 0,
+    CurrentStaffCount INT DEFAULT 0,
     BranchID INT,
+    ParentDepartmentID INT NULL, -- For hierarchical structure
+    DepartmentLevel INT DEFAULT 1, -- 1=main dept, 2=sub-dept, 3=team
+    EstablishedDate DATE,
+    Budget DECIMAL(15,2) DEFAULT 0,
+    ContactPhone NVARCHAR(20),
+    ContactEmail NVARCHAR(255),
+    OfficeLocation NVARCHAR(500),
+    Responsibilities NVARCHAR(MAX), -- JSON format for detailed responsibilities
+    KPITargets NVARCHAR(MAX), -- JSON format for KPI targets
     StatusID INT DEFAULT 1,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     LastModified DATETIME2 DEFAULT GETDATE(),
+    CreatedBy INT,
+    ModifiedBy INT,
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
-    FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID)
+    FOREIGN KEY (ParentDepartmentID) REFERENCES Department(DepartmentID),
+    FOREIGN KEY (ManagerEmployeeId) REFERENCES Staff(StaffID),
+    FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 INSERT INTO Department (DepartmentCode, DepartmentName, Description, ManagerStaffName, StaffQuota, BranchID) VALUES
@@ -6923,8 +6939,8 @@ CREATE TABLE MajorCategories (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Chuyên Ngành (Academic Majors)
@@ -6957,8 +6973,8 @@ CREATE TABLE Majors (
     UpdatedDate DATETIME2,
     FOREIGN KEY (CategoryId) REFERENCES MajorCategories(CategoryId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Môn Học trong Chuyên Ngành (Major Subjects)
@@ -6981,8 +6997,8 @@ CREATE TABLE MajorSubjects (
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId) ON DELETE CASCADE,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(MajorId, SubjectCode)
 );
 
@@ -7009,10 +7025,10 @@ CREATE TABLE MajorCurricula (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId),
-    FOREIGN KEY (ApprovedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (ApprovedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(MajorId, Version)
 );
 
@@ -7038,8 +7054,8 @@ CREATE TABLE CurriculumDetails (
     FOREIGN KEY (CurriculumId) REFERENCES MajorCurricula(CurriculumId) ON DELETE CASCADE,
     FOREIGN KEY (MajorSubjectId) REFERENCES MajorSubjects(MajorSubjectId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(CurriculumId, SessionOrder)
 );
 
@@ -7058,8 +7074,8 @@ CREATE TABLE MajorInstructorRequirements (
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId) ON DELETE CASCADE,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Thống Kê Chuyên Ngành (Major Statistics)
@@ -7078,7 +7094,7 @@ CREATE TABLE MajorStatistics (
     CreatedBy INT,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     PRIMARY KEY (MajorId, YearMonth)
 );
 
@@ -7606,8 +7622,8 @@ CREATE TABLE ReportTypes (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Lịch Sử Tạo Báo Cáo (Report Generation History)
@@ -7632,7 +7648,7 @@ CREATE TABLE ReportGenerationHistory (
     ExpiryDate DATETIME2, -- When file should be cleaned up
     GeneratedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (GeneratedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (GeneratedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Quyền Truy Cập Báo Cáo (Report Access Permissions)
@@ -7651,7 +7667,7 @@ CREATE TABLE ReportAccessPermissions (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     UNIQUE(ReportTypeId, PermissionModule, AccessLevel)
 );
 
@@ -7677,8 +7693,8 @@ CREATE TABLE DataExportDefinitions (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Lịch Hẹn Báo Cáo Tự Động (Scheduled Reports)
@@ -7704,7 +7720,7 @@ CREATE TABLE ScheduledReports (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     UpdatedDate DATETIME2,
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId)
 );
 
@@ -7722,7 +7738,7 @@ CREATE TABLE ReportUsageAnalytics (
     PreferredFormat NVARCHAR(20),
     LastAccessTime DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (UserId) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (UserId) REFERENCES Staff(StaffID),
     PRIMARY KEY (ReportTypeId, UserId, AccessDate)
 );
 
@@ -7740,7 +7756,7 @@ CREATE TABLE ReportCache (
     CacheExpiry DATETIME2 NOT NULL,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (GeneratedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (GeneratedBy) REFERENCES Staff(StaffID),
     UNIQUE(ReportTypeId, CacheKey)
 );
 
@@ -8296,8 +8312,8 @@ CREATE TABLE RequestTypes (
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: Requests - Bảng chính lưu trữ yêu cầu
@@ -8336,16 +8352,16 @@ CREATE TABLE Requests (
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
-    FOREIGN KEY (RequestorID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (RequestorID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
     FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
     FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
     FOREIGN KEY (MajorID) REFERENCES Major(MajorID),
     FOREIGN KEY (CurrentStatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (AssignedToID) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (AssignedToID) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestWorkflowSteps - Định nghĩa các bước trong quy trình phê duyệt
@@ -8369,7 +8385,7 @@ CREATE TABLE RequestWorkflowSteps (
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
     FOREIGN KEY (ResponsibleDepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestWorkflowHistory - Lịch sử di chuyển qua các bước
@@ -8390,7 +8406,7 @@ CREATE TABLE RequestWorkflowHistory (
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (StepID) REFERENCES RequestWorkflowSteps(StepID),
     FOREIGN KEY (FromStepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (ActionBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (ActionBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusBeforeAction) REFERENCES Status(StatusID),
     FOREIGN KEY (StatusAfterAction) REFERENCES Status(StatusID)
 );
@@ -8412,8 +8428,8 @@ CREATE TABLE RequestApprovals (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (StepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (ApproverID) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (DelegatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ApproverID) REFERENCES Staff(StaffID),
+    FOREIGN KEY (DelegatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestDocuments - Tài liệu đính kèm yêu cầu
@@ -8437,7 +8453,7 @@ CREATE TABLE RequestDocuments (
     Description NVARCHAR(MAX),
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (UploadedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (UploadedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8460,8 +8476,8 @@ CREATE TABLE RequestComments (
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (ParentCommentID) REFERENCES RequestComments(CommentID),
-    FOREIGN KEY (CommentBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (EditedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CommentBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (EditedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8486,7 +8502,7 @@ CREATE TABLE RequestNotifications (
     ActionUrl NVARCHAR(500), -- Deep link to specific action
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (RecipientID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (RecipientID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8505,8 +8521,8 @@ CREATE TABLE RequestTemplates (
     ModifiedBy INT,
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -9422,10 +9438,10 @@ CREATE TABLE RequestSummaryViews (
     CreatedBy INT,
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
-    FOREIGN KEY (OwnerID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (OwnerID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestSummaryFilters - Lưu trữ bộ lọc được lưu
@@ -9443,9 +9459,9 @@ CREATE TABLE RequestSummaryFilters (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestDashboardMetrics - Metrics cho dashboard
@@ -9492,7 +9508,7 @@ CREATE TABLE RequestDashboardMetrics (
     
     FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
-    FOREIGN KEY (CalculatedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CalculatedBy) REFERENCES Staff(StaffID),
     
     -- Ensure one record per date/department/branch combination
     UNIQUE(MetricDate, DepartmentID, BranchID)
@@ -9539,13 +9555,13 @@ CREATE TABLE RequestSummaryAlerts (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     CreatedBy INT,
     
-    FOREIGN KEY (TargetUserID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (TargetUserID) REFERENCES Staff(StaffID),
     FOREIGN KEY (TargetDepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (RelatedRequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (ReadBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (DismissedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ResolvedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ReadBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (DismissedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ResolvedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestSummaryUserPreferences - Tùy chọn người dùng cho dashboard
@@ -9583,7 +9599,7 @@ CREATE TABLE RequestSummaryUserPreferences (
     
     LastUpdated DATETIME2 DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (UserID) REFERENCES Staff(StaffID),
     FOREIGN KEY (DefaultViewID) REFERENCES RequestSummaryViews(ViewID),
     
     -- One preference record per user
@@ -9631,9 +9647,9 @@ CREATE TABLE RequestAppraisalComments (
     
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (AppraisalStepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (FollowUpWith) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (FollowUpWith) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
