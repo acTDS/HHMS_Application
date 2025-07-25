@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HHMS WindowsForms Application Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .window-frame {
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background: #f9fafb;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            position: relative;
+        }
+        .title-bar {
+            background: linear-gradient(to right, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .close { background: #ef4444; }
+        .minimize { background: #f59e0b; }
+        .maximize { background: #10b981; }
+        .webview-content {
+            border: 1px solid #e5e7eb;
+            border-radius: 0 0 6px 6px;
+            background: white;
+            min-height: 400px;
+            position: relative;
+        }
+        .resize-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(-45deg, transparent 30%, #9ca3af 30%, #9ca3af 35%, transparent 35%, transparent 65%, #9ca3af 65%, #9ca3af 70%, transparent 70%);
+            cursor: se-resize;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+            HHMS Application - WindowsForms with WebView2 Demo
+        </h1>
+        
+        <!-- Main Navigation Window -->
+        <div class="window-frame">
+            <div class="title-bar">
+                <span>HHMS Application - Trung Tâm Ngoại Ngữ 68</span>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <div class="control-btn close"></div>
+                </div>
+            </div>
+            <div class="webview-content p-6">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">
+                    HHMS - Hệ thống Quản lý Trung Tâm Ngoại Ngữ 68
+                </h2>
+                <p class="text-gray-600 mb-6">Chọn chức năng bạn muốn sử dụng:</p>
+                
+                <div class="grid grid-cols-4 gap-4">
+                    <button onclick="openWindow('login')" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Đăng nhập
+                    </button>
+                    <button onclick="openWindow('dashboard')" class="bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Bảng điều khiển
+                    </button>
+                    <button onclick="openWindow('account')" class="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Quản lý Tài khoản
+                    </button>
+                    <button onclick="openWindow('branch')" class="bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Chi nhánh
+                    </button>
+                    <button onclick="openWindow('password')" class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Đổi mật khẩu
+                    </button>
+                    <button onclick="openWindow('class')" class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Lớp học
+                    </button>
+                    <button onclick="openWindow('department')" class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Phòng ban
+                    </button>
+                    <button onclick="openWindow('documents')" class="bg-cyan-500 hover:bg-cyan-600 text-white p-3 rounded-lg font-medium transition-colors">
+                        Tài liệu
+                    </button>
+                </div>
+            </div>
+            <div class="resize-indicator"></div>
+        </div>
+
+        <!-- Example Login Window -->
+        <div id="login-window" class="window-frame hidden">
+            <div class="title-bar">
+                <span>Đăng nhập - Trung Tâm Ngoại Ngữ 68</span>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <div class="control-btn close" onclick="closeWindow('login')"></div>
+                </div>
+            </div>
+            <div class="webview-content">
+                <iframe src="UI/Login.html" class="w-full h-96 border-0 rounded-b-lg"></iframe>
+            </div>
+            <div class="resize-indicator"></div>
+        </div>
+
+        <!-- Example Dashboard Window -->
+        <div id="dashboard-window" class="window-frame hidden">
+            <div class="title-bar">
+                <span>Bảng Điều Khiển - Trung Tâm Ngoại Ngữ 68</span>
+                <div class="window-controls">
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                    <div class="control-btn close" onclick="closeWindow('dashboard')"></div>
+                </div>
+            </div>
+            <div class="webview-content">
+                <iframe src="UI/DashBoard.html" class="w-full h-96 border-0 rounded-b-lg"></iframe>
+            </div>
+            <div class="resize-indicator"></div>
+        </div>
+
+        <!-- Features List -->
+        <div class="mt-8 bg-white rounded-lg p-6 border border-gray-200">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Tính năng chính:</h3>
+            <ul class="space-y-2 text-gray-600">
+                <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> 23 Form riêng biệt cho từng chức năng</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> WebView2 integration cho hiển thị HTML</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Tự động căn chỉnh kích thước theo form</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Navigation form chính để mở các chức năng</li>
+                <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Responsive design cho các kích thước màn hình khác nhau</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function openWindow(type) {
+            const windowMap = {
+                'login': 'login-window',
+                'dashboard': 'dashboard-window'
+            };
+            
+            const windowId = windowMap[type];
+            if (windowId) {
+                document.getElementById(windowId).classList.remove('hidden');
+            } else {
+                alert(`Mở form ${type} - Tính năng sẽ được implement trong ứng dụng thực tế`);
+            }
+        }
+        
+        function closeWindow(type) {
+            const windowMap = {
+                'login': 'login-window',
+                'dashboard': 'dashboard-window'
+            };
+            
+            const windowId = windowMap[type];
+            if (windowId) {
+                document.getElementById(windowId).classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
