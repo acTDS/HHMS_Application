@@ -1,6 +1,5 @@
 
 CREATE DATABASE HHMS_NgoaiNgu68;
-END
 GO
 
 USE HHMS_NgoaiNgu68;
@@ -57,14 +56,31 @@ CREATE TABLE Department (
     DepartmentCode NVARCHAR(20) UNIQUE NOT NULL,
     DepartmentName NVARCHAR(255) NOT NULL,
     Description NVARCHAR(500),
-    ManagerStaffName NVARCHAR(255),
+    ManagerStaffName NVARCHAR(255), -- Legacy field, will be replaced by ManagerEmployeeId
+    ManagerEmployeeId INT, -- Reference to actual Staff record
     StaffQuota INT DEFAULT 0,
+    CurrentStaffCount INT DEFAULT 0,
     BranchID INT,
+    ParentDepartmentID INT NULL, -- For hierarchical structure
+    DepartmentLevel INT DEFAULT 1, -- 1=main dept, 2=sub-dept, 3=team
+    EstablishedDate DATE,
+    Budget DECIMAL(15,2) DEFAULT 0,
+    ContactPhone NVARCHAR(20),
+    ContactEmail NVARCHAR(255),
+    OfficeLocation NVARCHAR(500),
+    Responsibilities NVARCHAR(MAX), -- JSON format for detailed responsibilities
+    KPITargets NVARCHAR(MAX), -- JSON format for KPI targets
     StatusID INT DEFAULT 1,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     LastModified DATETIME2 DEFAULT GETDATE(),
+    CreatedBy INT,
+    ModifiedBy INT,
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
-    FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID)
+    FOREIGN KEY (ParentDepartmentID) REFERENCES Department(DepartmentID),
+    FOREIGN KEY (ManagerEmployeeId) REFERENCES Staff(StaffID),
+    FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 INSERT INTO Department (DepartmentCode, DepartmentName, Description, ManagerStaffName, StaffQuota, BranchID) VALUES
@@ -115,10 +131,16 @@ CREATE TABLE Staff (
     Phone NVARCHAR(20),
     Email NVARCHAR(255) UNIQUE,
     ContractType NVARCHAR(50), -- 'Full-time', 'Part-time', 'Contract'
+    ContractCode NVARCHAR(50), -- Contract code/number
     Position NVARCHAR(100),
+    Education NVARCHAR(200), -- Degree/Education level
     BranchID INT,
     DepartmentID INT,
     HireDate DATE DEFAULT GETDATE(),
+    SocialInsuranceNumber NVARCHAR(50), -- Social insurance number
+    TaxCode NVARCHAR(50), -- Tax identification number
+    BankBranch NVARCHAR(200), -- Bank branch name
+    BankAccountNumber NVARCHAR(50), -- Bank account number
     BaseSalary DECIMAL(19,2) DEFAULT 0,
     StatusID INT DEFAULT 1,
     AvatarPath NVARCHAR(500),
@@ -129,11 +151,11 @@ CREATE TABLE Staff (
     FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID)
 );
 
-INSERT INTO Staff (StaffCode, FullName, Gender, IDNumber, Email, Position, BranchID, DepartmentID, BaseSalary) VALUES
-('ST001', 'Nguyễn Văn Admin', 'Nam', '123456789012', 'admin@nn68.edu.vn', 'Quản trị hệ thống', 1, 4, 15000000),
-('ST002', 'Trần Thị Manager', 'Nữ', '123456789013', 'manager@nn68.edu.vn', 'Trưởng phòng Giáo vụ', 1, 2, 12000000),
-('ST003', 'Lê Hoàng Teacher', 'Nam', '123456789014', 'teacher@nn68.edu.vn', 'Giảng viên', 1, 2, 8000000),
-('ST004', 'Phạm Thị Staff', 'Nữ', '123456789015', 'staff@nn68.edu.vn', 'Nhân viên tư vấn', 1, 5, 7000000);
+INSERT INTO Staff (StaffCode, FullName, Gender, IDNumber, Email, Position, Education, ContractType, ContractCode, BranchID, DepartmentID, BaseSalary, SocialInsuranceNumber, TaxCode, BankBranch, BankAccountNumber) VALUES
+('ST001', 'Nguyễn Văn Admin', 'Nam', '123456789012', 'admin@nn68.edu.vn', 'Quản trị hệ thống', 'Cử nhân Công nghệ thông tin', 'Full-time', 'HĐ2020-001', 1, 4, 15000000, 'XH123456789', 'MST001234567', 'Vietcombank - Chi nhánh Hà Nội', '1234567890123'),
+('ST002', 'Trần Thị Manager', 'Nữ', '123456789013', 'manager@nn68.edu.vn', 'Trưởng phòng Giáo vụ', 'Thạc sĩ Giáo dục học', 'Full-time', 'HĐ2019-015', 1, 2, 12000000, 'XH123456790', 'MST001234568', 'Techcombank - Chi nhánh Hà Nội', '1234567890124'),
+('ST003', 'Lê Hoàng Teacher', 'Nam', '123456789014', 'teacher@nn68.edu.vn', 'Giảng viên', 'Cử nhân Ngôn ngữ Anh', 'Full-time', 'HĐ2021-032', 1, 2, 8000000, 'XH123456791', 'MST001234569', 'BIDV - Chi nhánh Hà Nội', '1234567890125'),
+('ST004', 'Phạm Thị Staff', 'Nữ', '123456789015', 'staff@nn68.edu.vn', 'Nhân viên tư vấn', 'Cử nhân Kinh tế', 'Part-time', 'HĐ2022-018', 1, 5, 7000000, 'XH123456792', 'MST001234570', 'ACB - Chi nhánh Hà Nội', '1234567890126');
 
 -- Bảng tài khoản đăng nhập
 CREATE TABLE Account (
@@ -533,7 +555,20 @@ INSERT INTO SystemConfig (ConfigKey, ConfigValue, DataType, Category, Descriptio
 -- Indexes cho performance
 CREATE INDEX IX_Staff_Email ON Staff(Email);
 CREATE INDEX IX_Staff_StaffCode ON Staff(StaffCode);
+CREATE INDEX IX_Staff_IDNumber ON Staff(IDNumber);
+CREATE INDEX IX_Staff_BranchID ON Staff(BranchID);
+CREATE INDEX IX_Staff_DepartmentID ON Staff(DepartmentID);
 CREATE INDEX IX_Account_Username ON Account(Username);
+CREATE INDEX IX_Student_StudentCode ON Student(StudentCode);
+CREATE INDEX IX_Student_IDNumber ON Student(IDNumber);
+CREATE INDEX IX_Student_BranchID ON Student(BranchID);
+CREATE INDEX IX_Student_AdvisorStaffID ON Student(AdvisorStaffID);
+CREATE INDEX IX_Class_ClassCode ON Class(ClassCode);
+CREATE INDEX IX_Class_BranchID ON Class(BranchID);
+CREATE INDEX IX_Class_MajorID ON Class(MajorID);
+CREATE INDEX IX_Class_MainTeacherID ON Class(MainTeacherID);
+CREATE INDEX IX_ClassEnrollment_StudentID ON ClassEnrollment(StudentID);
+CREATE INDEX IX_ClassEnrollment_ClassID ON ClassEnrollment(ClassID);
 CREATE INDEX IX_Notification_CreatedDate ON Notification(CreatedDate);
 CREATE INDEX IX_ActivityLog_ActivityDate ON ActivityLog(ActivityDate);
 CREATE INDEX IX_ActivityLog_StaffID ON ActivityLog(StaffID);
@@ -567,6 +602,101 @@ FROM DashboardMetric dm
 INNER JOIN MetricType mt ON dm.MetricTypeID = mt.MetricTypeID
 INNER JOIN Branch b ON dm.BranchID = b.BranchID
 WHERE mt.IsActive = 1;
+
+-- View for comprehensive staff listing (for StaffList.html)
+CREATE VIEW vw_StaffList AS
+SELECT 
+    s.StaffID,
+    s.StaffCode,
+    s.FullName,
+    s.Gender,
+    s.IDNumber,
+    s.BirthDate,
+    s.StaffAddress,
+    s.Phone,
+    s.Email,
+    s.Education,
+    s.ContractType,
+    s.ContractCode,
+    s.Position,
+    s.HireDate,
+    s.SocialInsuranceNumber,
+    s.TaxCode,
+    s.BankBranch,
+    s.BankAccountNumber,
+    b.BranchName,
+    d.DepartmentName,
+    gs.StatusName AS Status,
+    s.BaseSalary,
+    s.CreatedDate
+FROM Staff s
+LEFT JOIN Branch b ON s.BranchID = b.BranchID
+LEFT JOIN Department d ON s.DepartmentID = d.DepartmentID
+LEFT JOIN GeneralStatus gs ON s.StatusID = gs.StatusID;
+
+-- View for comprehensive student listing (for StudentList.html)
+CREATE VIEW vw_StudentList AS
+SELECT 
+    st.StudentID,
+    st.StudentCode,
+    st.FullName,
+    st.Gender,
+    st.IDNumber,
+    st.DateOfBirth,
+    st.Address,
+    st.Phone,
+    st.Email,
+    st.EntryLevel,
+    b.BranchName,
+    advisor.FullName AS AdvisorName,
+    -- Get current class enrollment
+    (SELECT TOP 1 c.ClassName 
+     FROM ClassEnrollment ce 
+     INNER JOIN Class c ON ce.ClassID = c.ClassID 
+     WHERE ce.StudentID = st.StudentID AND ce.StatusID = 1 
+     ORDER BY ce.EnrollmentDate DESC) AS CurrentClass,
+    gs.StatusName AS Status,
+    st.EnrollmentDate,
+    st.CreatedDate
+FROM Student st
+LEFT JOIN Branch b ON st.BranchID = b.BranchID
+LEFT JOIN Staff advisor ON st.AdvisorStaffID = advisor.StaffID
+LEFT JOIN GeneralStatus gs ON st.StatusID = gs.StatusID;
+
+-- View for comprehensive class listing (for ClassList.html)
+CREATE VIEW vw_ClassList AS
+SELECT 
+    c.ClassID,
+    c.ClassCode,
+    c.ClassName,
+    c.Room,
+    c.MaxCapacity,
+    c.CurrentEnrollment,
+    c.StartDate,
+    c.ExpectedEndDate,
+    c.ActualEndDate,
+    c.Schedule,
+    b.BranchName,
+    m.MajorName,
+    mainTeacher.FullName AS MainTeacherName,
+    assistantTeacher.FullName AS AssistantTeacherName,
+    gs.StatusName AS Status,
+    CASE 
+        WHEN c.CurrentEnrollment >= c.MaxCapacity THEN 'Full'
+        WHEN c.CurrentEnrollment >= (c.MaxCapacity * 0.8) THEN 'Almost Full'
+        ELSE 'Available'
+    END AS EnrollmentStatus,
+    CASE 
+        WHEN c.CurrentEnrollment > 0 THEN (c.CurrentEnrollment * 100.0 / c.MaxCapacity)
+        ELSE 0
+    END AS EnrollmentPercentage,
+    c.CreatedDate
+FROM Class c
+LEFT JOIN Branch b ON c.BranchID = b.BranchID
+LEFT JOIN Major m ON c.MajorID = m.MajorID
+LEFT JOIN Staff mainTeacher ON c.MainTeacherID = mainTeacher.StaffID
+LEFT JOIN Staff assistantTeacher ON c.AssistantTeacherID = assistantTeacher.StaffID
+LEFT JOIN GeneralStatus gs ON c.StatusID = gs.StatusID;
 
 -- View cho user permissions
 CREATE VIEW vw_UserPermissions AS
@@ -667,6 +797,187 @@ BEGIN
     AND n.StatusID = 1
     AND (n.ExpiryDate IS NULL OR n.ExpiryDate > GETDATE())
     ORDER BY n.CreatedDate DESC;
+END;
+
+-- Procedure để lấy danh sách nhân viên cho StaffList.html
+CREATE PROCEDURE sp_GetStaffList
+    @SearchTerm NVARCHAR(255) = NULL,
+    @BranchID INT = NULL,
+    @DepartmentID INT = NULL,
+    @StatusID INT = NULL,
+    @PageNumber INT = 1,
+    @PageSize INT = 50
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    SELECT 
+        StaffID,
+        StaffCode,
+        FullName,
+        Gender,
+        IDNumber,
+        BirthDate,
+        StaffAddress,
+        Phone,
+        Email,
+        Education,
+        ContractType,
+        ContractCode,
+        Position,
+        HireDate,
+        SocialInsuranceNumber,
+        TaxCode,
+        BankBranch,
+        BankAccountNumber,
+        BranchName,
+        DepartmentName,
+        Status,
+        BaseSalary
+    FROM vw_StaffList
+    WHERE (@SearchTerm IS NULL OR 
+           StaffCode LIKE '%' + @SearchTerm + '%' OR
+           FullName LIKE '%' + @SearchTerm + '%' OR
+           Email LIKE '%' + @SearchTerm + '%' OR
+           Phone LIKE '%' + @SearchTerm + '%' OR
+           IDNumber LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE BranchID = @BranchID))
+    AND (@DepartmentID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE DepartmentID = @DepartmentID))
+    AND (@StatusID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE StatusID = @StatusID))
+    ORDER BY StaffCode
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+    
+    -- Return total count for pagination
+    SELECT COUNT(*) AS TotalCount
+    FROM vw_StaffList
+    WHERE (@SearchTerm IS NULL OR 
+           StaffCode LIKE '%' + @SearchTerm + '%' OR
+           FullName LIKE '%' + @SearchTerm + '%' OR
+           Email LIKE '%' + @SearchTerm + '%' OR
+           Phone LIKE '%' + @SearchTerm + '%' OR
+           IDNumber LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE BranchID = @BranchID))
+    AND (@DepartmentID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE DepartmentID = @DepartmentID))
+    AND (@StatusID IS NULL OR StaffID IN (SELECT StaffID FROM Staff WHERE StatusID = @StatusID));
+END;
+
+-- Procedure để lấy danh sách học viên cho StudentList.html
+CREATE PROCEDURE sp_GetStudentList
+    @SearchTerm NVARCHAR(255) = NULL,
+    @BranchID INT = NULL,
+    @AdvisorStaffID INT = NULL,
+    @StatusID INT = NULL,
+    @PageNumber INT = 1,
+    @PageSize INT = 50
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    SELECT 
+        StudentID,
+        StudentCode,
+        FullName,
+        Gender,
+        IDNumber,
+        DateOfBirth,
+        Address,
+        Phone,
+        Email,
+        EntryLevel,
+        BranchName,
+        AdvisorName,
+        CurrentClass,
+        Status,
+        EnrollmentDate
+    FROM vw_StudentList
+    WHERE (@SearchTerm IS NULL OR 
+           StudentCode LIKE '%' + @SearchTerm + '%' OR
+           FullName LIKE '%' + @SearchTerm + '%' OR
+           Email LIKE '%' + @SearchTerm + '%' OR
+           Phone LIKE '%' + @SearchTerm + '%' OR
+           IDNumber LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE BranchID = @BranchID))
+    AND (@AdvisorStaffID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE AdvisorStaffID = @AdvisorStaffID))
+    AND (@StatusID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE StatusID = @StatusID))
+    ORDER BY StudentCode
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+    
+    -- Return total count for pagination
+    SELECT COUNT(*) AS TotalCount
+    FROM vw_StudentList
+    WHERE (@SearchTerm IS NULL OR 
+           StudentCode LIKE '%' + @SearchTerm + '%' OR
+           FullName LIKE '%' + @SearchTerm + '%' OR
+           Email LIKE '%' + @SearchTerm + '%' OR
+           Phone LIKE '%' + @SearchTerm + '%' OR
+           IDNumber LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE BranchID = @BranchID))
+    AND (@AdvisorStaffID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE AdvisorStaffID = @AdvisorStaffID))
+    AND (@StatusID IS NULL OR StudentID IN (SELECT StudentID FROM Student WHERE StatusID = @StatusID));
+END;
+
+-- Procedure để lấy danh sách lớp học cho ClassList.html
+CREATE PROCEDURE sp_GetClassList
+    @SearchTerm NVARCHAR(255) = NULL,
+    @BranchID INT = NULL,
+    @MajorID INT = NULL,
+    @StatusID INT = NULL,
+    @PageNumber INT = 1,
+    @PageSize INT = 50
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    SELECT 
+        ClassID,
+        ClassCode,
+        ClassName,
+        Room,
+        MaxCapacity,
+        CurrentEnrollment,
+        StartDate,
+        ExpectedEndDate,
+        ActualEndDate,
+        Schedule,
+        BranchName,
+        MajorName,
+        MainTeacherName,
+        AssistantTeacherName,
+        Status,
+        EnrollmentStatus,
+        EnrollmentPercentage
+    FROM vw_ClassList
+    WHERE (@SearchTerm IS NULL OR 
+           ClassCode LIKE '%' + @SearchTerm + '%' OR
+           ClassName LIKE '%' + @SearchTerm + '%' OR
+           MainTeacherName LIKE '%' + @SearchTerm + '%' OR
+           AssistantTeacherName LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE BranchID = @BranchID))
+    AND (@MajorID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE MajorID = @MajorID))
+    AND (@StatusID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE StatusID = @StatusID))
+    ORDER BY ClassCode
+    OFFSET @Offset ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+    
+    -- Return total count for pagination
+    SELECT COUNT(*) AS TotalCount
+    FROM vw_ClassList
+    WHERE (@SearchTerm IS NULL OR 
+           ClassCode LIKE '%' + @SearchTerm + '%' OR
+           ClassName LIKE '%' + @SearchTerm + '%' OR
+           MainTeacherName LIKE '%' + @SearchTerm + '%' OR
+           AssistantTeacherName LIKE '%' + @SearchTerm + '%')
+    AND (@BranchID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE BranchID = @BranchID))
+    AND (@MajorID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE MajorID = @MajorID))
+    AND (@StatusID IS NULL OR ClassID IN (SELECT ClassID FROM Class WHERE StatusID = @StatusID));
 END;
 
 -- Procedure để lấy T-Codes theo user
@@ -1961,9 +2272,13 @@ CREATE TABLE Student (
     FullName NVARCHAR(255) NOT NULL,
     DateOfBirth DATE,
     Gender NVARCHAR(10), -- 'Male', 'Female', 'Other'
+    IDNumber NVARCHAR(50) UNIQUE, -- CMND/CCCD number
     Phone NVARCHAR(20),
     Email NVARCHAR(255),
     Address NVARCHAR(500),
+    BranchID INT, -- Branch where student is enrolled
+    AdvisorStaffID INT, -- Staff member who is the advisor
+    EntryLevel NVARCHAR(100), -- Entry level (Beginner, Intermediate, Advanced, etc.)
     ParentName NVARCHAR(255), -- Tên phụ huynh (nếu học viên nhỏ tuổi)
     ParentPhone NVARCHAR(20),
     ParentEmail NVARCHAR(255),
@@ -1974,6 +2289,8 @@ CREATE TABLE Student (
     CreatedBy INT,
     LastModified DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
+    FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
+    FOREIGN KEY (AdvisorStaffID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES GeneralStatus(StatusID),
     FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
@@ -2157,15 +2474,15 @@ INSERT INTO Major (MajorCode, MajorName, Description, CreatedBy) VALUES
 ('KIDS', 'English for Kids', 'Tiếng Anh cho trẻ em', 1);
 
 -- Thêm dữ liệu mẫu cho Students
-INSERT INTO Student (StudentCode, FullName, DateOfBirth, Gender, Phone, Email, Address, CreatedBy) VALUES
-('HV001', 'Nguyễn Văn An', '1995-03-15', 'Male', '0901234567', 'nguyenvanan@email.com', '123 Đường ABC, Quận 1, TP.HCM', 1),
-('HV002', 'Trần Thị Bình', '1997-07-22', 'Female', '0907654321', 'tranthibinh@email.com', '456 Đường DEF, Quận 3, TP.HCM', 1),
-('HV003', 'Lê Minh Cường', '1996-11-08', 'Male', '0909876543', 'leminhcuong@email.com', '789 Đường GHI, Quận 5, TP.HCM', 1),
-('HV004', 'Phạm Thị Dung', '1998-02-14', 'Female', '0903456789', 'phamthidung@email.com', '321 Đường JKL, Quận 7, TP.HCM', 1),
-('HV005', 'Hoàng Văn Em', '1994-09-30', 'Male', '0906789012', 'hoangvanem@email.com', '654 Đường MNO, Quận 10, TP.HCM', 1),
-('HV006', 'Vũ Thị Phương', '1999-05-18', 'Female', '0902345678', 'vuthiphuong@email.com', '987 Đường PQR, Quận Bình Thạnh, TP.HCM', 1),
-('HV007', 'Đỗ Minh Quang', '1995-12-03', 'Male', '0908901234', 'dominhquang@email.com', '147 Đường STU, Quận Tân Bình, TP.HCM', 1),
-('HV008', 'Ngô Thị Hoa', '1997-04-25', 'Female', '0905678901', 'ngothihoa@email.com', '258 Đường VWX, Quận Phú Nhuận, TP.HCM', 1);
+INSERT INTO Student (StudentCode, FullName, DateOfBirth, Gender, IDNumber, Phone, Email, Address, BranchID, AdvisorStaffID, EntryLevel, CreatedBy) VALUES
+('HV001', 'Nguyễn Văn An', '1995-03-15', 'Male', '123456789101', '0901234567', 'nguyenvanan@email.com', '123 Đường ABC, Quận 1, TP.HCM', 1, 4, 'Beginner', 1),
+('HV002', 'Trần Thị Bình', '1997-07-22', 'Female', '123456789102', '0907654321', 'tranthibinh@email.com', '456 Đường DEF, Quận 3, TP.HCM', 1, 4, 'Intermediate', 1),
+('HV003', 'Lê Minh Cường', '1996-11-08', 'Male', '123456789103', '0909876543', 'leminhcuong@email.com', '789 Đường GHI, Quận 5, TP.HCM', 1, 3, 'Advanced', 1),
+('HV004', 'Phạm Thị Dung', '1998-02-14', 'Female', '123456789104', '0903456789', 'phamthidung@email.com', '321 Đường JKL, Quận 7, TP.HCM', 1, 3, 'Beginner', 1),
+('HV005', 'Hoàng Văn Em', '1994-09-30', 'Male', '123456789105', '0906789012', 'hoangvanem@email.com', '654 Đường MNO, Quận 10, TP.HCM', 2, 2, 'Intermediate', 1),
+('HV006', 'Vũ Thị Phương', '1999-05-18', 'Female', '123456789106', '0902345678', 'vuthiphuong@email.com', '987 Đường PQR, Quận Bình Thạnh, TP.HCM', 2, 2, 'Advanced', 1),
+('HV007', 'Đỗ Minh Quang', '1995-12-03', 'Male', '123456789107', '0908901234', 'dominhquang@email.com', '147 Đường STU, Quận Tân Bình, TP.HCM', 2, 4, 'Beginner', 1),
+('HV008', 'Ngô Thị Hoa', '1997-04-25', 'Female', '123456789108', '0905678901', 'ngothihoa@email.com', '258 Đường VWX, Quận Phú Nhuận, TP.HCM', 1, 3, 'Intermediate', 1);
 
 -- Thêm dữ liệu mẫu cho Classes
 INSERT INTO Class (ClassCode, ClassName, CourseID, MajorID, BranchID, MainTeacherID, Room, MaxCapacity, StartDate, ExpectedEndDate, Schedule, CreatedBy) VALUES
@@ -6923,8 +7240,8 @@ CREATE TABLE MajorCategories (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Chuyên Ngành (Academic Majors)
@@ -6957,8 +7274,8 @@ CREATE TABLE Majors (
     UpdatedDate DATETIME2,
     FOREIGN KEY (CategoryId) REFERENCES MajorCategories(CategoryId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Môn Học trong Chuyên Ngành (Major Subjects)
@@ -6981,8 +7298,8 @@ CREATE TABLE MajorSubjects (
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId) ON DELETE CASCADE,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(MajorId, SubjectCode)
 );
 
@@ -7009,10 +7326,10 @@ CREATE TABLE MajorCurricula (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId),
-    FOREIGN KEY (ApprovedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (ApprovedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(MajorId, Version)
 );
 
@@ -7038,8 +7355,8 @@ CREATE TABLE CurriculumDetails (
     FOREIGN KEY (CurriculumId) REFERENCES MajorCurricula(CurriculumId) ON DELETE CASCADE,
     FOREIGN KEY (MajorSubjectId) REFERENCES MajorSubjects(MajorSubjectId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID),
     UNIQUE(CurriculumId, SessionOrder)
 );
 
@@ -7058,8 +7375,8 @@ CREATE TABLE MajorInstructorRequirements (
     UpdatedDate DATETIME2,
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId) ON DELETE CASCADE,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Thống Kê Chuyên Ngành (Major Statistics)
@@ -7078,7 +7395,7 @@ CREATE TABLE MajorStatistics (
     CreatedBy INT,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (MajorId) REFERENCES Majors(MajorId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     PRIMARY KEY (MajorId, YearMonth)
 );
 
@@ -7606,8 +7923,8 @@ CREATE TABLE ReportTypes (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Lịch Sử Tạo Báo Cáo (Report Generation History)
@@ -7632,7 +7949,7 @@ CREATE TABLE ReportGenerationHistory (
     ExpiryDate DATETIME2, -- When file should be cleaned up
     GeneratedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (GeneratedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (GeneratedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Quyền Truy Cập Báo Cáo (Report Access Permissions)
@@ -7651,7 +7968,7 @@ CREATE TABLE ReportAccessPermissions (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     UNIQUE(ReportTypeId, PermissionModule, AccessLevel)
 );
 
@@ -7677,8 +7994,8 @@ CREATE TABLE DataExportDefinitions (
     UpdatedBy INT,
     UpdatedDate DATETIME2,
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
-    FOREIGN KEY (UpdatedBy) REFERENCES Employees(EmployeeId)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (UpdatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Bảng Lịch Hẹn Báo Cáo Tự Động (Scheduled Reports)
@@ -7704,7 +8021,7 @@ CREATE TABLE ScheduledReports (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     UpdatedDate DATETIME2,
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (CreatedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusId) REFERENCES Status(StatusId)
 );
 
@@ -7722,7 +8039,7 @@ CREATE TABLE ReportUsageAnalytics (
     PreferredFormat NVARCHAR(20),
     LastAccessTime DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (UserId) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (UserId) REFERENCES Staff(StaffID),
     PRIMARY KEY (ReportTypeId, UserId, AccessDate)
 );
 
@@ -7740,7 +8057,7 @@ CREATE TABLE ReportCache (
     CacheExpiry DATETIME2 NOT NULL,
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (ReportTypeId) REFERENCES ReportTypes(ReportTypeId),
-    FOREIGN KEY (GeneratedBy) REFERENCES Employees(EmployeeId),
+    FOREIGN KEY (GeneratedBy) REFERENCES Staff(StaffID),
     UNIQUE(ReportTypeId, CacheKey)
 );
 
@@ -8296,8 +8613,8 @@ CREATE TABLE RequestTypes (
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: Requests - Bảng chính lưu trữ yêu cầu
@@ -8336,16 +8653,16 @@ CREATE TABLE Requests (
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
-    FOREIGN KEY (RequestorID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (RequestorID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
     FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
     FOREIGN KEY (ClassID) REFERENCES Class(ClassID),
     FOREIGN KEY (MajorID) REFERENCES Major(MajorID),
     FOREIGN KEY (CurrentStatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (AssignedToID) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (AssignedToID) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestWorkflowSteps - Định nghĩa các bước trong quy trình phê duyệt
@@ -8369,7 +8686,7 @@ CREATE TABLE RequestWorkflowSteps (
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
     FOREIGN KEY (ResponsibleDepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestWorkflowHistory - Lịch sử di chuyển qua các bước
@@ -8390,7 +8707,7 @@ CREATE TABLE RequestWorkflowHistory (
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (StepID) REFERENCES RequestWorkflowSteps(StepID),
     FOREIGN KEY (FromStepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (ActionBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (ActionBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusBeforeAction) REFERENCES Status(StatusID),
     FOREIGN KEY (StatusAfterAction) REFERENCES Status(StatusID)
 );
@@ -8412,8 +8729,8 @@ CREATE TABLE RequestApprovals (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (StepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (ApproverID) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (DelegatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ApproverID) REFERENCES Staff(StaffID),
+    FOREIGN KEY (DelegatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestDocuments - Tài liệu đính kèm yêu cầu
@@ -8437,7 +8754,7 @@ CREATE TABLE RequestDocuments (
     Description NVARCHAR(MAX),
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (UploadedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (UploadedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8460,8 +8777,8 @@ CREATE TABLE RequestComments (
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (ParentCommentID) REFERENCES RequestComments(CommentID),
-    FOREIGN KEY (CommentBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (EditedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CommentBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (EditedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8486,7 +8803,7 @@ CREATE TABLE RequestNotifications (
     ActionUrl NVARCHAR(500), -- Deep link to specific action
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (RecipientID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (RecipientID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -8505,8 +8822,8 @@ CREATE TABLE RequestTemplates (
     ModifiedBy INT,
     StatusID INT DEFAULT 1,
     FOREIGN KEY (RequestTypeID) REFERENCES RequestTypes(RequestTypeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
@@ -9422,10 +9739,10 @@ CREATE TABLE RequestSummaryViews (
     CreatedBy INT,
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
-    FOREIGN KEY (OwnerID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (OwnerID) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestSummaryFilters - Lưu trữ bộ lọc được lưu
@@ -9443,9 +9760,9 @@ CREATE TABLE RequestSummaryFilters (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedDate DATETIME2 DEFAULT GETDATE(),
     ModifiedBy INT,
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestDashboardMetrics - Metrics cho dashboard
@@ -9492,7 +9809,7 @@ CREATE TABLE RequestDashboardMetrics (
     
     FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (BranchID) REFERENCES Branch(BranchID),
-    FOREIGN KEY (CalculatedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (CalculatedBy) REFERENCES Staff(StaffID),
     
     -- Ensure one record per date/department/branch combination
     UNIQUE(MetricDate, DepartmentID, BranchID)
@@ -9539,13 +9856,13 @@ CREATE TABLE RequestSummaryAlerts (
     CreatedDate DATETIME2 DEFAULT GETDATE(),
     CreatedBy INT,
     
-    FOREIGN KEY (TargetUserID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (TargetUserID) REFERENCES Staff(StaffID),
     FOREIGN KEY (TargetDepartmentID) REFERENCES Department(DepartmentID),
     FOREIGN KEY (RelatedRequestID) REFERENCES Requests(RequestID),
-    FOREIGN KEY (ReadBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (DismissedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ResolvedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID)
+    FOREIGN KEY (ReadBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (DismissedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ResolvedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID)
 );
 
 -- Table: RequestSummaryUserPreferences - Tùy chọn người dùng cho dashboard
@@ -9583,7 +9900,7 @@ CREATE TABLE RequestSummaryUserPreferences (
     
     LastUpdated DATETIME2 DEFAULT GETDATE(),
     
-    FOREIGN KEY (UserID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (UserID) REFERENCES Staff(StaffID),
     FOREIGN KEY (DefaultViewID) REFERENCES RequestSummaryViews(ViewID),
     
     -- One preference record per user
@@ -9631,9 +9948,9 @@ CREATE TABLE RequestAppraisalComments (
     
     FOREIGN KEY (RequestID) REFERENCES Requests(RequestID),
     FOREIGN KEY (AppraisalStepID) REFERENCES RequestWorkflowSteps(StepID),
-    FOREIGN KEY (FollowUpWith) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-    FOREIGN KEY (ModifiedBy) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (FollowUpWith) REFERENCES Staff(StaffID),
+    FOREIGN KEY (CreatedBy) REFERENCES Staff(StaffID),
+    FOREIGN KEY (ModifiedBy) REFERENCES Staff(StaffID),
     FOREIGN KEY (StatusID) REFERENCES Status(StatusID)
 );
 
