@@ -1,0 +1,3285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tổng Hợp - Trung Tâm Ngoại Ngữ 68</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Liên kết Font Awesome để sử dụng các biểu tượng (đã thay đổi để dùng CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Thiết lập font và màu nền chung */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Màu nền nhẹ nhàng hơn */
+            color: #333333; /* Màu chữ mặc định */
+            display: flex;
+            flex-direction: column; /* Đảm bảo nội dung chính xếp chồng dọc */
+        }
+
+        /* Khu vực nội dung chính */
+        .main-content {
+            flex-grow: 1; /* Cho phép mở rộng để lấp đầy không gian còn lại */
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* Nền trắng cho nội dung chính đồng bộ */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ nhàng đồng bộ */
+            border-radius: 0; /* Loại bỏ bo góc để lấp đầy trang */
+            width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+            max-width: none; /* Loại bỏ giới hạn chiều rộng tối đa */
+            margin: 0; /* Loại bỏ margin tự động */
+            overflow-y: auto; /* Cho phép cuộn nếu nội dung form tràn */
+        }
+
+        /* Tiêu đề (Header) */
+        .header {
+            background-color: #2d3748;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 0; /* Loại bỏ bo góc để lấp đầy trang */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 30px; /* Tăng khoảng cách giữa logo và tiêu đề */
+            flex-grow: 1; /* Cho phép phần tử này mở rộng để lấp đầy không gian */
+            justify-content: flex-start; /* Giữ nội dung căn trái */
+        }
+
+        .header-logo img {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .header-date {
+            font-size: 1rem;
+            color: #a0aec0;
+            white-space: nowrap;
+            margin-right: 20px; /* Khoảng cách giữa ngày tháng và icon */
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-icons {
+            position: relative; /* Thêm position relative để dropdown thông báo căn chỉnh theo */
+        }
+
+        .header-icons svg {
+            width: 24px;
+            height: 24px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .header-icons svg:hover {
+            color: #ffffff;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px; /* Adjust as needed */
+            right: -5px; /* Adjust as needed */
+            background-color: #f00; /* Red color */
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            min-width: 18px; /* Ensure it's round for single digits */
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            display: none; /* Hidden by default, show with JS if count > 0 */
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Distance from notification icon */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 280px; /* Slightly wider */
+            max-height: 300px; /* Height limit */
+            overflow-y: auto; /* Add scrollbar if too long */
+            display: none;
+            flex-direction: column;
+            padding: 0; /* Changed to 0, inner elements will have padding */
+            margin-top: 5px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .notification-dropdown.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Notification Dropdown Header */
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #4a5568; /* Slightly lighter background for header */
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #667eea;
+        }
+
+        .notification-dropdown-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .notification-dropdown-header button {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .notification-dropdown-header button:hover {
+            color: #ffffff;
+        }
+
+        /* Notification List */
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notification-list li {
+            padding: 10px 15px;
+            color: #e2e8f0;
+            border-bottom: 1px solid #4a5568;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .notification-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notification-list li:hover {
+            background-color: #4a5568;
+        }
+
+        .notification-list li strong {
+            color: #ffffff;
+        }
+
+        .notification-list li .time {
+            display: block;
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 2px;
+        }
+
+        .notification-dropdown .no-notifications {
+            padding: 10px 15px;
+            color: #a0aec0;
+            text-align: center;
+            font-style: italic;
+            display: none; /* Hidden by default, shown by JS */
+        }
+
+        /* Thông tin người dùng và dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .user-info img {
+            width: 36px; /* Kích thước avatar lớn hơn một chút */
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4299e1; /* Viền xanh nổi bật */
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Căn trái thông tin người dùng */
+            white-space: nowrap;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .user-details .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details .user-title {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Khoảng cách với user-info */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 160px; /* Rộng hơn một chút */
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .user-dropdown.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .user-dropdown button {
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border-radius: 0;
+            font-size: 0.95rem;
+        }
+
+        .user-dropdown button:hover {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+
+        /* Nội dung chính của Dashboard (sẽ chứa bảng phân quyền) */
+        .dashboard-body {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #ffffff; /* Nền trắng cho phần body */
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem; /* Tiêu đề lớn hơn */
+            font-weight: 700;
+            color: #2c3e50; /* Màu đen đậm hơn */
+            margin-bottom: 30px;
+            text-align: center; /* Căn giữa tiêu đề */
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db; /* Đường kẻ dưới nổi bật hơn */
+        }
+
+        /* Phần bảng phân quyền */
+        .permission-table-section, .account-table-section {
+            background-color: #fdfdfd; /* Nền gần trắng đồng bộ */
+            padding: 25px; /* Tăng padding đồng bộ */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); /* Đổ bóng nhẹ hơn */
+            border: 1px solid #e0e0e0; /* Viền sáng hơn đồng bộ */
+            margin-bottom: 40px; /* Add space between sections */
+        }
+
+        .permission-table-section h2, .account-table-section h2 {
+            color: #2c3e50; /* Màu chữ ĐEN đồng bộ */
+            margin-bottom: 25px; /* Tăng margin-bottom đồng bộ */
+            font-size: 1.8em;
+            text-align: center;
+            border-bottom: 2px solid #f39c12;
+            padding-bottom: 12px; /* Tăng padding-bottom đồng bộ */
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: flex-end; /* Đẩy thanh tìm kiếm sang phải */
+            align-items: center; /* Align items vertically */
+            margin-bottom: 25px; /* Tăng margin-bottom đồng bộ */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 15px; /* Space between controls */
+        }
+
+        .table-controls.justify-between {
+            justify-content: space-between; /* For system definitions table */
+        }
+
+        /* Nút thêm mới */
+        .add-button, .secondary-button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .secondary-button {
+            background-color: #3498db; /* Blue for secondary actions */
+        }
+
+        .add-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        .secondary-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .add-button svg, .secondary-button svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .search-bar {
+            flex-grow: 1; /* Cho phép thanh tìm kiếm mở rộng */
+            max-width: 450px; /* Giới hạn chiều rộng tối đa */
+        }
+
+        .search-bar input[type="text"] {
+            width: 100%;
+            padding: 12px 15px; /* Tăng padding đồng bộ */
+            border: 1px solid #ced4da; /* Viền sáng hơn đồng bộ */
+            border-radius: 8px; /* Bo góc đồng bộ */
+            background-color: #f8f9fa; /* Nền input RẤT NHẠT đồng bộ */
+            color: #495057; /* Chữ input ĐEN đồng bộ */
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-bar input[type="text"]:focus {
+            border-color: #007bff; /* Màu focus đồng bộ */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Box-shadow focus đồng bộ */
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 50vh; /* Giảm max-height để giảm khe hở khi ít dữ liệu */
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .permission-table, .data-table, .account-table, #rolesTable {
+            width: 100%;
+            border-collapse: collapse; /* Đảm bảo các đường viền liền mạch */
+            /* min-width: 1200px; */ /* Bỏ min-width để bảng co giãn linh hoạt hơn */
+        }
+
+        .permission-table th, .permission-table td,
+        .data-table th, .data-table td,
+        .account-table th, .account-table td,
+        #rolesTable th, #rolesTable td {
+            padding: 15px 20px; /* Tăng padding để ô lớn hơn đồng bộ */
+            text-align: left;
+            /* Kẻ ô cẩn thận hơn đồng bộ */
+            color: #343a40; /* Màu chữ ĐEN đồng bộ */
+            white-space: nowrap;
+            font-size: 0.95em; /* Tăng nhẹ kích thước font đồng bộ */
+            border: 1px solid #dee2e6; /* Consistent border for all cells */
+        }
+
+
+        .permission-table th, .data-table th, .account-table th, #rolesTable th {
+            background-color: #e9ecef;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center; /* Căn giữa tiêu đề cột */
+            /* border: 1px solid #b0b0b0; */ /* Changed border color for th elements */
+        }
+
+        .permission-table tbody tr:nth-child(even),
+        .data-table tbody tr:nth-child(even),
+        .account-table tbody tr:nth-child(even),
+        #rolesTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .permission-table tbody tr:hover,
+        .data-table tbody tr:hover,
+        .account-table tbody tr:hover,
+        #rolesTable tbody tr:hover {
+            background-color: #e2f0fe;
+            cursor: pointer;
+        }
+
+        .permission-table .actions button,
+        .data-table .actions button,
+        .account-table .actions button,
+        #rolesTable .actions button {
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s;
+            margin-right: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .permission-table .actions .edit-btn,
+        .data-table .actions .edit-btn,
+        .account-table .actions .edit-btn,
+        #rolesTable .actions .edit-btn { background-color: #007bff; }
+        .permission-table .actions .edit-btn:hover,
+        .data-table .actions .edit-btn:hover,
+        .account-table .actions .edit-btn:hover,
+        #rolesTable .actions .edit-btn:hover { background-color: #0056b3; transform: translateY(-1px); }
+
+        .data-table .actions .delete-btn,
+        .account-table .actions .delete-btn,
+        #rolesTable .actions .delete-btn { background-color: #dc3545; }
+        .data-table .actions .delete-btn:hover,
+        .account-table .actions .delete-btn:hover,
+        #rolesTable .actions .delete-btn:hover { background-color: #c82333; transform: translateY(-1px); }
+
+        /* Checkbox style */
+        .permission-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #007bff;
+            cursor: pointer;
+        }
+
+        /* Icons in table cells */
+        .permission-icons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .permission-icons i {
+            font-size: 1.2em;
+            color: #28a745;
+            opacity: 0.7;
+        }
+
+        .permission-icons i.tcode-icon {
+            color: #e67e22; /* Màu cam cho T-Code */
+        }
+
+        .permission-icons i:hover {
+            opacity: 1;
+            color: #007bff;
+        }
+
+        .tcode-list {
+            list-style: none; /* Remove default list bullets */
+            padding: 0;
+            margin: 0;
+        }
+
+        .tcode-list li {
+            margin-bottom: 4px; /* Small space between items */
+            white-space: nowrap; /* Prevent wrapping for individual T-code */
+            color: #343a40; /* Ensure text color is consistent */
+        }
+
+        /* Modal cho chỉnh sửa phân quyền và thêm/chỉnh sửa quyền hệ thống */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 900px; /* Max width for employee permission modal */
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #333333;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal-content.small-modal { /* For system permission definition modal */
+            max-width: 600px;
+        }
+        #addEditAccountModal .modal-content {
+            max-width: 700px; /* Wider for account + permissions */
+        }
+        #manageRolesModal .modal-content {
+            max-width: 900px; /* Even wider for roles table */
+        }
+        #addEditRoleModal .modal-content {
+            max-width: 600px;
+        }
+
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default for employee permissions */
+            gap: 20px;
+        }
+
+        .form-grid.single-column { /* For system permission definition modal */
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content .form-group { margin-bottom: 0; }
+        .modal-content .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555555;
+            font-size: 0.95em;
+        }
+
+        .modal-content .form-group input,
+        .modal-content .form-group select {
+            width: 100%;
+            background-color: #fcfcfc;
+            color: #333333;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-content .form-group input:focus,
+        .modal-content .form-group select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .modal-content .form-group input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #666666;
+        }
+
+        .modal-content .form-group.hidden {
+            display: none;
+        }
+
+        .modal-content .form-group.checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .modal-content .form-group.checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: #007bff;
+        }
+
+        .permission-filter-controls { /* New container for filter inputs */
+            grid-column: 1 / -1; /* Span across both columns */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+            gap: 15px; /* Space between filter inputs */
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .permission-filter-controls input,
+        .permission-filter-controls select {
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #495057;
+            font-size: 0.95em;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .permission-filter-controls input:focus,
+        .permission-filter-controls select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .permission-checkbox-group {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .permission-checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+            color: #333333;
+        }
+
+        .permission-checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: #007bff;
+        }
+
+
+        .modal-content .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .modal-content .form-actions button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+        .modal-content .form-actions .submit-button { background-color: #28a745; color: white; }
+        .modal-content .form-actions .submit-button:hover { background-color: #218838; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .modal-content .form-actions .cancel-button { background-color: #6c757d; color: white; }
+        .modal-content .form-actions .cancel-button:hover { background-color: #5a6268; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: #888888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            color: #333333;
+        }
+
+        /* CSS cho Full-screen Loading Overlay */
+        .full-screen-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10003; /* Tăng z-index để nó nằm trên modal và confirmation */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .full-screen-loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .full-screen-spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #fff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom Message Box Overlay */
+        .custom-message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10002; /* Đảm bảo nó nằm trên các modal khác */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-message-box-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-message-box-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: #333333;
+        }
+
+        .custom-message-box-content p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .custom-message-box-content button {
+            background-color: #4299e1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .custom-message-box-content button:hover {
+            background-color: #3182ce;
+        }
+
+        /* Tab styles */
+        .tab-buttons {
+            display: flex;
+            justify-content: center; /* Center the tab buttons */
+            margin-bottom: 30px;
+            background-color: #e2e8f0; /* Light background for tab bar */
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #4a5568;
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1; /* Make buttons take equal space */
+            text-align: center;
+        }
+
+        .tab-button:hover {
+            background-color: #cbd5e0; /* Lighter hover background */
+            color: #2d3748;
+        }
+
+        .tab-button.active {
+            background-color: #4299e1; /* Active tab color */
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            transform: translateY(-2px); /* Slight lift for active tab */
+        }
+
+        .tab-button.active:hover {
+            background-color: #3182ce; /* Darker active hover */
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none; /* Hidden by default */
+        }
+
+        .tab-content.active {
+            display: block; /* Shown when active */
+        }
+
+        /* Permission specific styles */
+        .role-base-permissions-display {
+            background-color: #f0f4f8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #d9e2ec;
+        }
+        .role-base-permissions-display h4 {
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 5px;
+        }
+        .role-base-permissions-display ul {
+            list-style: disc;
+            padding-left: 20px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        .role-base-permissions-display ul li {
+            margin-bottom: 3px;
+        }
+
+        .permissions-checkbox-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+        }
+        .permissions-checkbox-list label {
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+            font-size: 0.95rem;
+            color: #333;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+        .permissions-checkbox-list input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+
+        /* Module-based permission display in table */
+        .module-permissions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px; /* Space between module groups */
+        }
+
+        .module-group {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between module name and icons */
+            padding: 4px 0;
+            border-bottom: 1px dashed #e0e0e0; /* Subtle separator */
+        }
+
+        .module-group:last-child {
+            border-bottom: none;
+        }
+
+        .module-name {
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 80px; /* Give module name some fixed width */
+            white-space: nowrap;
+        }
+
+        .permission-icons-group {
+            display: flex;
+            flex-wrap: wrap; /* Allow icons to wrap */
+            gap: 5px; /* Space between individual icons */
+        }
+
+        .permission-icon-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.85em;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .permission-icon-item i {
+            font-size: 1.1em;
+            color: #3498db; /* Default icon color */
+            opacity: 0.8;
+        }
+
+        .permission-icon-item i.tcode-icon {
+            color: #e67e22; /* T-Code specific color */
+        }
+
+        .permission-icon-item .indicator-plus {
+            color: #28a745; /* Green for added */
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        .permission-icon-item .indicator-minus {
+            color: #dc3545; /* Red for removed */
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+
+        /* Điều chỉnh responsive */
+        @media (max-width: 1024px) {
+            .header-date {
+                display: none;
+            }
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+            .permission-table-section h2, .account-table-section h2 {
+                font-size: 1.5em;
+            }
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-bar {
+                max-width: 100%;
+            }
+            .permission-table th, .permission-table td,
+            .data-table th, .data-table td,
+            .account-table th, .account-table td,
+            #rolesTable th, #rolesTable td {
+                padding: 12px 15px;
+            }
+            .modal-content {
+                max-width: 90%;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .permission-filter-controls {
+                grid-template-columns: 1fr;
+            }
+            .permission-checkbox-group {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            /* Removed min-width for tables in media queries */
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .main-content {
+                padding: 20px;
+                border-radius: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .dashboard-body {
+                padding: 15px;
+            }
+
+            .dashboard-title {
+                font-size: 1.6rem;
+                margin-bottom: 20px;
+            }
+
+            .permission-table-section, .account-table-section {
+                padding: 15px;
+            }
+
+            .permission-table-section h2, .account-table-section h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+
+            /* Removed min-width for tables in media queries */
+
+            .permission-table th, .permission-table td,
+            .data-table th, .data-table td,
+            .account-table th, .account-table td,
+            #rolesTable th, #rolesTable td {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .permission-table .actions button,
+            .data-table .actions button,
+            .account-table .actions button,
+            #rolesTable .actions button {
+                padding: 6px 10px;
+                font-size: 0.8em;
+                margin-right: 3px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .permission-filter-controls {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .permission-checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-content .form-actions button {
+                width: 100%;
+            }
+
+            .modal-close-btn {
+                font-size: 1.3em;
+                top: 10px;
+                right: 10px;
+            }
+        </style>
+</head>
+<body>
+    <!-- Full-screen Loading Overlay -->
+    <div id="fullScreenLoadingOverlay" class="full-screen-loading-overlay">
+        <div class="full-screen-spinner"></div>
+    </div>
+
+    <!-- Custom Message Box Overlay for general messages -->
+    <div id="customMessageBoxOverlay" class="custom-message-box-overlay">
+        <div class="custom-message-box-content">
+            <p id="customMessageText"></p>
+            <button id="closeCustomMessageBox">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Box Overlay for delete -->
+    <div id="confirmationBoxOverlay" class="custom-message-box-overlay">
+        <div class="custom-message-box-content">
+            <p id="confirmationMessageText"></p>
+            <div class="flex justify-center gap-4 mt-4">
+                <button id="confirmActionButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">Xác nhận</button>
+                <button id="cancelActionButton" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md transition duration-300">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm/chỉnh sửa quyền hệ thống -->
+    <div id="addEditSystemPermissionModal" class="modal-overlay">
+        <div class="modal-content small-modal">
+            <button class="modal-close-btn" id="closeAddEditSystemModalBtn">&times;</button>
+            <h3 id="systemModalTitle">Thêm Quyền Mới</h3>
+            <form id="systemPermissionForm">
+                <input type="hidden" id="systemPermissionId" name="id">
+                <div class="form-grid single-column">
+                    <div class="form-group">
+                        <label for="systemPermissionName">Tên quyền</label>
+                        <input type="text" id="systemPermissionName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="systemPermissionDescription">Mô tả chức năng</label>
+                        <input type="text" id="systemPermissionDescription" name="description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="systemPermissionModule">Module</label>
+                        <select id="systemPermissionModule" name="module" required>
+                            <option value="">Chọn Module</option>
+                            <option value="STUDENT">Học viên</option>
+                            <option value="STAFF">Nhân sự</option>
+                            <option value="CLASS">Lớp</l>
+                            <option value="COURSE">Khóa học</l>
+                            <option value="DOCUMENT">Tài liệu</option>
+                            <option value="FINANCE">Tài chính</option>
+                            <option value="REPORTING">Báo cáo</option>
+                            <option value="TCODE">T-Code Chức năng</option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="isSystemTCodePermission" name="isTCodePermission">
+                        <label for="isSystemTCodePermission">Là T-Code chức năng?</label>
+                    </div>
+                    <div class="form-group hidden" id="systemTCodeValueGroup">
+                        <label for="systemTCodeValue">Mã T-Code</label>
+                        <input type="text" id="systemTCodeValue" name="tCodeValue">
+                    </div>
+                    <div class="form-group" id="systemPermissionTypeGroup">
+                        <label for="systemPermissionType">Loại quyền</label>
+                        <select id="systemPermissionType" name="type" required>
+                            <option value="">Chọn loại quyền</option>
+                            <option value="CREATE_REQUEST">Tạo yêu cầu</option>
+                            <option value="VIEW">Xem</option>
+                            <option value="ACCESS_FUNCTION">Truy cập chức năng (Thêm/Sửa/Xóa)</option>
+                            <option value="APPRAISAL">Thẩm định</option>
+                            <option value="APPROVAL">Phê duyệt</option>
+                            <option value="EDIT">Sửa (Chỉ cho Tài chính)</option>
+                            <option value="TCODE_ACCESS">Truy cập T-Code</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Lưu</button>
+                    <button type="button" class="cancel-button" id="cancelAddEditSystemBtn">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Thêm/Chỉnh Sửa Tài Khoản (Bao gồm phân quyền) -->
+    <div id="addEditAccountModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeAddEditAccountModalBtn">&times;</button>
+            <h3 id="addEditAccountModalTitle">Thêm Tài Khoản Mới</h3>
+            <form id="addEditAccountForm">
+                <input type="hidden" id="addEditAccountId">
+                <div class="form-group">
+                    <label for="addEditEmployeeId">Mã nhân viên</label>
+                    <input type="text" id="addEditEmployeeId" name="employeeId" placeholder="Nhập mã nhân viên" required>
+                </div>
+                <div class="form-group">
+                    <label for="addEditUsername">Tên đăng nhập</label>
+                    <input type="text" id="addEditUsername" name="username" placeholder="Nhập tên đăng nhập" required>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label for="addEditPassword">Mật khẩu</label>
+                    <input type="password" id="addEditPassword" name="password" placeholder="Để trống nếu không đổi mật khẩu">
+                    <p class="text-sm text-gray-600 mt-1" id="passwordHint"></p>
+                </div>
+                <div class="form-group">
+                    <label for="addEditEmail">Email</label>
+                    <input type="email" id="addEditEmail" name="email" placeholder="Nhập email">
+                </div>
+                <div class="form-group">
+                    <label for="addEditDisplayName">Tên hiển thị</label>
+                    <input type="text" id="addEditDisplayName" name="displayName" placeholder="Nhập tên hiển thị">
+                </div>
+                <div class="form-group">
+                    <label for="addEditStatusId">Trạng thái</label>
+                    <select id="addEditStatusId" name="statusId" required>
+                        <!-- Options will be populated by C# -->
+                        <option value="">Đang tải...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="addEditFirstLoginChangePwd">Đổi mật khẩu lần đầu đăng nhập</label>
+                    <select id="addEditFirstLoginChangePwd" name="firstLoginChangePwd" required>
+                        <option value="true">Có</option>
+                        <option value="false">Không</option>
+                    </select>
+                </div>
+
+                <!-- Phần phân quyền -->
+                <div class="form-group">
+                    <label for="addEditUserRoleSelect">Vai Trò Cơ Sở:</label>
+                    <select id="addEditUserRoleSelect" required>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="role-base-permissions-display">
+                    <h4>Quyền Hạn Từ Vai Trò Cơ Sở (<span id="baseRoleNameDisplay"></span>):</h4>
+                    <ul id="baseRolePermissionsList">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label>Quyền Hạn Tùy Chỉnh Cho Tài Khoản Này:</label>
+                    <div id="accountPermissionsCheckboxList" class="permissions-checkbox-list">
+                        <!-- All permissions checkboxes will be populated here by JS -->
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">
+                        Chọn hoặc bỏ chọn các quyền hạn để tùy chỉnh cho tài khoản này.
+                        Các thay đổi ở đây sẽ ghi đè lên quyền hạn từ vai trò cơ sở.
+                    </p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Lưu Thay Đổi</button>
+                    <button type="button" class="cancel-button" id="cancelAddEditAccountBtn">Hủy</button>
+                </div>
+            </form>
+            <div class="text-center mt-4">
+                <button id="resetPasswordAccountBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">Reset Mật Khẩu Tài Khoản</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Roles Modal Overlay -->
+    <div id="manageRolesModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeManageRolesModalBtn">&times;</button>
+            <h3>Quản Lý Vai Trò</h3>
+            <div class="table-controls justify-end">
+                <button id="addNewRoleBtn" class="secondary-button">
+                    <i class="fas fa-plus mr-2"></i>Thêm Vai Trò Mới
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="rolesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Vai Trò</th>
+                            <th>Số Lượng Quyền Hạn</th>
+                            <th>Quyền Hạn</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody">
+                        <tr><td colspan="5" class="text-center py-4">Đang tải dữ liệu vai trò...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-button" id="closeManageRolesModalFooterBtn">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Role Modal Overlay -->
+    <div id="addEditRoleModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeAddEditRoleModalBtn">&times;</button>
+            <h3 id="addEditRoleModalTitle">Thêm Vai Trò Mới</h3>
+            <form id="addEditRoleForm">
+                <input type="hidden" id="roleIdInput">
+                <div class="form-group">
+                    <label for="roleNameInput">Tên Vai Trò:</label>
+                    <input type="text" id="roleNameInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Chọn Quyền Hạn:</label>
+                    <div id="permissionsCheckboxList" class="permissions-checkbox-list">
+                        <!-- Permissions checkboxes will be populated here by JS -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button" id="saveRoleBtn">Lưu Vai Trò</button>
+                    <button type="button" class="cancel-button" id="cancelAddEditRoleBtn">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Khu vực nội dung chính -->
+    <div class="main-content">
+        <!-- Tiêu đề -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-logo">
+                    <img src="https://placehold.co/100x100/1a202c/e2e8f0?text=Logo" alt="Trung Tâm Ngoại Ngữ 68">
+                </div>
+                <div class="header-title">Trung Tâm Ngoại Ngữ 68</div>
+            </div>
+            <div class="header-right">
+                <div id="currentDate" class="header-date"></div>
+                <div class="header-icons">
+                    <!-- Biểu tượng thông báo -->
+                    <svg id="notificationIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                    <span id="notificationCountBadge" class="notification-badge">3</span>
+                    <!-- Notification Dropdown -->
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="notification-dropdown-header">
+                            <h3>Thông báo</h3>
+                            <button id="clearNotificationsBtn">Xóa tất cả</button>
+                        </div>
+                        <ul id="notificationList" class="notification-list">
+                            <!-- Notifications will be rendered here -->
+                            <li class="no-notifications">Không có thông báo mới.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Thông tin người dùng và Dropdown -->
+                <div class="user-info" id="userInfo">
+                    <img src="https://placehold.co/36x36/1a202c/e2e8f0?text=U" alt="User Avatar" />
+                    <div class="user-details">
+                        <span class="user-name" id="employeeName">Đang tải...</span>
+                        <span class="user-title" id="employeeTitle"></span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer; color: #a0aec0;"><path d="m6 9 6 6 6-6" /></svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button id="changePasswordBtn">Đổi Mật Khẩu</button>
+                        <button id="logoutBtn">Đăng Xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung chính của Dashboard - Bảng Tổng Hợp Tài Khoản -->
+        <div class="dashboard-body">
+            <h1 class="dashboard-title">Quản lý Tài khoản & Phân quyền</h1>
+
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="accountPermissionsTab">Tài khoản & Phân quyền</button>
+                <button class="tab-button" data-tab="systemPermissionsTab">Quyền Hệ Thống</button>
+            </div>
+
+            <div id="accountPermissionsTab" class="tab-content active">
+                <div class="account-table-section">
+                    <h2>Danh Sách Tài Khoản & Phân Quyền</h2>
+                    <div class="table-controls">
+                        <button id="addAccountBtn" class="add-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-plus"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                            Thêm Tài Khoản Mới
+                        </button>
+                        <div class="search-bar">
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm theo bất kỳ trường nào..." />
+                        </div>
+                        <button id="manageRolesBtn" class="secondary-button">
+                            <i class="fas fa-cogs mr-2"></i>Quản Lý Vai Trò
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="account-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã NV</th>
+                                    <th>Họ Tên</th>
+                                    <th>Vai Trò</th>
+                                    <th>Tên Đăng Nhập</th>
+                                    <th>Email</th>
+                                    <th>Tên Hiển Thị</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Quyền Hạn Hiệu Lực</th>
+                                    <th>Đăng Nhập Cuối</th>
+                                    <th>Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accountTableBody">
+                                <!-- Dữ liệu tài khoản sẽ được tải động -->
+                                <tr><td colspan="10" class="text-center text-gray-500 py-4">Đang tải dữ liệu tài khoản...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung chính của Dashboard - Quản lý Quyền Hệ Thống -->
+            <div id="systemPermissionsTab" class="tab-content">
+                <div class="permission-table-section">
+                    <h2>Quản lý Quyền Hệ Thống</h2>
+                    <div class="table-controls justify-between">
+                        <button id="addSystemPermissionBtn" class="add-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                            Thêm Quyền Mới
+                        </button>
+                        <div class="search-bar">
+                            <input type="text" id="systemSearchInput" placeholder="Tìm kiếm theo ID, tên, hoặc mô tả..." />
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID Quyền</th>
+                                    <th>Tên Quyền</th>
+                                    <th>Mô tả</th>
+                                    <th>Module</th>
+                                    <th>Loại</th>
+                                    <th>Mã T-Code</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="systemPermissionDefinitionTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 1rem;">Đang tải dữ liệu quyền...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fullScreenLoadingOverlay = document.getElementById('fullScreenLoadingOverlay');
+        const customMessageBoxOverlay = document.getElementById('customMessageBoxOverlay');
+        const customMessageText = document.getElementById('customMessageText');
+        const closeCustomMessageBox = document.getElementById('closeCustomMessageBox');
+
+        // Confirmation Box elements
+        const confirmationBoxOverlay = document.getElementById('confirmationBoxOverlay');
+        const confirmationMessageText = document.getElementById('confirmationMessageText');
+        const confirmActionButton = document.getElementById('confirmActionButton');
+        const cancelActionButton = document.getElementById('cancelActionButton');
+
+        let pendingAction = null; // To store the action to be confirmed (e.g., delete)
+
+        function showFullScreenLoading() {
+            fullScreenLoadingOverlay.classList.add('active');
+        }
+
+        function hideFullScreenLoading() {
+            fullScreenLoadingOverlay.classList.remove('active');
+        }
+
+        /**
+         * Hiển thị một thông báo tùy chỉnh thay vì alert().
+         * @param {string} message - Nội dung thông báo.
+         */
+        function showCustomMessage(message) {
+            customMessageText.textContent = message;
+            customMessageBoxOverlay.classList.add('show');
+        }
+
+        closeCustomMessageBox.addEventListener('click', () => {
+            customMessageBoxOverlay.classList.remove('show');
+        });
+
+        /**
+         * Hiển thị hộp thoại xác nhận tùy chỉnh.
+         * @param {string} message - Nội dung xác nhận.
+         * @param {function} onConfirm - Hàm callback khi người dùng xác nhận.
+         */
+        function showConfirmationBox(message, onConfirm) {
+            confirmationMessageText.textContent = message;
+            confirmationBoxOverlay.classList.add('show');
+            // No need for pendingAction here, directly assign callbacks
+
+            // Clear previous listeners to prevent multiple calls
+            confirmActionButton.onclick = null;
+            cancelActionButton.onclick = null;
+
+            confirmActionButton.onclick = () => {
+                // User confirmed, now show loading *on top of* current modals
+                showFullScreenLoading(); // Show loading overlay immediately
+
+                // Hide the confirmation box after loading is shown, so loading is visible
+                confirmationBoxOverlay.classList.remove('show');
+
+                // Execute the action. The action itself should handle hiding the loading.
+                onConfirm();
+            };
+
+            cancelActionButton.onclick = () => {
+                confirmationBoxOverlay.classList.remove('show');
+                // No action needed on cancel, just close the confirmation box
+            };
+        }
+
+        // JavaScript để hiển thị ngày và giờ hiện tại
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+        updateCurrentDate();
+        setInterval(updateCurrentDate, 60000);
+
+        // JavaScript để xử lý dropdown người dùng
+        const userInfo = document.getElementById('userInfo');
+        const userDropdown = document.getElementById('userDropdown');
+
+        if (userInfo && userDropdown) {
+            userInfo.addEventListener('click', (event) => {
+                event.stopPropagation();
+                userDropdown.classList.toggle('show');
+                // Close notification dropdown if open
+                if (notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+
+            document.body.addEventListener('click', (event) => {
+                if (userDropdown.classList.contains('show') && !userInfo.contains(event.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // JavaScript để xử lý dropdown thông báo
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationCountBadge = document.getElementById('notificationCountBadge');
+        const notificationList = document.getElementById('notificationList'); // Changed to notificationList
+        const clearNotificationsBtn = document.getElementById('clearNotificationsBtn'); // Changed from markAllReadBtn
+
+        // Global array to hold current notifications
+        let activeNotifications = [];
+
+        /**
+         * Cập nhật số lượng thông báo trên huy hiệu.
+         * @param {number} count - Số lượng thông báo chưa đọc.
+         */
+        function updateNotificationCount(count) {
+            if (notificationCountBadge) {
+                notificationCountBadge.textContent = count > 99 ? '99+' : count; // Limit display to 99+
+                if (count > 0) {
+                    notificationCountBadge.style.display = 'block';
+                } else {
+                    notificationCountBadge.style.display = 'none';
+                }
+            }
+        }
+
+        /**
+         * Checks if two dates are on the same day.
+         * @param {Date} d1 - First date.
+         * @param {Date} d2 - Second date.
+         * @returns {boolean} - True if same day, false otherwise.
+         */
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        /**
+         * Determines the time category for a given notification date.
+         * @param {Date} notificationDate - The date of the notification.
+         * @returns {string} - The time category (e.g., 'Mới', 'Hôm nay', 'Hôm qua').
+         */
+        function getTimeCategory(notificationDate) {
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
+
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            notificationDate.setSeconds(0, 0); // Normalize notification date for comparison
+
+            if (notificationDate > oneHourAgo) {
+                return 'Mới';
+            } else if (isSameDay(notificationDate, now)) {
+                return 'Hôm nay';
+            } else if (isSameDay(notificationDate, yesterday)) {
+                return 'Hôm qua';
+            } else if (notificationDate >= startOfWeek) {
+                return 'Tuần này';
+            } else if (notificationDate >= startOfMonth) {
+                return 'Tháng này';
+            }
+            return 'Cũ hơn';
+        }
+
+        /**
+         * Formats a date into a human-readable "time ago" string.
+         * @param {Date} date - The date to format.
+         * @returns {string} - Formatted time string.
+         */
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            let interval = seconds / 31536000; // years
+            if (interval > 1) {
+                return Math.floor(interval) + " năm trước";
+            }
+            interval = seconds / 2592000; // months
+            if (interval > 1) {
+                return Math.floor(interval) + " tháng trước";
+            }
+            interval = seconds / 86400; // days
+            if (interval > 1) {
+                return Math.floor(interval) + " ngày trước";
+            }
+            interval = seconds / 3600; // hours
+            if (interval > 1) {
+                return Math.floor(interval) + " giờ trước";
+            }
+            interval = seconds / 60; // minutes
+            if (interval > 1) {
+                return Math.floor(interval) + " phút trước";
+            }
+            return Math.floor(seconds) + " giây trước";
+        }
+
+        /**
+         * Render notifications into the dropdown, grouped by time.
+         * @param {Array<Object>} notifications - Array of notification objects.
+         */
+        function renderNotifications(notifications) {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<li class="no-notifications">Không có thông báo mới.</li>';
+                clearNotificationsBtn.style.display = 'none';
+                updateNotificationCount(0);
+                return;
+            }
+
+            clearNotificationsBtn.style.display = 'block';
+
+            // Sort notifications by date, newest first
+            notifications.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            const groupedNotifications = {
+                'Mới': [],
+                'Hôm nay': [],
+                'Hôm qua': [],
+                'Tuần này': [],
+                'Tháng này': [],
+                'Cũ hơn': []
+            };
+
+            notifications.forEach(notif => {
+                const category = getTimeCategory(notif.date);
+                // Ensure the category exists before pushing
+                if (!groupedNotifications[category]) {
+                    groupedNotifications[category] = [];
+                }
+                groupedNotifications[category].push(notif);
+            });
+
+            // Order of categories for rendering
+            const categoryOrder = ['Mới', 'Hôm nay', 'Hôm qua', 'Tuần này', 'Tháng này', 'Cũ hơn'];
+
+            categoryOrder.forEach(category => {
+                if (groupedNotifications[category].length > 0) {
+                    const categoryHeader = document.createElement('li'); // Changed to li for list
+                    categoryHeader.classList.add('notification-dropdown-header'); // Re-using existing style for category
+                    categoryHeader.innerHTML = `<h3>${category}</h3>`; // Added h3 for consistent styling
+                    notificationList.appendChild(categoryHeader);
+
+                    groupedNotifications[category].forEach(notif => {
+                        const notificationItem = document.createElement('li'); // Changed to li
+                        notificationItem.classList.add('notification-item');
+                        notificationItem.dataset.id = notif.id; // Assign a unique ID to each notification
+                        notificationItem.innerHTML = `
+                            <strong>${notif.title}:</strong> ${notif.message}
+                            <span class="time">${formatTimeAgo(notif.date)}</span>
+                        `;
+                        notificationList.appendChild(notificationItem);
+
+                        // Add click listener to each individual notification item
+                        notificationItem.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent dropdown from closing immediately
+                            markNotificationAsRead(notif.id);
+                        });
+                    });
+                }
+            });
+            updateNotificationCount(notifications.length);
+        }
+
+        /**
+         * Marks a single notification as read and updates the list.
+         * @param {string} id - The ID of the notification to mark as read.
+         */
+        function markNotificationAsRead(id) {
+            activeNotifications = activeNotifications.filter(notif => notif.id !== id);
+            renderNotifications(activeNotifications);
+            showCustomMessage(`Thông báo "${id}" đã được đánh dấu là đã đọc.`);
+            // Optionally, close the dropdown after marking one as read
+            notificationDropdown.classList.remove('show');
+        }
+
+        // Initial mock notifications with Date objects
+        activeNotifications = [
+            { id: 'notif1', title: 'Thông báo 1', message: 'Học viên mới đã đăng ký.', date: new Date(Date.now() - 30 * 60 * 1000) }, // 30 mins ago (Mới)
+            { id: 'notif2', title: 'Thông báo 2', message: 'Lịch học sắp tới.', date: new Date(Date.now() - 5 * 60 * 60 * 1000) }, // 5 hours ago (Hôm nay)
+            { id: 'notif3', title: 'Thông báo 3', message: 'Yêu cầu hỗ trợ mới.', date: new Date(Date.now() - 24 * 60 * 60 * 1000 - 2 * 60 * 60 * 1000) }, // Yesterday (Hôm qua)
+            { id: 'notif4', title: 'Thông báo 4', message: 'Khóa học mới được thêm.', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) }, // 3 days ago (Tuần này)
+            { id: 'notif5', title: 'Thông báo 5', message: 'Cập nhật hệ thống.', date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) }, // 15 days ago (Tháng này)
+            { id: 'notif6', title: 'Thông báo 6', message: 'Báo cáo hàng tháng đã sẵn sàng.', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) }, // 40 days ago (Cũ hơn)
+        ];
+        renderNotifications(activeNotifications); // Render initial notifications
+
+        if (notificationIcon && notificationDropdown) {
+            notificationIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Ngăn chặn sự kiện click lan ra body
+                notificationDropdown.classList.toggle('show');
+            });
+
+            document.body.addEventListener('click', (event) => {
+                // Đóng dropdown thông báo nếu click ra ngoài
+                if (notificationDropdown.classList.contains('show') && !notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Xử lý nút "Đánh dấu tất cả đã đọc"
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', () => {
+                activeNotifications = []; // Clear all notifications
+                renderNotifications(activeNotifications); // Re-render to show "No notifications"
+                notificationDropdown.classList.remove('show'); // Đóng dropdown
+                showCustomMessage('Tất cả thông báo đã được đánh dấu là đã đọc.');
+            });
+        }
+
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        if (changePasswordBtn) {
+            changePasswordBtn.addEventListener('click', () => {
+                showFullScreenLoading();
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(JSON.stringify({ type: 'ShowChangePasswordDialog' }));
+                } else {
+                    showCustomMessage('Chức năng đổi mật khẩu chỉ khả dụng trong ứng dụng Windows Forms.');
+                }
+                userDropdown.classList.remove('show');
+                setTimeout(hideFullScreenLoading, 1000);
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(JSON.stringify({ type: 'Logout' }));
+                } else {
+                    showCustomMessage('Chức năng đăng xuất chỉ khả dụng trong ứng dụng Windows Forms.');
+                }
+                userDropdown.classList.remove('show');
+            });
+        }
+
+        function setLoggedInUserName(name) {
+            const userNameSpan = document.getElementById('employeeName');
+            if (userNameSpan) {
+                userNameSpan.textContent = name;
+            }
+        }
+
+        function setLoggedInUserTitle(title) {
+            const userTitleSpan = document.getElementById('employeeTitle');
+            if (userTitleSpan) {
+                userTitleSpan.textContent = title;
+            }
+        }
+
+        // Hàm để điền dữ liệu vào dropdown trong modal
+        function populateDropdown(selectElementId, data, placeholderText) {
+            const selectElement = document.getElementById(selectElementId);
+            selectElement.innerHTML = `<option value="">${placeholderText}</option>`;
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.textContent = item.text;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // --- Chức năng tạo mật khẩu mạnh ngẫu nhiên ---
+        /**
+         * Tạo một mật khẩu mạnh ngẫu nhiên với độ dài tối thiểu 8 ký tự,
+         * bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
+         * @returns {string} Mật khẩu mạnh được tạo.
+         */
+        function generateStrongPassword() {
+            const length = 12; // Độ dài mật khẩu mặc định, có thể thay đổi
+            const charset = {
+                lowercase: "abcdefghijklmnopqrstuvwxyz",
+                uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                numbers: "0123456789",
+                special: "!@#$%^&*()_+{}[]:;<>,.?~"
+            };
+
+            let password = "";
+            let requiredChars = [
+                charset.lowercase[Math.floor(Math.random() * charset.lowercase.length)],
+                charset.uppercase[Math.floor(Math.random() * charset.uppercase.length)],
+                charset.numbers[Math.floor(Math.random() * charset.numbers.length)],
+                charset.special[Math.floor(Math.random() * charset.special.length)]
+            ];
+
+            // Đảm bảo mật khẩu có ít nhất một ký tự từ mỗi loại
+            password += requiredChars.join('');
+
+            // Thêm các ký tự ngẫu nhiên còn lại để đạt đủ độ dài
+            const allChars = charset.lowercase + charset.uppercase + charset.numbers + charset.special;
+            for (let i = password.length; i < length; i++) {
+                password += allChars[Math.floor(Math.random() * allChars.length)];
+            }
+
+            // Xáo trộn mật khẩu để các ký tự bắt buộc không ở đầu
+            password = password.split('').sort(() => 0.5 - Math.random()).join('');
+
+            return password;
+        }
+
+        /**
+         * Gửi email thực tế thông qua backend (WebView2).
+         * @param {string} toEmail - Địa chỉ email người nhận.
+         * @param {string} subject - Chủ đề email.
+         * @param {string} body - Nội dung email (HTML hoặc plain text).
+         */
+        function sendEmail(toEmail, subject, body) {
+            console.log(`Attempting to send email to: ${toEmail}`);
+            console.log(`Subject: ${subject}`);
+            console.log(`Body: ${body}`);
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({
+                    type: 'sendEmail',
+                    toEmail: toEmail,
+                    subject: subject,
+                    body: body
+                }));
+            } else {
+                console.warn('Chức năng gửi email chỉ khả dụng trong ứng dụng Windows Forms (WebView2).');
+                showCustomMessage(`Mô phỏng: Đã gửi email đến ${toEmail} với chủ đề "${subject}".`);
+            }
+        }
+
+
+        // --- Global Data Stores ---
+        let allEmployeesPermissions = []; // Stores all employee data with their assigned permissions
+        let allSystemPermissionDefinitions = []; // Stores all available system permission definitions (ID, Name, Description, etc.)
+        let allRoles = []; // Stores all available roles (for employee permissions)
+
+        // All possible granular permissions for the entire system (for account dashboard)
+        // This will now be populated from allSystemPermissionDefinitions
+        let allAvailablePermissions = [];
+
+        // Simulated Roles and Permissions (now mutable)
+        let simulatedRoles = [];
+
+        // --- Common Definitions ---
+        const permissionModules = [
+            { id: 'STUDENT', name: 'Học viên', types: ['CREATE_REQUEST', 'VIEW', 'ACCESS_FUNCTION', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-user-graduate' },
+            { id: 'STAFF', name: 'Nhân sự', types: ['CREATE_REQUEST', 'VIEW', 'ACCESS_FUNCTION', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-users' },
+            { id: 'CLASS', name: 'Lớp', types: ['CREATE_REQUEST', 'VIEW', 'ACCESS_FUNCTION', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-chalkboard' },
+            { id: 'COURSE', name: 'Khóa học', types: ['CREATE_REQUEST', 'VIEW', 'ACCESS_FUNCTION', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-book-open' },
+            { id: 'DOCUMENT', name: 'Tài liệu', types: ['CREATE_REQUEST', 'VIEW', 'ACCESS_FUNCTION', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-file-alt' },
+            { id: 'FINANCE', name: 'Tài chính', types: ['VIEW', 'EDIT', 'CREATE_REQUEST', 'APPRAISAL', 'APPROVAL'], icon: 'fas fa-wallet' },
+            { id: 'REPORTING', name: 'Báo cáo', types: ['VIEW'], icon: 'fas fa-chart-bar' },
+            { id: 'TCODE', name: 'T-Code Chức năng', types: ['TCODE_ACCESS'], icon: 'fas fa-terminal' }
+        ];
+
+        const permissionTypeIcons = {
+            'CREATE_REQUEST': { icon: 'fas fa-plus-square', title: 'Tạo yêu cầu' },
+            'VIEW': { icon: 'fas fa-eye', title: 'Xem' },
+            'ACCESS_FUNCTION': { icon: 'fas fa-cogs', title: 'Truy cập chức năng (Thêm/Sửa/Xóa)' },
+            'APPRAISAL': { icon: 'fas fa-clipboard-check', title: 'Thẩm định' },
+            'APPROVAL': { icon: 'fas fa-check-square', title: 'Phê duyệt' },
+            'EDIT': { icon: 'fas fa-edit', title: 'Sửa' },
+            'TCODE_ACCESS': { icon: 'fas fa-terminal tcode-icon', title: 'Truy cập T-Code' }
+        };
+
+        // --- Tab Switching Logic ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTabId = button.dataset.tab;
+
+                // Remove 'active' class from all buttons and content
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add 'active' class to the clicked button and its corresponding content
+                button.classList.add('active');
+                document.getElementById(targetTabId).classList.add('active');
+            });
+        });
+
+        // --- System Permission Definitions Section Logic ---
+        const systemPermissionDefinitionTableBody = document.getElementById('systemPermissionDefinitionTableBody');
+        const systemSearchInput = document.getElementById('systemSearchInput');
+        const addSystemPermissionBtn = document.getElementById('addSystemPermissionBtn');
+        const addEditSystemPermissionModal = document.getElementById('addEditSystemPermissionModal');
+        const closeAddEditSystemModalBtn = document.getElementById('closeAddEditSystemModalBtn');
+        const cancelAddEditSystemBtn = document.getElementById('cancelAddEditSystemBtn');
+        const systemPermissionForm = document.getElementById('systemPermissionForm');
+        const systemModalTitle = document.getElementById('systemModalTitle');
+
+        const isSystemTCodePermissionCheckbox = document.getElementById('isSystemTCodePermission');
+        const systemTCodeValueGroup = document.getElementById('systemTCodeValueGroup');
+        const systemPermissionTypeDropdown = document.getElementById('systemPermissionType');
+        const systemPermissionTypeGroup = document.getElementById('systemPermissionTypeGroup');
+        const systemPermissionModuleDropdown = document.getElementById('systemPermissionModule');
+        const systemPermissionIdInput = document.getElementById('systemPermissionId');
+
+
+        // Hàm để tạo ID mới đơn giản (chỉ dùng cho mock data)
+        function generateId(module, type, tCodeValue) {
+            if (type === 'TCODE_ACCESS' && tCodeValue) {
+                return `TCODE_${tCodeValue.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+            }
+            return `${module}_${type}`;
+        }
+
+        /**
+         * Render bảng định nghĩa quyền hệ thống.
+         * @param {Array<Object>} permissionList - Mảng các đối tượng định nghĩa quyền.
+         */
+        function renderSystemPermissionDefinitionsTable(permissionList) {
+            systemPermissionDefinitionTableBody.innerHTML = ''; // Xóa nội dung hiện có
+            if (!permissionList || permissionList.length === 0) {
+                systemPermissionDefinitionTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500 py-4">Không có định nghĩa quyền nào.</td></tr>';
+                return;
+            }
+
+            permissionList.forEach(perm => {
+                const row = document.createElement('tr');
+                const tCodeDisplay = perm.isTCode && perm.tCodeValue
+                    ? perm.tCodeValue.split(' ').join('<br>')
+                    : '-';
+
+                row.innerHTML = `
+                    <td>${perm.id || ''}</td>
+                    <td>${perm.name || ''}</td>
+                    <td>${perm.description || ''}</td>
+                    <td>${perm.module || ''}</td>
+                    <td>${perm.type || ''}</td>
+                    <td>${tCodeDisplay}</td>
+                    <td class="actions">
+                        <button class="edit-btn" data-permission-id="${perm.id}">Sửa</button>
+                        <button class="delete-btn" data-permission-id="${perm.id}">Xóa</button>
+                    </td>
+                `;
+                systemPermissionDefinitionTableBody.appendChild(row);
+            });
+
+            document.querySelectorAll('#systemPermissionDefinitionTableBody .edit-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    editSystemPermissionDefinition(event.target.dataset.permissionId);
+                });
+            });
+            document.querySelectorAll('#systemPermissionDefinitionTableBody .delete-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    deleteSystemPermissionDefinition(event.target.dataset.permissionId);
+                });
+            });
+        }
+
+        /**
+         * Hàm tìm kiếm quyền trong bảng định nghĩa quyền hệ thống.
+         */
+        function performSystemDefinitionSearch() {
+            const searchTerm = systemSearchInput.value.toLowerCase();
+            const filteredPermissions = allSystemPermissionDefinitions.filter(perm => {
+                return (perm.id && perm.id.toLowerCase().includes(searchTerm)) ||
+                       (perm.name && perm.name.toLowerCase().includes(searchTerm)) ||
+                       (perm.description && perm.description.toLowerCase().includes(searchTerm)) ||
+                       (perm.module && perm.module.toLowerCase().includes(searchTerm)) ||
+                       (perm.type && perm.type.toLowerCase().includes(searchTerm)) ||
+                       (perm.tCodeValue && perm.tCodeValue.toLowerCase().includes(searchTerm));
+            });
+            renderSystemPermissionDefinitionsTable(filteredPermissions);
+        }
+
+        if (systemSearchInput) {
+            systemSearchInput.addEventListener('input', performSystemDefinitionSearch);
+        }
+
+        // Mở modal thêm quyền hệ thống mới
+        if (addSystemPermissionBtn) {
+            addSystemPermissionBtn.addEventListener('click', () => {
+                systemModalTitle.textContent = 'Thêm Quyền Mới';
+                systemPermissionForm.reset();
+                systemPermissionIdInput.value = '';
+                systemPermissionIdInput.readOnly = false; // Enable ID input for new
+                isSystemTCodePermissionCheckbox.checked = false;
+                toggleSystemTCodeFields();
+                openModal(addEditSystemPermissionModal);
+            });
+        }
+
+        // Đóng modal thêm/chỉnh sửa quyền hệ thống
+        function closeAddEditSystemModal() {
+            addEditSystemPermissionModal.classList.remove('show');
+        }
+
+        if (closeAddEditSystemModalBtn) {
+            closeAddEditSystemModalBtn.addEventListener('click', closeAddEditSystemModal);
+        }
+        if (cancelAddEditSystemBtn) {
+            cancelAddEditSystemBtn.addEventListener('click', closeAddEditSystemModal);
+        }
+        addEditSystemPermissionModal.addEventListener('click', (event) => {
+            if (event.target === addEditSystemPermissionModal) {
+                closeAddEditSystemModal();
+            }
+        });
+
+        // Logic ẩn/hiện trường Mã T-Code và điều chỉnh loại quyền và module cho quyền hệ thống
+        function toggleSystemTCodeFields() {
+            if (isSystemTCodePermissionCheckbox.checked) {
+                systemTCodeValueGroup.classList.remove('hidden');
+                systemPermissionTypeGroup.classList.add('hidden');
+                systemPermissionTypeDropdown.value = 'TCODE_ACCESS';
+                systemPermissionTypeDropdown.required = false;
+
+                systemPermissionModuleDropdown.value = 'TCODE';
+                systemPermissionModuleDropdown.disabled = true;
+            } else {
+                systemTCodeValueGroup.classList.add('hidden');
+                systemPermissionTypeGroup.classList.remove('hidden');
+                systemPermissionTypeDropdown.value = '';
+                systemPermissionTypeDropdown.required = true;
+
+                systemPermissionModuleDropdown.disabled = false;
+                systemPermissionModuleDropdown.value = '';
+            }
+        }
+
+        isSystemTCodePermissionCheckbox.addEventListener('change', toggleSystemTCodeFields);
+        toggleSystemTCodeFields(); // Gọi lần đầu để thiết lập trạng thái ban đầu
+
+        /**
+         * Mở modal chỉnh sửa và điền dữ liệu quyền hệ thống.
+         * @param {string} permissionId - ID của quyền cần chỉnh sửa.
+         */
+        function editSystemPermissionDefinition(permissionId) {
+            const permToEdit = allSystemPermissionDefinitions.find(p => p.id === permissionId);
+            if (permToEdit) {
+                systemModalTitle.textContent = 'Chỉnh Sửa Quyền';
+                systemPermissionIdInput.value = permToEdit.id;
+                systemPermissionIdInput.readOnly = true; // Disable ID input for editing
+                document.getElementById('systemPermissionName').value = permToEdit.name;
+                document.getElementById('systemPermissionDescription').value = permToEdit.description;
+
+                isSystemTCodePermissionCheckbox.checked = permToEdit.isTCode;
+                toggleSystemTCodeFields();
+
+                systemPermissionModuleDropdown.value = permToEdit.module;
+                if (permToEdit.isTCode) {
+                    systemPermissionModuleDropdown.disabled = true;
+                } else {
+                    systemPermissionModuleDropdown.disabled = false;
+                }
+
+                if (permToEdit.isTCode) {
+                    document.getElementById('systemTCodeValue').value = permToEdit.tCodeValue || '';
+                    systemPermissionTypeDropdown.value = 'TCODE_ACCESS';
+                } else {
+                    systemPermissionTypeDropdown.value = permToEdit.type || '';
+                }
+
+                openModal(addEditSystemPermissionModal);
+            } else {
+                showCustomMessage('Không tìm thấy quyền để chỉnh sửa.');
+            }
+        }
+
+        // Xử lý submit form thêm/chỉnh sửa quyền hệ thống
+        if (systemPermissionForm) {
+            systemPermissionForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                showFullScreenLoading();
+
+                const id = systemPermissionIdInput.value.trim();
+                const name = document.getElementById('systemPermissionName').value.trim();
+                const description = document.getElementById('systemPermissionDescription').value.trim();
+                const isTCode = isSystemTCodePermissionCheckbox.checked;
+                const tCodeValue = isTCode ? document.getElementById('systemTCodeValue').value.trim() : null;
+                const type = isTCode ? 'TCODE_ACCESS' : systemPermissionTypeDropdown.value;
+                const module = isTCode ? 'TCODE' : systemPermissionModuleDropdown.value;
+
+                let updatedOrNewPermission = { id, name, description, module, type, isTCode, tCodeValue };
+
+                if (isTCode) {
+                    if (!tCodeValue) {
+                        showCustomMessage('Vui lòng nhập Mã T-Code.');
+                        hideFullScreenLoading();
+                        return;
+                    }
+                }
+
+                setTimeout(() => {
+                    if (systemPermissionIdInput.readOnly) { // Editing existing permission
+                        const index = allSystemPermissionDefinitions.findIndex(p => p.id === id);
+                        if (index !== -1) {
+                            allSystemPermissionDefinitions[index] = updatedOrNewPermission;
+                            showCustomMessage('Cập nhật quyền thành công!');
+                        } else {
+                            showCustomMessage('Lỗi: Không tìm thấy quyền để cập nhật.');
+                        }
+                    } else { // Adding new permission
+                        updatedOrNewPermission.id = generateId(module, type, tCodeValue);
+                        if (allSystemPermissionDefinitions.some(p => p.id === updatedOrNewPermission.id)) {
+                            showCustomMessage('Lỗi: ID quyền đã tồn tại. Vui lòng thay đổi Mã T-Code hoặc Module/Loại quyền.');
+                            hideFullScreenLoading();
+                            return;
+                        }
+                        allSystemPermissionDefinitions.push(updatedOrNewPermission);
+                        showCustomMessage('Thêm quyền mới thành công!');
+                    }
+                    renderSystemPermissionDefinitionsTable(allSystemPermissionDefinitions);
+                    // Re-render account table as system permissions might have changed
+                    performSearch();
+                    hideFullScreenLoading();
+                    closeAddEditSystemModal();
+                }, 1000);
+            });
+        }
+
+        /**
+         * Xóa định nghĩa quyền hệ thống.
+         * @param {string} permissionId - ID của quyền cần xóa.
+         */
+        function deleteSystemPermissionDefinition(permissionId) {
+            const message = `Bạn có chắc chắn muốn xóa quyền "${permissionId}" này không?`;
+            const actionId = `deletePerm_${permissionId}`;
+
+            showConfirmationBox(message, () => {
+                showFullScreenLoading();
+                setTimeout(() => {
+                    allSystemPermissionDefinitions = allSystemPermissionDefinitions.filter(p => p.id !== permissionId);
+                    renderSystemPermissionDefinitionsTable(allSystemPermissionDefinitions);
+                    // Also update account permissions if any account had this permission
+                    allAccountData.forEach(account => {
+                        account.userAddedPermissions = account.userAddedPermissions.filter(pId => pId !== permissionId);
+                        account.userRemovedPermissions = account.userRemovedPermissions.filter(pId => pId !== permissionId);
+                        const role = simulatedRoles.find(r => r.id === account.roleId);
+                        if (role) {
+                            role.permissions = role.permissions.filter(pId => pId !== permissionId);
+                        }
+                    });
+                    performSearch(); // Re-render account table
+                    showCustomMessage(`Xóa quyền "${permissionId}" thành công!`);
+                    hideFullScreenLoading();
+                }, 1000);
+            });
+        }
+
+        // --- Chức năng cho Bảng Tổng Hợp Tài Khoản (Combined with Employee Permissions) ---
+        const accountTableBody = document.getElementById('accountTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const addAccountBtn = document.getElementById('addAccountBtn');
+        const manageRolesBtn = document.getElementById('manageRolesBtn');
+
+        let allAccountData = []; // Biến toàn cục để lưu trữ tất cả dữ liệu tài khoản (từ C# + mô phỏng quyền)
+
+        // Helper to get role name
+        function getRoleName(roleId) {
+            const role = simulatedRoles.find(r => r.id === roleId);
+            return role ? role.name : 'Unknown';
+        }
+
+        // Helper to get descriptive permission name
+        function getPermissionName(permissionId) {
+            const perm = allAvailablePermissions.find(ap => ap.id === permissionId);
+            return perm ? perm.name : permissionId;
+        }
+
+        // Helper to get effective permissions for an account
+        function getEffectivePermissionsForAccount(account) {
+            const role = simulatedRoles.find(r => r.id === account.roleId);
+            let effectivePermissions = new Set(role ? role.permissions : []);
+
+            // Add account-specific added permissions
+            if (account.userAddedPermissions) {
+                account.userAddedPermissions.forEach(permId => effectivePermissions.add(permId));
+            }
+
+            // Remove account-specific removed permissions
+            if (account.userRemovedPermissions) {
+                account.userRemovedPermissions.forEach(permId => effectivePermissions.delete(permId));
+            }
+
+            return Array.from(effectivePermissions).sort(); // Return sorted array of IDs
+        }
+
+        // Helper to get permissions display for table (with indicators for added/removed)
+        function getPermissionsDisplayForTable(account) {
+            const role = simulatedRoles.find(r => r.id === account.roleId);
+            const baseRolePermissions = new Set(role ? role.permissions : []);
+            const effectivePermissionIds = getEffectivePermissionsForAccount(account);
+
+            if (effectivePermissionIds.length === 0) {
+                return '<div class="text-center text-gray-500 italic">Không có quyền hạn</div>';
+            }
+
+            // Map permission IDs to their full definitions
+            allSystemPermissionDefinitions.forEach(permDef => {
+                const moduleInfo = permissionModules.find(m => m.id === permDef.module);
+                if (moduleInfo) {
+                    permDef.icon = moduleInfo.icon;
+                }
+            });
+
+            const effectivePermissions = effectivePermissionIds.map(permId => {
+                const permDef = allSystemPermissionDefinitions.find(p => p.id === permId);
+                // Fallback if definition not found (shouldn't happen if data is consistent)
+                return permDef || { id: permId, name: permId, module: 'UNKNOWN', type: 'UNKNOWN', isTCode: false, tCodeValue: null };
+            });
+
+            // Group permissions by module
+            const groupedByModule = effectivePermissions.reduce((acc, perm) => {
+                const moduleName = perm.module || 'Khác'; // Default module if not specified
+                if (!acc[moduleName]) {
+                    acc[moduleName] = [];
+                }
+                acc[moduleName].push(perm);
+                return acc;
+            }, {});
+
+            let html = '<div class="module-permissions-container">';
+
+            // Sort modules for consistent display
+            const sortedModuleNames = Object.keys(groupedByModule).sort();
+
+            sortedModuleNames.forEach(moduleName => {
+                const moduleInfo = permissionModules.find(m => m.id === moduleName);
+                const moduleDisplayName = moduleInfo ? moduleInfo.name : moduleName;
+                const moduleIcon = moduleInfo ? moduleInfo.icon : 'fas fa-question-circle'; // Default icon for unknown module
+
+                html += `
+                    <div class="module-group">
+                        <div class="module-name">
+                            <i class="${moduleIcon}" title="${moduleDisplayName}"></i> ${moduleDisplayName}:
+                        </div>
+                        <div class="permission-icons-group">
+                `;
+
+                groupedByModule[moduleName].forEach(perm => {
+                    const typeIcon = permissionTypeIcons[perm.type] ? permissionTypeIcons[perm.type].icon : 'fas fa-question';
+                    const typeTitle = permissionTypeIcons[perm.type] ? permissionTypeIcons[perm.type].title : perm.type;
+                    // Display T-Code value for T-Codes, else permission name
+                    const displayText = perm.isTCode && perm.tCodeValue ? perm.tCodeValue : perm.name;
+
+                    let indicator = '';
+                    if (account.userAddedPermissions && account.userAddedPermissions.includes(perm.id) && !baseRolePermissions.has(perm.id)) {
+                        indicator = '<span class="indicator-plus" title="Thêm bởi tài khoản">(+)</span>';
+                    } else if (account.userRemovedPermissions && account.userRemovedPermissions.includes(perm.id) && baseRolePermissions.has(perm.id)) {
+                        indicator = '<span class="indicator-minus" title="Bỏ bởi tài khoản">(-)</span>';
+                    }
+
+                    html += `
+                        <span class="permission-icon-item" title="${perm.name} (${typeTitle})">
+                            <i class="${typeIcon}"></i> ${displayText}${indicator}
+                        </span>
+                    `;
+                });
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        /**
+         * Định dạng ngày giờ.
+         * @param {string} dateTimeString - Chuỗi ngày giờ.
+         * @returns {string} Ngày giờ đã định dạng.
+         */
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return '';
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('vi-VN', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        /**
+         * Hiển thị dữ liệu tài khoản lên bảng.
+         * @param {Array<Object>} accountList - Mảng các đối tượng tài khoản.
+         */
+        function renderAccountTable(accountList) {
+            accountTableBody.innerHTML = ''; // Xóa nội dung hiện có
+            if (accountList && accountList.length > 0) {
+                accountList.forEach(account => {
+                    // Find full name from allEmployeesPermissions
+                    const employee = allEmployeesPermissions.find(emp => emp.employeeId === account.employeeId);
+                    const fullName = employee ? employee.fullName : 'N/A';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${account.employeeId || ''}</td>
+                        <td>${fullName}</td>
+                        <td>${getRoleName(account.roleId)}</td>
+                        <td>${account.username || ''}</td>
+                        <td>${account.email || ''}</td>
+                        <td>${account.displayName || ''}</td>
+                        <td>${account.statusName || ''}</td>
+                        <td>${getPermissionsDisplayForTable(account)}</td>
+                        <td>${formatDateTime(account.lastLogin)}</td>
+                        <td class="actions">
+                            <button class="edit-btn" data-account-id="${account.accountId}">Sửa</button>
+                        </td>
+                    `;
+                    accountTableBody.appendChild(row);
+                });
+
+                // Gắn sự kiện cho các nút Sửa và Xóa
+                document.querySelectorAll('.account-table .edit-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const accountIdToEdit = event.target.dataset.accountId;
+                        openAddEditAccountModal(accountIdToEdit); // Open unified modal
+                    });
+                });
+                // Removed delete button event listener as per user request
+                // document.querySelectorAll('.account-table .delete-btn').forEach(button => {
+                //     button.addEventListener('click', (event) => {
+                //         const accountIdToDelete = event.target.dataset.accountId;
+                //         showConfirmationBox(`Bạn có chắc chắn muốn xóa tài khoản ID ${accountIdToDelete} không?`, () => {
+                //             deleteAccount(accountIdToDelete);
+                //         });
+                //     });
+                // });
+
+            } else {
+                accountTableBody.innerHTML = '<tr><td colspan="10" class="text-center text-gray-500 py-4">Không có dữ liệu tài khoản.</td></tr>';
+            }
+        }
+
+        /**
+         * Hàm tìm kiếm tài khoản.
+         */
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredAccounts = allAccountData.filter(account => {
+                // Get full name for searching
+                const employee = allEmployeesPermissions.find(emp => emp.employeeId === account.employeeId);
+                const fullName = employee ? employee.fullName : '';
+
+                // Search in all relevant fields
+                return (account.employeeId && String(account.employeeId).toLowerCase().includes(searchTerm)) ||
+                       (fullName.toLowerCase().includes(searchTerm)) ||
+                       (account.username && account.username.toLowerCase().includes(searchTerm)) ||
+                       (account.email && account.email.toLowerCase().includes(searchTerm)) ||
+                       (account.displayName && account.displayName.toLowerCase().includes(searchTerm)) ||
+                       (account.statusName && account.statusName.toLowerCase().includes(searchTerm)) ||
+                       (getRoleName(account.roleId).toLowerCase().includes(searchTerm)) ||
+                       (getPermissionsDisplayForTable(account).toLowerCase().includes(searchTerm));
+            });
+            renderAccountTable(filteredAccounts);
+        }
+
+        // Gắn sự kiện cho thanh tìm kiếm
+        if (searchInput) {
+            searchInput.addEventListener('input', performSearch); // Tìm kiếm khi gõ
+        }
+
+        // --- Chức năng Thêm/Chỉnh Sửa Tài Khoản (Modal thống nhất) ---
+        const addEditAccountModal = document.getElementById('addEditAccountModal');
+        const closeAddEditAccountModalBtn = document.getElementById('closeAddEditAccountModalBtn');
+        const cancelAddEditAccountBtn = document.getElementById('cancelAddEditAccountBtn');
+        const addEditAccountForm = document.getElementById('addEditAccountForm');
+        const addEditAccountModalTitle = document.getElementById('addEditAccountModalTitle');
+        const addEditAccountIdInput = document.getElementById('addEditAccountId');
+        const addEditEmployeeIdInput = document.getElementById('addEditEmployeeId');
+        const addEditUsernameInput = document.getElementById('addEditUsername');
+        const passwordGroup = document.getElementById('passwordGroup');
+        const addEditPasswordInput = document.getElementById('addEditPassword');
+        const passwordHint = document.getElementById('passwordHint');
+        const addEditEmailInput = document.getElementById('addEditEmail');
+        const addEditDisplayNameInput = document.getElementById('addEditDisplayName');
+        const addEditStatusIdSelect = document.getElementById('addEditStatusId');
+        const addEditFirstLoginChangePwdSelect = document.getElementById('addEditFirstLoginChangePwd');
+        const resetPasswordAccountBtn = document.getElementById('resetPasswordAccountBtn');
+
+        const addEditUserRoleSelect = document.getElementById('addEditUserRoleSelect');
+        const baseRoleNameDisplay = document.getElementById('baseRoleNameDisplay');
+        const baseRolePermissionsList = document.getElementById('baseRolePermissionsList');
+        const accountPermissionsCheckboxList = document.getElementById('accountPermissionsCheckboxList');
+
+
+        // Mở modal thêm/chỉnh sửa tài khoản
+        function openAddEditAccountModal(accountId = null) {
+            showFullScreenLoading(); // Show loading when modal opens and data is about to be fetched
+            addEditAccountForm.reset(); // Clear form fields
+            resetPasswordAccountBtn.style.display = 'none'; // Hide reset password button by default
+
+            // Populate role dropdown
+            addEditUserRoleSelect.innerHTML = '';
+            simulatedRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.name;
+                addEditUserRoleSelect.appendChild(option);
+            });
+
+            let currentAccount = null;
+
+            if (accountId) { // Edit mode
+                addEditAccountModalTitle.textContent = 'Chỉnh Sửa Thông Tin Tài Khoản';
+                currentAccount = allAccountData.find(a => a.accountId == accountId);
+                if (!currentAccount) {
+                    showCustomMessage('Không tìm thấy tài khoản này.');
+                    hideFullScreenLoading(); // Hide loading if account not found
+                    return;
+                }
+                addEditAccountIdInput.value = currentAccount.accountId;
+                addEditEmployeeIdInput.value = currentAccount.employeeId || '';
+                addEditUsernameInput.value = currentAccount.username || '';
+                addEditUsernameInput.readOnly = true; // Username is read-only when editing
+                addEditEmailInput.value = currentAccount.email || '';
+                addEditDisplayNameInput.value = currentAccount.displayName || '';
+                addEditFirstLoginChangePwdSelect.value = currentAccount.firstLoginChangePwd ? 'true' : 'false';
+
+                // Hide password input and hint for editing
+                passwordGroup.classList.add('hidden');
+                addEditPasswordInput.value = ''; // Ensure value is cleared
+                addEditPasswordInput.required = false; // Not required
+                passwordHint.textContent = ''; // Clear hint
+                resetPasswordAccountBtn.style.display = 'block'; // Still show reset password button
+
+                // Set current role for existing account
+                addEditUserRoleSelect.value = currentAccount.roleId || '';
+
+            } else { // Add mode
+                addEditAccountModalTitle.textContent = 'Thêm Tài Khoản Mới';
+                addEditAccountIdInput.value = ''; // No ID for new account yet
+                addEditEmployeeIdInput.value = '';
+                addEditUsernameInput.value = '';
+                addEditUsernameInput.readOnly = false; // Username is editable for new account
+                addEditEmailInput.value = '';
+                addEditDisplayNameInput.value = '';
+                addEditFirstLoginChangePwdSelect.value = 'true'; // Default for new account
+
+                // Show password input and hint for new accounts
+                passwordGroup.classList.remove('hidden');
+                addEditPasswordInput.type = 'text'; // Set type to text to display generated password
+                addEditPasswordInput.value = ''; // Will be filled by generateStrongPassword
+                addEditPasswordInput.readOnly = true; // Make it read-only for new accounts
+                addEditPasswordInput.required = false; // Password will be auto-generated for new accounts
+                passwordHint.textContent = 'Mật khẩu sẽ được tạo ngẫu nhiên.';
+                resetPasswordAccountBtn.style.display = 'none'; // Hide reset password button
+
+                // Default role for new account (first role if any)
+                addEditUserRoleSelect.value = simulatedRoles.length > 0 ? simulatedRoles[0].id : '';
+
+                // Create a temporary account object for initial permission display in add mode
+                currentAccount = {
+                    accountId: null, // Temporary ID
+                    employeeId: null,
+                    username: '',
+                    password: '',
+                    email: '',
+                    displayName: '',
+                    statusId: null,
+                    firstLoginChangePwd: true,
+                    lastLogin: null,
+                    wrongLoginCount: 0,
+                    roleId: parseInt(addEditUserRoleSelect.value),
+                    userAddedPermissions: [],
+                    userRemovedPermissions: []
+                };
+            }
+
+            // Store the current account being edited/added globally for re-evaluation
+            addEditAccountModal._currentAccount = currentAccount;
+
+            // Initial population of status dropdowns (from C#)
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({ type: 'requestStatusDataForAddModal' })); // Can use same for edit
+            } else {
+                // Simulate status data for browser testing
+                setTimeout(() => {
+                    const mockStatuses = [
+                        { value: 1, text: 'Active' },
+                        { value: 2, text: 'Inactive' },
+                        { value: 3, text: 'Locked' }
+                    ];
+                    populateDropdown('addEditStatusId', mockStatuses, 'Chọn trạng thái');
+                    if (accountId) {
+                        const account = allAccountData.find(a => a.accountId == accountId);
+                        if (account) {
+                            addEditStatusIdSelect.value = currentAccount.statusId || '';
+                        }
+                    }
+                    hideFullScreenLoading(); // Hide loading after mock data is loaded
+                }, 500);
+            }
+
+            // Initial population of permissions based on current account/role selection
+            populateAccountPermissionsCheckboxes(addEditAccountModal._currentAccount);
+
+            // Update permissions display when role changes in the modal
+            addEditUserRoleSelect.removeEventListener('change', handleAccountRoleChangeInModal); // Clean up previous listener
+            addEditUserRoleSelect.addEventListener('change', handleAccountRoleChangeInModal);
+
+            openModal(addEditAccountModal);
+        }
+
+        // Handles role change in the account add/edit modal
+        function handleAccountRoleChangeInModal() {
+            const selectedRoleId = parseInt(addEditUserRoleSelect.value);
+            const account = addEditAccountModal._currentAccount; // Get the original account object
+
+            // Create a temporary account object with the newly selected role
+            // but retain the account's specific added/removed permissions
+            const tempAccount = {
+                ...account,
+                roleId: selectedRoleId
+            };
+            populateAccountPermissionsCheckboxes(tempAccount);
+        }
+
+        // Populates the checkboxes in the account add/edit modal based on effective permissions
+        function populateAccountPermissionsCheckboxes(account) {
+            accountPermissionsCheckboxList.innerHTML = ''; // Clear existing checkboxes
+
+            const effectivePermissions = new Set(getEffectivePermissionsForAccount(account));
+            const role = simulatedRoles.find(r => r.id === account.roleId);
+            const baseRolePermissions = new Set(role ? role.permissions : []);
+
+            // Display base role permissions
+            baseRoleNameDisplay.textContent = role ? role.name : 'Không xác định';
+            baseRolePermissionsList.innerHTML = '';
+            if (baseRolePermissions.size > 0) {
+                Array.from(baseRolePermissions).sort().forEach(permId => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = getPermissionName(permId);
+                    baseRolePermissionsList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = 'Vai trò này không có quyền hạn cơ sở.';
+                baseRolePermissionsList.appendChild(listItem);
+            }
+
+            // Populate all available permissions as checkboxes
+            allAvailablePermissions.forEach(perm => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" name="accountPermission" value="${perm.id}">
+                        ${perm.name}
+                    </label>
+                `;
+                const checkbox = div.querySelector('input[type="checkbox"]');
+                if (effectivePermissions.has(perm.id)) {
+                    checkbox.checked = true;
+                }
+                accountPermissionsCheckboxList.appendChild(div);
+            });
+        }
+
+        // Close Add/Edit Account Modal
+        function closeAddEditAccountModal() {
+            addEditAccountModal.classList.remove('show');
+            addEditUserRoleSelect.removeEventListener('change', handleAccountRoleChangeInModal); // Clean up listener
+            addEditAccountModal._currentAccount = null; // Clear stored account
+        }
+
+        // Event listeners for Add/Edit Account Modal
+        if (addAccountBtn) {
+            addAccountBtn.addEventListener('click', () => openAddEditAccountModal());
+        }
+        if (closeAddEditAccountModalBtn) {
+            closeAddEditAccountModalBtn.addEventListener('click', closeAddEditAccountModal);
+        }
+        if (cancelAddEditAccountBtn) {
+            cancelAddEditAccountBtn.addEventListener('click', closeAddEditAccountModal);
+        }
+        addEditAccountModal.addEventListener('click', (event) => {
+            if (event.target === addEditAccountModal) {
+                closeAddEditAccountModal();
+            }
+        });
+
+        // Xử lý submit form thêm/chỉnh sửa tài khoản
+        if (addEditAccountForm) {
+            addEditAccountForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                showFullScreenLoading();
+
+                const accountId = addEditAccountIdInput.value ? parseInt(addEditAccountIdInput.value, 10) : null;
+                const newEmployeeId = addEditEmployeeIdInput.value.trim(); // Keep as string for employeeId
+                const newUsername = addEditUsernameInput.value.trim();
+                const newEmail = addEditEmailInput.value.trim();
+                const newDisplayName = addEditDisplayNameInput.value.trim();
+                const newStatusId = parseInt(addEditStatusIdSelect.value, 10);
+                const newFirstLoginChangePwd = addEditFirstLoginChangePwdSelect.value === 'true';
+                const newRoleId = parseInt(addEditUserRoleSelect.value, 10);
+                const selectedEffectivePermissions = Array.from(accountPermissionsCheckboxList.querySelectorAll('input[name="accountPermission"]:checked'))
+                                            .map(checkbox => checkbox.value);
+
+                if (!newEmployeeId || !newUsername || !newStatusId || !newRoleId) {
+                    showCustomMessage('Vui lòng điền đầy đủ các trường bắt buộc (Mã NV, Tên đăng nhập, Trạng thái, Vai trò).');
+                    hideFullScreenLoading();
+                    return;
+                }
+
+                // Check username uniqueness for new accounts or if username is changed for existing
+                const isEditingExisting = accountId !== null;
+                const usernameExists = allAccountData.some(account =>
+                    account.username.toLowerCase() === newUsername.toLowerCase() && account.accountId !== accountId
+                );
+
+                if (usernameExists && !isEditingExisting) { // Only check for new accounts
+                    showCustomMessage('Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác.');
+                    hideFullScreenLoading();
+                    return;
+                }
+
+                let message = '';
+                const newRole = simulatedRoles.find(r => r.id === newRoleId);
+                const newRoleBasePermissions = new Set(newRole ? newRole.permissions : []);
+                const newEffectivePermissionsSet = new Set(selectedEffectivePermissions);
+
+                let userAddedPermissions = [];
+                let userRemovedPermissions = [];
+
+                // Calculate userAddedPermissions and userRemovedPermissions relative to the NEW chosen role
+                newEffectivePermissionsSet.forEach(permId => {
+                    if (!newRoleBasePermissions.has(permId)) {
+                        userAddedPermissions.push(permId);
+                    }
+                });
+
+                newRoleBasePermissions.forEach(permId => {
+                    if (!newEffectivePermissionsSet.has(permId)) {
+                        userRemovedPermissions.push(permId);
+                    }
+                });
+
+
+                if (isEditingExisting) {
+                    const accountIndex = allAccountData.findIndex(a => a.accountId === accountId);
+                    if (accountIndex !== -1) {
+                        const currentAccount = allAccountData[accountIndex];
+                        // Password field is now hidden for editing, so no direct password update via this form submit
+                        // Password changes are handled via the "Reset Password" button
+
+                        // Update basic account info
+                        currentAccount.employeeId = newEmployeeId;
+                        currentAccount.email = newEmail;
+                        currentAccount.displayName = newDisplayName;
+                        currentAccount.statusId = newStatusId;
+                        currentAccount.firstLoginChangePwd = newFirstLoginChangePwd;
+
+                        // Send update to C# backend for basic account info
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({
+                                type: 'updateAccount',
+                                data: {
+                                    accountId: currentAccount.accountId,
+                                    employeeId: currentAccount.employeeId,
+                                    email: currentAccount.email,
+                                    displayName: currentAccount.displayName,
+                                    statusId: currentAccount.statusId,
+                                    firstLoginChangePwd: currentAccount.firstLoginChangePwd
+                                }
+                            }));
+                        }
+
+                        // Update role and custom permissions
+                        currentAccount.roleId = newRoleId;
+                        currentAccount.userAddedPermissions = userAddedPermissions;
+                        currentAccount.userRemovedPermissions = userRemovedPermissions;
+
+                        message = `Đã cập nhật thông tin và quyền hạn của tài khoản ${currentAccount.displayName} thành công!`;
+                    } else {
+                        message = 'Không tìm thấy tài khoản để cập nhật.';
+                    }
+                } else { // Add new account
+                    const newAccountId = allAccountData.length > 0 ? Math.max(...allAccountData.map(a => a.accountId)) + 1 : 1;
+                    const generatedPassword = generateStrongPassword(); // Generate password for new account
+
+                    const newAccount = {
+                        accountId: newAccountId,
+                        employeeId: newEmployeeId,
+                        username: newUsername,
+                        password: generatedPassword, // Use generated password
+                        email: newEmail,
+                        displayName: newDisplayName,
+                        statusId: newStatusId,
+                        firstLoginChangePwd: newFirstLoginChangePwd,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        lastLogin: null,
+                        wrongLoginCount: 0,
+                        roleId: newRoleId,
+                        userAddedPermissions: userAddedPermissions,
+                        userRemovedPermissions: userRemovedPermissions
+                    };
+
+                    allAccountData.push(newAccount); // Add to frontend data
+                    
+                    // Send welcome email
+                    const welcomeSubject = `Thông tin đăng nhập tài khoản mới của bạn tại Trung Tâm Ngoại Ngữ 68`;
+                    const welcomeBody = `
+                        <p>Chào ${newAccount.displayName || newAccount.username},</p>
+                        <p>Tài khoản của bạn tại Trung Tâm Ngoại Ngữ 68 đã được tạo thành công.</p>
+                        <p>Thông tin đăng nhập của bạn:</p>
+                        <ul>
+                            <li><strong>Tên đăng nhập:</strong> ${newAccount.username}</li>
+                            <li><strong>Mật khẩu ban đầu:</strong> ${generatedPassword}</li>
+                        </ul>
+                        <p>Vui lòng đăng nhập và đổi mật khẩu của bạn ngay lập tức để đảm bảo bảo mật.</p>
+                        <p>Trân trọng,</p>
+                        <p>Trung Tâm Ngoại Ngữ 68</p>
+                    `;
+                    sendEmail(newAccount.email, welcomeSubject, welcomeBody);
+
+                    message = `Đã thêm tài khoản "${newDisplayName}" thành công! Mật khẩu ban đầu: ${generatedPassword}. Email chào mừng đã được gửi đến ${newEmail}.`;
+
+                    // Send create to C# backend
+                    if (window.chrome && window.chrome.webview) {
+                        window.chrome.webview.postMessage(JSON.stringify({
+                            type: 'createAccount',
+                            data: {
+                                employeeId: newAccount.employeeId,
+                                username: newAccount.username,
+                                password: newAccount.password,
+                                email: newAccount.email,
+                                displayName: newAccount.displayName,
+                                statusId: newAccount.statusId,
+                                firstLoginChangePwd: newAccount.firstLoginChangePwd
+                            }
+                        }));
+                    }
+                }
+
+                performSearch(); // Re-render account table
+                closeAddEditAccountModal();
+                showCustomMessage(message);
+                hideFullScreenLoading();
+            });
+        }
+
+        // --- Chức năng Reset Mật Khẩu Tài Khoản ---
+        if (resetPasswordAccountBtn) {
+            resetPasswordAccountBtn.addEventListener('click', () => {
+                const accountId = addEditAccountIdInput.value; // Lấy ID từ modal edit
+                if (accountId) {
+                    showConfirmationBox(`Bạn có chắc chắn muốn RESET mật khẩu cho tài khoản ID ${accountId} không? Mật khẩu mới sẽ được tạo ngẫu nhiên.`, () => {
+                        const newGeneratedPassword = generateStrongPassword(); // TẠO MẬT KHẨU NGẪU NHIÊN KHI RESET
+                        const currentAccount = allAccountData.find(a => a.accountId == accountId); // Get the account object
+
+                        if (!currentAccount) {
+                            showCustomMessage('Lỗi: Không tìm thấy tài khoản để reset mật khẩu.');
+                            hideFullScreenLoading();
+                            return;
+                        }
+
+                        const resetSubject = `Mật khẩu tài khoản của bạn tại Trung Tâm Ngoại Ngữ 68 đã được reset`;
+                        const resetBody = `
+                            <p>Chào ${currentAccount.displayName || currentAccount.username},</p>
+                            <p>Mật khẩu tài khoản của bạn tại Trung Tâm Ngoại Ngữ 68 đã được reset thành công.</p>
+                            <p>Mật khẩu mới của bạn là:</p>
+                            <ul>
+                                <li><strong>Mật khẩu mới:</strong> ${newGeneratedPassword}</li>
+                            </ul>
+                            <p>Vui lòng đăng nhập và đổi mật khẩu của bạn ngay lập tức để đảm bảo bảo mật.</p>
+                            <p>Nếu bạn không yêu cầu hành động này, vui lòng liên hệ với quản trị viên hệ thống ngay lập tức.</p>
+                            <p>Trân trọng,</p>
+                            <p>Trung Tâm Ngoại Ngữ 68</p>
+                        `;
+
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({
+                                type: 'resetAccountPassword',
+                                accountId: parseInt(accountId, 10), // Ensure accountId is int
+                                newPassword: newGeneratedPassword // Gửi mật khẩu đã tạo
+                            }));
+                            // Also send email for reset
+                            sendEmail(currentAccount.email, resetSubject, resetBody);
+                            // Loading and modal closing will be handled by the message listener
+                        } else {
+                            // Simulate reset for browser testing
+                            setTimeout(() => {
+                                showCustomMessage(`Simulated: Mật khẩu tài khoản ID ${accountId} đã được reset thành công! Mật khẩu mới: ${newGeneratedPassword}. Email đã được gửi đến ${currentAccount.email}.`);
+                                hideFullScreenLoading(); // Hide loading after simulated op completes
+                                closeAddEditAccountModal(); // Close modal after simulated op completes
+                            }, 1500);
+                        }
+                    });
+                } else {
+                    showCustomMessage('Không tìm thấy ID tài khoản để reset mật khẩu.');
+                }
+            });
+        }
+
+        // --- Chức năng xóa tài khoản ---
+        function deleteAccount(accountId) {
+            showFullScreenLoading();
+            console.log('Deleting account with ID:', accountId);
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({
+                    type: 'deleteAccount',
+                    accountId: parseInt(accountId, 10) // Ensure accountId is int
+                }));
+            } else {
+                showCustomMessage('Chức năng xóa chỉ hoạt động trong môi trường WebView2.');
+                hideFullScreenLoading();
+                // Simulate deletion for browser testing
+                setTimeout(() => {
+                    allAccountData = allAccountData.filter(a => a.accountId != accountId);
+                    renderAccountTable(allAccountData);
+                    showCustomMessage('Simulated: Xóa tài khoản thành công!');
+                }, 1500);
+            }
+        }
+
+
+        // --- Manage Roles Functions ---
+        const manageRolesModal = document.getElementById('manageRolesModal');
+        const rolesTableBody = document.getElementById('rolesTableBody');
+        const addNewRoleBtn = document.getElementById('addNewRoleBtn');
+        const closeManageRolesModalBtn = document.getElementById('closeManageRolesModalBtn');
+        const closeManageRolesModalFooterBtn = document.getElementById('closeManageRolesModalFooterBtn');
+
+
+        function openManageRolesModal() {
+            renderRolesTable();
+            openModal(manageRolesModal);
+        }
+
+        function closeManageRolesModal() {
+            manageRolesModal.classList.remove('show');
+            // Re-render account table and filters in case roles changed
+            // This is important because role names are displayed in the main table
+            performSearch();
+        }
+
+        function renderRolesTable() {
+            rolesTableBody.innerHTML = '';
+            if (simulatedRoles.length === 0) {
+                rolesTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Không có vai trò nào được định nghĩa.</td></tr>';
+                return;
+            }
+
+            simulatedRoles.forEach(role => {
+                const row = rolesTableBody.insertRow();
+                const permissionsDisplay = Array.from(role.permissions).sort().map(getPermissionName).join(', ');
+                row.innerHTML = `
+                    <td>${role.id}</td>
+                    <td>${role.name}</td>
+                    <td>${role.permissions ? role.permissions.length : 0}</td>
+                    <td>${permissionsDisplay || 'Không có quyền hạn'}</td>
+                    <td class="actions">
+                        <button class="edit-btn" onclick="openAddEditRoleModal(${role.id})">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="delete-btn" onclick="deleteRole(${role.id})">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        // Event listeners for Manage Roles Modal
+        if (manageRolesBtn) {
+            manageRolesBtn.addEventListener('click', openManageRolesModal);
+        }
+        if (closeManageRolesModalBtn) {
+            closeManageRolesModalBtn.addEventListener('click', closeManageRolesModal);
+        }
+        if (closeManageRolesModalFooterBtn) {
+            closeManageRolesModalFooterBtn.addEventListener('click', closeManageRolesModal);
+        }
+        manageRolesModal.addEventListener('click', (event) => {
+            if (event.target === manageRolesModal) {
+                closeManageRolesModal();
+            }
+        });
+
+
+        // --- Add/Edit Role Modal functions ---
+        const addEditRoleModal = document.getElementById('addEditRoleModal');
+        const closeAddEditRoleModalBtn = document.getElementById('closeAddEditRoleModalBtn');
+        const addEditRoleModalTitle = document.getElementById('addEditRoleModalTitle');
+        const addEditRoleForm = document.getElementById('addEditRoleForm');
+        const roleIdInput = document.getElementById('roleIdInput');
+        const roleNameInput = document.getElementById('roleNameInput');
+        const permissionsCheckboxList = document.getElementById('permissionsCheckboxList');
+        const saveRoleBtn = document.getElementById('saveRoleBtn');
+        const cancelAddEditRoleBtn = document.getElementById('cancelAddEditRoleBtn');
+
+
+        function openAddEditRoleModal(roleId = null) {
+            addEditRoleForm.reset();
+            roleIdInput.value = '';
+            roleNameInput.value = '';
+            permissionsCheckboxList.innerHTML = ''; // Clear existing checkboxes
+
+            // Populate all available permissions as checkboxes
+            allAvailablePermissions.forEach(perm => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" name="permission" value="${perm.id}">
+                        ${perm.name}
+                    </label>
+                `;
+                permissionsCheckboxList.appendChild(div);
+            });
+
+            if (roleId) {
+                addEditRoleModalTitle.textContent = 'Chỉnh Sửa Vai Trò';
+                const role = simulatedRoles.find(r => r.id === roleId);
+                if (role) {
+                    roleIdInput.value = role.id;
+                    roleNameInput.value = role.name;
+                    // Check permissions that the role already has
+                    role.permissions.forEach(permId => {
+                        const checkbox = permissionsCheckboxList.querySelector(`input[value="${permId}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            } else {
+                addEditRoleModalTitle.textContent = 'Thêm Vai Trò Mới';
+            }
+            openModal(addEditRoleModal);
+        }
+
+        function closeAddEditRoleModal() {
+            addEditRoleModal.classList.remove('show');
+        }
+
+        // Event listeners for Add/Edit Role Modal
+        if (addNewRoleBtn) {
+            addNewRoleBtn.addEventListener('click', () => openAddEditRoleModal());
+        }
+        if (closeAddEditRoleModalBtn) {
+            closeAddEditRoleModalBtn.addEventListener('click', closeAddEditRoleModal);
+        }
+        if (cancelAddEditRoleBtn) {
+            cancelAddEditRoleBtn.addEventListener('click', closeAddEditRoleModal);
+        }
+        addEditRoleModal.addEventListener('click', (event) => {
+            if (event.target === addEditRoleModal) {
+                closeAddEditRoleModal();
+            }
+        });
+
+        addEditRoleForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            showFullScreenLoading(); // Show loading when saving role
+
+            const id = roleIdInput.value ? parseInt(roleIdInput.value, 10) : null;
+            const name = roleNameInput.value.trim();
+            const selectedPermissions = Array.from(permissionsCheckboxList.querySelectorAll('input[name="permission"]:checked'))
+                                            .map(checkbox => checkbox.value);
+
+            if (!name) {
+                showCustomMessage('Vui lòng nhập tên vai trò.');
+                hideFullScreenLoading(); // Hide loading if validation fails
+                return;
+            }
+
+            setTimeout(() => { // Simulate async save operation
+                if (id) {
+                    // Edit existing role
+                    const roleIndex = simulatedRoles.findIndex(r => r.id === id);
+                    if (roleIndex !== -1) {
+                        simulatedRoles[roleIndex].name = name;
+                        simulatedRoles[roleIndex].permissions = selectedPermissions;
+                        showCustomMessage(`Đã cập nhật vai trò "${name}" thành công!`);
+                    } else {
+                        showCustomMessage('Không tìm thấy vai trò để cập nhật.');
+                    }
+                } else {
+                    // Add new role
+                    const newId = simulatedRoles.length > 0 ? Math.max(...simulatedRoles.map(r => r.id)) + 1 : 1;
+                    simulatedRoles.push({ id: newId, name, permissions: selectedPermissions });
+                    showCustomMessage(`Đã thêm vai trò "${name}" mới thành công!`);
+                }
+                renderRolesTable(); // Re-render roles table
+                hideFullScreenLoading(); // Hide loading after save
+                closeAddEditRoleModal(); // Close modal after save
+            }, 1000); // Simulate network delay
+        });
+
+
+        function deleteRole(roleId) {
+            showConfirmationBox(`Bạn có chắc chắn muốn xóa vai trò ID: ${roleId} này không? Thao tác này không thể hoàn tác.`, () => {
+                // Check if any account is assigned to this role
+                const accountsWithRole = allAccountData.filter(account => account.roleId === roleId);
+                if (accountsWithRole.length > 0) {
+                    showCustomMessage(`Không thể xóa vai trò này vì có ${accountsWithRole.length} tài khoản đang được gán. Vui lòng thay đổi vai trò của họ trước.`);
+                    return;
+                }
+                showFullScreenLoading(); // Show loading before deletion
+                setTimeout(() => { // Simulate async delete operation
+                    simulatedRoles = simulatedRoles.filter(r => r.id !== roleId);
+                    renderRolesTable();
+                    showCustomMessage(`Đã xóa vai trò ID: ${roleId}.`);
+                    hideFullScreenLoading(); // Hide loading after deletion
+                }, 1000); // Simulate network delay
+            });
+        }
+
+        // Global function to open any modal
+        function openModal(modalElement) {
+            modalElement.classList.add('show');
+        }
+
+
+        // Lắng nghe thông báo từ C#
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.addEventListener('message', event => {
+                const message = JSON.parse(event.data);
+                if (message.type === 'accountListData') {
+                    // Merge C# data with simulated permission data
+                    allAccountData = message.data.map(account => {
+                        // For demonstration, assign a default role if not present, and empty permission arrays
+                        // In a real app, these would come from the backend
+                        const existingAccount = allAccountData.find(a => a.accountId === account.accountId);
+                        return {
+                            ...account,
+                            roleId: existingAccount ? existingAccount.roleId : (simulatedRoles.length > 0 ? simulatedRoles[0].id : null),
+                            userAddedPermissions: existingAccount ? existingAccount.userAddedPermissions : [],
+                            userRemovedPermissions: existingAccount ? existingAccount.userRemovedPermissions : []
+                        };
+                    });
+                    performSearch(); // Render with combined data
+                    hideFullScreenLoading();
+                } else if (message.type === 'tcodesData') {
+                    // Removed tcodeListDiv and related rendering
+                    // renderTCodes(message.data);
+                } else if (message.type === 'loggedInUserName') {
+                    setLoggedInUserName(message.name);
+                    setLoggedInUserTitle(message.title);
+                } else if (message.type === 'createAccountStatus') {
+                    hideFullScreenLoading();
+                    if (message.success) {
+                        showCustomMessage(`Thêm tài khoản mới thành công! Mật khẩu ban đầu: ${message.generatedPassword}. Email chào mừng đã được gửi.`); // Updated message
+                        closeAddEditAccountModal();
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ type: 'requestAccountListData' }));
+                        }
+                    } else {
+                        showCustomMessage('Lỗi khi thêm tài khoản mới: ' + message.error);
+                    }
+                } else if (message.type === 'updateAccountStatus') {
+                    hideFullScreenLoading();
+                    if (message.success) {
+                        showCustomMessage('Cập nhật thông tin tài khoản thành công!');
+                        closeAddEditAccountModal();
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ type: 'requestAccountListData' }));
+                        }
+                    } else {
+                        showCustomMessage('Lỗi khi cập nhật thông tin tài khoản: ' + message.error);
+                    }
+                } else if (message.type === 'deleteAccountStatus') {
+                    hideFullScreenLoading();
+                    if (message.success) {
+                        showCustomMessage('Xóa tài khoản thành công!');
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ type: 'requestAccountListData' }));
+                        }
+                    } else {
+                        showCustomMessage('Lỗi khi xóa tài khoản: ' + message.error);
+                    }
+                } else if (message.type === 'resetAccountPasswordStatus') { // Xử lý phản hồi reset mật khẩu
+                    hideFullScreenLoading();
+                    if (message.success) {
+                        showCustomMessage(`Reset mật khẩu tài khoản thành công! Mật khẩu mới: ${message.generatedPassword}. Email đã được gửi.`); // Updated message
+                        closeAddEditAccountModal(); // Đóng modal chỉnh sửa sau khi reset
+                    } else {
+                        showCustomMessage('Lỗi khi reset mật khẩu tài khoản: ' + message.error);
+                    }
+                } else if (message.type === 'statusDataForAddModal' || message.type === 'statusDataForEditModal') {
+                    // Populate status dropdowns for both add and edit modals
+                    populateDropdown('addEditStatusId', message.statuses, 'Chọn trạng thái');
+                    // If in edit mode, set the selected status after options are populated
+                    if (addEditAccountModal.classList.contains('show') && addEditAccountIdInput.value) {
+                        const currentAccount = allAccountData.find(a => a.accountId == addEditAccountIdInput.value);
+                        if (currentAccount) {
+                            addEditStatusIdSelect.value = currentAccount.statusId || '';
+                        }
+                    }
+                    hideFullScreenLoading(); // Hide loading after status data is populated
+                }
+            });
+        }
+
+        // --- Initial Data Fetching ---
+        function fetchAllData() {
+            showFullScreenLoading();
+            setTimeout(() => {
+                allSystemPermissionDefinitions = [
+                    { id: 'STUDENT_CREATE_REQUEST', name: 'Tạo Yêu cầu học viên', description: 'Tạo yêu cầu liên quan đến học viên', module: 'STUDENT', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'STUDENT_VIEW', name: 'Xem học viên', description: 'Xem thông tin chi tiết học viên', module: 'STUDENT', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'STUDENT_ACCESS_FUNCTION', name: 'Truy cập chức năng học viên', description: 'Thêm, sửa, xóa thông tin học viên', module: 'STUDENT', type: 'ACCESS_FUNCTION', isTCode: false, tCodeValue: null },
+                    { id: 'STUDENT_APPRAISAL', name: 'Thẩm định học viên', description: 'Thẩm định các yêu cầu của học viên', module: 'STUDENT', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'STUDENT_APPROVAL', name: 'Phê duyệt học viên', description: 'Phê duyệt các yêu cầu của học viên', module: 'STUDENT', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'TCODE_STUDENT_INFO_DISPLAY', name: 'Hiển thị thông tin học viên', description: 'Truy cập chức năng hiển thị thông tin học viên qua T-Code', module: 'TCODE', type: 'TCODE_ACCESS', isTCode: true, tCodeValue: 'Z_STUDENT_INFO' },
+                    { id: 'TCODE_CREATE_STUDENT', name: 'Tạo học viên mới', description: 'Truy cập chức năng tạo học viên mới qua T-Code', module: 'TCODE', type: 'TCODE_ACCESS', isTCode: true, tCodeValue: 'Z_CREATE_STUDENT' },
+                    { id: 'STAFF_CREATE_REQUEST', name: 'Tạo Yêu cầu nhân sự', description: 'Tạo yêu cầu liên quan đến nhân sự', module: 'STAFF', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'STAFF_VIEW', name: 'Xem nhân sự', description: 'Xem thông tin chi tiết nhân sự', module: 'STAFF', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'STAFF_ACCESS_FUNCTION', name: 'Truy cập chức năng nhân sự', description: 'Thêm, sửa, xóa thông tin nhân sự', module: 'STAFF', type: 'ACCESS_FUNCTION', isTCode: false, tCodeValue: null },
+                    { id: 'STAFF_APPRAISAL', name: 'Thẩm định nhân sự', description: 'Thẩm định các yêu cầu của nhân sự', module: 'STAFF', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'STAFF_APPROVAL', name: 'Phê duyệt nhân sự', description: 'Phê duyệt các yêu cầu của nhân sự', module: 'STAFF', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'TCODE_HR_REPORT', name: 'Báo cáo nhân sự', description: 'Truy cập báo cáo nhân sự qua T-Code', module: 'TCODE', type: 'TCODE_ACCESS', isTCode: true, tCodeValue: 'Z_HR_REPORT' },
+                    { id: 'CLASS_CREATE_REQUEST', name: 'Tạo Yêu cầu lớp học', description: 'Tạo yêu cầu liên quan đến lớp học', module: 'CLASS', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'CLASS_VIEW', name: 'Xem lớp học', description: 'Xem thông tin chi tiết lớp học', module: 'CLASS', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'CLASS_ACCESS_FUNCTION', name: 'Truy cập chức năng lớp học', description: 'Thêm, sửa, xóa thông tin lớp học', module: 'CLASS', type: 'ACCESS_FUNCTION', isTCode: false, tCodeValue: null },
+                    { id: 'CLASS_APPRAISAL', name: 'Thẩm định lớp học', description: 'Thẩm định các yêu cầu của lớp học', module: 'CLASS', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'CLASS_APPROVAL', name: 'Phê duyệt lớp học', description: 'Phê duyệt các yêu cầu của lớp học', module: 'CLASS', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'COURSE_CREATE_REQUEST', name: 'Tạo Yêu cầu khóa học', description: 'Tạo yêu cầu liên quan đến khóa học', module: 'COURSE', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'COURSE_VIEW', name: 'Xem khóa học', description: 'Xem thông tin chi tiết khóa học', module: 'COURSE', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'COURSE_ACCESS_FUNCTION', name: 'Truy cập chức năng khóa học', description: 'Thêm, sửa, xóa thông tin khóa học', module: 'COURSE', type: 'ACCESS_FUNCTION', isTCode: false, tCodeValue: null },
+                    { id: 'COURSE_APPRAISAL', name: 'Thẩm định khóa học', description: 'Thẩm định các yêu cầu của khóa học', module: 'COURSE', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'COURSE_APPROVAL', name: 'Phê duyệt khóa học', description: 'Phê duyệt các yêu cầu của khóa học', module: 'COURSE', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'DOCUMENT_CREATE_REQUEST', name: 'Tạo Yêu cầu tài liệu', description: 'Tạo yêu cầu liên quan đến tài liệu', module: 'DOCUMENT', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'DOCUMENT_VIEW', name: 'Xem tài liệu', description: 'Xem thông tin chi tiết tài liệu', module: 'DOCUMENT', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'DOCUMENT_ACCESS_FUNCTION', name: 'Truy cập chức năng tài liệu', description: 'Thêm, sửa, xóa thông tin tài liệu', module: 'DOCUMENT', type: 'ACCESS_FUNCTION', isTCode: false, tCodeValue: null },
+                    { id: 'DOCUMENT_APPRAISAL', name: 'Thẩm định tài liệu', description: 'Thẩm định các yêu cầu của tài liệu', module: 'DOCUMENT', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'DOCUMENT_APPROVAL', name: 'Phê duyệt tài liệu', description: 'Phê duyệt các yêu cầu của tài liệu', module: 'DOCUMENT', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'FINANCE_VIEW', name: 'Xem tài chính', description: 'Xem các báo cáo và thông tin tài chính', module: 'FINANCE', type: 'VIEW', isTCode: false, tCodeValue: null },
+                    { id: 'FINANCE_EDIT', name: 'Sửa tài chính', description: 'Sửa các giao dịch và mục tài chính', module: 'FINANCE', type: 'EDIT', isTCode: false, tCodeValue: null },
+                    { id: 'FINANCE_CREATE_REQUEST', name: 'Tạo Yêu cầu tài chính', description: 'Tạo yêu cầu liên quan đến tài chính', module: 'FINANCE', type: 'CREATE_REQUEST', isTCode: false, tCodeValue: null },
+                    { id: 'FINANCE_APPRAISAL', name: 'Thẩm định tài chính', description: 'Thẩm định các yêu cầu tài chính', module: 'FINANCE', type: 'APPRAISAL', isTCode: false, tCodeValue: null },
+                    { id: 'FINANCE_APPROVAL', name: 'Phê duyệt tài chính', description: 'Phê duyệt các yêu cầu tài chính', module: 'FINANCE', type: 'APPROVAL', isTCode: false, tCodeValue: null },
+                    { id: 'REPORTING_VIEW', name: 'Xem báo cáo', description: 'Xem các báo cáo tổng hợp', module: 'REPORTING', type: 'VIEW', isTCode: false, tCodeValue: null }
+                ];
+
+                // Populate allAvailablePermissions from allSystemPermissionDefinitions
+                allAvailablePermissions = allSystemPermissionDefinitions.map(perm => ({
+                    id: perm.id,
+                    name: perm.name
+                }));
+
+                // Define simulated roles using the IDs from allSystemPermissionDefinitions
+                simulatedRoles = [
+                    { id: 1, name: 'Quản trị viên', permissions: allSystemPermissionDefinitions.map(p => p.id) }, // All permissions
+                    { id: 2, name: 'Kế toán', permissions: [
+                        'FINANCE_VIEW', 'FINANCE_EDIT', 'FINANCE_CREATE_REQUEST', 'FINANCE_APPRAISAL', 'FINANCE_APPROVAL',
+                        'REPORTING_VIEW'
+                    ]},
+                    { id: 3, name: 'Quản lý Chi nhánh', permissions: [
+                        'STUDENT_VIEW', 'STAFF_VIEW', 'CLASS_VIEW', 'COURSE_VIEW', 'DOCUMENT_VIEW', 'FINANCE_VIEW', 'REPORTING_VIEW'
+                    ]},
+                    { id: 4, name: 'Nhân viên', permissions: [
+                        'STUDENT_VIEW', 'STUDENT_CREATE_REQUEST', 'DOCUMENT_CREATE_REQUEST'
+                    ]}
+                ];
+
+                // Simulate account data from C#
+                allAccountData = [
+                    { accountId: 101, employeeId: 'NV001', username: 'admin.user', email: 'admin@example.com', displayName: 'Quản Trị Viên', statusId: 1, statusName: 'Active', firstLoginChangePwd: false, createdAt: '2023-01-15T10:00:00Z', updatedAt: '2024-07-15T14:30:00Z', lastLogin: '2024-07-17T09:00:00Z', wrongLoginCount: 0, roleId: 1, userAddedPermissions: [], userRemovedPermissions: [] },
+                    { accountId: 102, employeeId: 'NV002', username: 'teacher.b', email: 'teacherb@example.com', displayName: 'Trần Thị B', statusId: 1, statusName: 'Active', firstLoginChangePwd: true, createdAt: '2023-02-20T11:00:00Z', updatedAt: '2023-02-20T11:00:00Z', lastLogin: null, wrongLoginCount: 0, roleId: 4, userAddedPermissions: ['CLASS_ACCESS_FUNCTION'], userRemovedPermissions: [] },
+                    { accountId: 103, employeeId: 'NV003', username: 'consultant.c', email: 'consultantc@example.com', displayName: 'Lê Văn C', statusId: 1, statusName: 'Active', firstLoginChangePwd: false, createdAt: '2023-03-01T09:30:00Z', updatedAt: '2024-06-01T10:00:00Z', lastLogin: '2024-07-16T15:00:00Z', wrongLoginCount: 0, roleId: 4, userAddedPermissions: ['STUDENT_APPRAISAL', 'TCODE_STUDENT_INFO_DISPLAY', 'TCODE_CREATE_STUDENT'], userRemovedPermissions: ['DOCUMENT_CREATE_REQUEST'] },
+                    { accountId: 104, employeeId: 'NV004', username: 'accountant.d', email: 'accountantd@example.com', displayName: 'Phạm Thị D', statusId: 1, statusName: 'Active', firstLoginChangePwd: false, createdAt: '2023-04-10T14:00:00Z', updatedAt: '2024-05-10T16:00:00Z', lastLogin: '2024-07-17T08:30:00Z', wrongLoginCount: 0, roleId: 2, userAddedPermissions: [], userRemovedPermissions: [] },
+                    { accountId: 105, employeeId: 'NV005', username: 'hr.e', email: 'hre@example.com', displayName: 'Hoàng Văn E', statusId: 2, statusName: 'Inactive', firstLoginChangePwd: false, createdAt: '2023-05-05T08:00:00Z', updatedAt: '2023-05-05T08:00:00Z', lastLogin: null, wrongLoginCount: 0, roleId: 3, userAddedPermissions: ['STAFF_ACCESS_FUNCTION', 'DOCUMENT_ACCESS_FUNCTION'], userRemovedPermissions: [] },
+                ];
+
+                renderSystemPermissionDefinitionsTable(allSystemPermissionDefinitions);
+                performSearch(); // Initial render for account dashboard (now combined)
+                hideFullScreenLoading();
+            }, 1500);
+        }
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            setLoggedInUserName("Người dùng Test");
+            setLoggedInUserTitle("Vai trò Test");
+            fetchAllData();
+        });
+
+        // Diagnostic script for Font Awesome
+        document.addEventListener('DOMContentLoaded', function() {
+            const testIcon = document.createElement('i');
+            testIcon.className = 'fas fa-check'; // A common Font Awesome icon
+            testIcon.style.position = 'absolute';
+            testIcon.style.visibility = 'hidden';
+            testIcon.style.width = 'auto';
+            testIcon.style.height = 'auto';
+            testIcon.style.fontSize = '24px'; // Give it a size to measure
+            document.body.appendChild(testIcon);
+
+            setTimeout(() => { // Give browser a moment to render
+                const isFontAwesomeLoaded = testIcon.offsetWidth > 0;
+                document.body.removeChild(testIcon); // Clean up
+
+                if (!isFontAwesomeLoaded) {
+                    showCustomMessage('Font Awesome không tải được. Vui lòng kiểm tra lại đường dẫn file và cấu trúc thư mục (đặc biệt thư mục "webfonts").');
+                }
+            }, 100); // Short delay to allow rendering
+        });
+    </script>
+</body>
+</html>

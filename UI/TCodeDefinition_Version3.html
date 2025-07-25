@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Định nghĩa T-Code chức năng UI</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f8f8; }
+        .container { width: 700px; margin: 32px auto; background: #fff; box-shadow: 0 2px 8px #ccc; border-radius: 8px; padding: 24px;}
+        h1 { color: #34495e; margin-bottom: 16px;}
+        table { border-collapse: collapse; width: 100%; margin-bottom: 24px;}
+        th, td { border: 1px solid #ddd; padding: 8px;}
+        th { background: #e5e5e5;}
+        tr:nth-child(even){background: #f2f2f2;}
+        .form-inline input, .form-inline select { margin: 0 8px 8px 0; }
+        .form-inline label { margin-right: 8px; }
+        .action-btn { margin-right: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Định nghĩa T-Code chức năng UI</h1>
+
+    <!-- Form thêm/sửa T-Code -->
+    <form id="tcodeForm" class="form-inline" onsubmit="return false;">
+        <label for="tcode">Mã T-Code:</label>
+        <input type="text" id="tcode" required maxlength="20">
+        <label for="tcodename">Tên chức năng:</label>
+        <input type="text" id="tcodename" required maxlength="255">
+        <label for="description">Mô tả:</label>
+        <input type="text" id="description" maxlength="500">
+        <label for="uifile">File UI:</label>
+        <input type="text" id="uifile" maxlength="255">
+        <label for="isactive">Kích hoạt:</label>
+        <select id="isactive">
+            <option value="1" selected>Active</option>
+            <option value="0">Inactive</option>
+        </select>
+        <button type="submit" onclick="addOrUpdateTCode()" class="action-btn">Lưu</button>
+        <button type="button" onclick="resetForm()" class="action-btn">Hủy</button>
+    </form>
+
+    <!-- Danh sách T-Code -->
+    <h2>Danh sách T-Code chức năng UI</h2>
+    <table id="tcodeTable">
+        <thead>
+            <tr>
+                <th>Mã T-Code</th>
+                <th>Tên chức năng</th>
+                <th>Mô tả</th>
+                <th>File UI</th>
+                <th>Kích hoạt</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dữ liệu sẽ được render bằng JS -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Mock data cho demo (thay bằng API thực tế khi triển khai)
+    let tcodeList = [
+        {TCodeID: 1, TCode: 'ZBRANCH', TCodeName: 'Quản lý chi nhánh', Description: 'Giao diện chi nhánh', UIFile: 'BranchManagement.html', IsActive: 1},
+        {TCodeID: 2, TCode: 'ZDEPT', TCodeName: 'Quản lý phòng ban', Description: 'Giao diện phòng ban', UIFile: 'DepartmentManagement.html', IsActive: 1}
+    ];
+
+    function renderTCodeTable() {
+        let tbody = document.querySelector("#tcodeTable tbody");
+        tbody.innerHTML = "";
+        tcodeList.forEach(tc => {
+            tbody.innerHTML += `<tr>
+                <td>${tc.TCode}</td>
+                <td>${tc.TCodeName}</td>
+                <td>${tc.Description}</td>
+                <td>${tc.UIFile}</td>
+                <td>${tc.IsActive ? "Active" : "Inactive"}</td>
+                <td>
+                    <button onclick="editTCode(${tc.TCodeID})">Sửa</button>
+                    <button onclick="deleteTCode(${tc.TCodeID})">Xóa</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    function addOrUpdateTCode() {
+        let tcode = document.getElementById("tcode").value.trim();
+        let tcodename = document.getElementById("tcodename").value.trim();
+        let description = document.getElementById("description").value.trim();
+        let uifile = document.getElementById("uifile").value.trim();
+        let isactive = parseInt(document.getElementById("isactive").value);
+        if(!tcode || !tcodename) { alert("Mã T-Code và Tên chức năng không được để trống!"); return; }
+        let editingId = document.getElementById("tcode").getAttribute("data-edit");
+        if(editingId) {
+            let idx = tcodeList.findIndex(tc => tc.TCodeID == editingId);
+            if(idx >= 0) {
+                tcodeList[idx] = {TCodeID: +editingId, TCode: tcode, TCodeName: tcodename, Description: description, UIFile: uifile, IsActive: isactive};
+            }
+        } else {
+            let newId = tcodeList.length ? Math.max(...tcodeList.map(x=>x.TCodeID))+1 : 1;
+            tcodeList.push({TCodeID: newId, TCode: tcode, TCodeName: tcodename, Description: description, UIFile: uifile, IsActive: isactive});
+        }
+        resetForm();
+        renderTCodeTable();
+    }
+
+    function editTCode(id) {
+        let tc = tcodeList.find(x => x.TCodeID == id);
+        if(tc) {
+            document.getElementById("tcode").value = tc.TCode;
+            document.getElementById("tcodename").value = tc.TCodeName;
+            document.getElementById("description").value = tc.Description;
+            document.getElementById("uifile").value = tc.UIFile;
+            document.getElementById("isactive").value = tc.IsActive;
+            document.getElementById("tcode").setAttribute("data-edit", id);
+        }
+    }
+
+    function deleteTCode(id) {
+        if(confirm("Bạn có chắc muốn xóa T-Code này?")) {
+            tcodeList = tcodeList.filter(tc => tc.TCodeID != id);
+            resetForm();
+            renderTCodeTable();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById("tcodeForm").reset();
+        document.getElementById("tcode").removeAttribute("data-edit");
+    }
+
+    renderTCodeTable();
+</script>
+</body>
+</html>

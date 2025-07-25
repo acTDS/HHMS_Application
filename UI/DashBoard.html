@@ -1,0 +1,1677 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển - Trung Tâm Ngoại Ngữ 68</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General font and background color settings */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Lighter background for a modern feel */
+            color: #333333; /* Default text color */
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px; /* Slightly narrower sidebar */
+            background-color: #2d3748; /* Darker sidebar color */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.25); /* More prominent shadow */
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column; /* Stack logo and text */
+            align-items: center; /* Center logo and text */
+            padding: 10px 0;
+        }
+
+            .sidebar-header img {
+                max-width: 120px; /* Larger logo */
+                height: 120px;
+                border-radius: 50%; /* Make it perfectly round */
+                object-fit: cover;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Soft shadow for logo */
+                margin-bottom: 15px; /* Space between logo and title */
+            }
+            
+            .sidebar-header .app-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #e2e8f0;
+                text-align: center;
+            }
+
+
+        .sidebar-nav {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #a0aec0;
+            margin-bottom: 15px;
+            margin-top: 20px;
+            padding-left: 0;
+            text-transform: uppercase; /* Uppercase for section titles */
+            letter-spacing: 0.05em;
+        }
+
+        /* T-Code input section in sidebar */
+        .sidebar-tcode-input-section {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+            .sidebar-tcode-input-section input[type="text"] {
+                width: 100%; /* Ensure it takes full width */
+                padding: 10px 15px; /* Increased padding */
+                border-radius: 8px; /* More rounded corners */
+                border: 1px solid #4a5568;
+                background-color: #1a202c;
+                color: #e2e8f0;
+                font-size: 0.95rem; /* Slightly larger font */
+                outline: none;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+            }
+
+                .sidebar-tcode-input-section input[type="text"]:focus {
+                    border-color: #4299e1;
+                    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Blue glow on focus */
+                }
+
+        .sidebar-nav .tcode-item {
+            display: flex; /* Use flex for icon and text alignment */
+            align-items: center;
+            padding: 12px 15px; /* Increased padding */
+            margin-bottom: 8px; /* More space between items */
+            border-radius: 8px;
+            color: #a0aec0;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+            cursor: pointer;
+            font-size: 0.95rem;
+            gap: 10px; /* Space between icon and text */
+        }
+
+            .sidebar-nav .tcode-item:hover {
+                background-color: #4a5568;
+                color: #ffffff;
+                transform: translateY(-2px); /* Subtle lift effect */
+            }
+            .sidebar-nav .tcode-item.active {
+                background-color: #4299e1; /* Active state with primary blue */
+                color: #ffffff;
+                font-weight: 600;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            .sidebar-nav .tcode-item.active:hover {
+                background-color: #3182ce; /* Darker blue on hover for active */
+            }
+            .sidebar-nav .tcode-item i {
+                color: #a0aec0; /* Default icon color */
+                transition: color 0.2s;
+            }
+            .sidebar-nav .tcode-item.active i {
+                color: #ffffff; /* White icon for active state */
+            }
+
+
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* White background for main content */
+        }
+
+        /* Header */
+        .header {
+            background-color: #2d3748;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Synchronized shadow */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-grow: 1; /* Allow to expand */
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .header-date {
+            font-size: 1rem;
+            color: #a0aec0;
+            white-space: nowrap;
+            margin-left: auto; /* Push date to the right */
+            padding-right: 20px; /* Space before icons */
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Notification specific styles from Tusision.html */
+        .header-notification-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-icons svg {
+            width: 24px;
+            height: 24px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .header-icons svg:hover {
+            color: #ffffff;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            line-height: 1;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 0 0 2px #2d3748;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 250px;
+            max-width: 350px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+
+        .notification-dropdown.show {
+            display: flex;
+        }
+
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px 10px;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .notification-dropdown-header h3 {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .notification-dropdown-header button {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .notification-dropdown-header button:hover {
+            color: #ffffff;
+        }
+
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .notification-list li {
+            color: #e2e8f0;
+            padding: 10px 15px;
+            border-bottom: 1px solid #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .notification-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notification-list li:hover {
+            background-color: #4a5568;
+        }
+
+        /* User Info and Dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+            .user-info img {
+                width: 36px; /* Slightly larger avatar size */
+                height: 36px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #4299e1; /* Prominent blue border */
+            }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Left-align user info */
+            white-space: nowrap;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+            .user-details .user-name {
+                font-weight: 600;
+                font-size: 1rem;
+                margin-bottom: 2px;
+            }
+
+            .user-details .user-title {
+                font-size: 0.85rem;
+                color: #a0aec0;
+            }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Distance from user-info */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 160px; /* Slightly wider */
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+            .user-dropdown.show {
+                display: flex;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .user-dropdown button {
+                background: none;
+                border: none;
+                color: #e2e8f0;
+                padding: 10px 15px;
+                text-align: left;
+                cursor: pointer;
+                transition: background-color 0.2s ease-in-out;
+                border-radius: 0;
+                font-size: 0.95rem;
+            }
+
+                .user-dropdown button:hover {
+                    background-color: #4a5568;
+                    color: #ffffff;
+                }
+
+        /* Main Dashboard Content */
+        .dashboard-body {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #ffffff; /* White background for main content */
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem; /* Larger, more prominent title */
+            font-weight: 800; /* Extra bold */
+            color: #2c3e50; /* Darker black color */
+            margin-bottom: 40px; /* More space below title */
+            text-align: center;
+            padding-bottom: 20px; /* More padding below title */
+            border-bottom: 4px solid #3498db; /* Thicker, more prominent border */
+            letter-spacing: 0.05em; /* Add some letter spacing */
+        }
+
+        /* Metric Cards Grid */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px; /* Increased gap */
+            margin-bottom: 40px; /* More space below grid */
+        }
+
+        .metric-card {
+            background-color: #fdfdfd; /* Near-white background for cards */
+            padding: 25px; /* Increased padding */
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px; /* Slightly taller cards */
+            border: 1px solid #e0e0e0; /* Subtle border */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+            .metric-card:hover {
+                transform: translateY(-5px); /* Lift effect on hover */
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+            }
+
+        .metric-card-header h2 {
+            font-size: 1.2rem; /* Slightly larger title */
+            font-weight: 600;
+            color: #555555; /* Darker grey for title */
+        }
+
+        .metric-card-header svg {
+            width: 28px; /* Larger icons */
+            height: 28px;
+            color: #3498db; /* Primary blue for icons */
+        }
+
+        .metric-value {
+            font-size: 2.8rem; /* Larger value */
+            font-weight: 800;
+            color: #2c3e50; /* Darker black for value */
+            margin-bottom: 8px; /* Space below value */
+        }
+
+        .metric-change {
+            font-size: 1rem; /* Slightly larger change text */
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* More space for icon */
+        }
+
+            .metric-change.positive {
+                color: #28a745; /* Brighter green for positive */
+            }
+
+            .metric-change.negative {
+                color: #dc3545; /* Brighter red for negative */
+            }
+
+        /* Section Grid */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px; /* Increased gap */
+            margin-bottom: 40px;
+        }
+
+        .section-grid-full {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px; /* Increased gap */
+            margin-bottom: 40px;
+        }
+
+        .section-card {
+            background-color: #fdfdfd; /* Near-white background for cards */
+            padding: 25px; /* Increased padding */
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 1px solid #e0e0e0; /* Subtle border */
+        }
+
+            .section-card h2 {
+                font-size: 1.8rem; /* Larger title */
+                font-weight: 700;
+                color: #2c3e50; /* Darker black for title */
+                margin-bottom: 25px; /* More space below title */
+                padding-bottom: 10px;
+                border-bottom: 2px solid #f39c12; /* Accent border */
+            }
+
+        /* List items */
+        .class-item, .activity-item, .request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 18px 0; /* Increased vertical padding */
+            border-bottom: 1px solid #e9ecef; /* Lighter border for separation */
+        }
+
+            .class-item:last-child, .activity-item:last-child, .request-item:last-child {
+                border-bottom: none;
+            }
+
+        .class-details, .activity-details, .request-details {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+            .class-details h3, .activity-details p, .request-details p {
+                font-size: 1.15rem; /* Slightly larger text */
+                font-weight: 600;
+                color: #333333; /* Darker text */
+                margin-bottom: 6px; /* More space below title/details */
+            }
+
+            .class-details p, .activity-details small, .request-details small {
+                font-size: 0.95rem; /* Slightly larger text */
+                color: #666666; /* Medium grey for sub-text */
+                margin-bottom: 4px;
+            }
+
+        .class-students {
+            font-size: 1rem; /* Larger text */
+            color: #3498db; /* Primary blue for student count */
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0; /* Prevent shrinking */
+            margin-left: 20px; /* More space */
+        }
+
+        .activity-icon {
+            background-color: #e2e8f0; /* Lighter background for icon circle */
+            border-radius: 50%;
+            width: 40px; /* Larger icon circle */
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            color: #4299e1; /* Primary blue for icon */
+            font-size: 1.2rem; /* Larger icon font size */
+            flex-shrink: 0;
+            margin-right: 20px; /* More space */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #666666;
+            white-space: nowrap;
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .section-grid {
+                grid-template-columns: 1fr; /* Stack sections vertically */
+            }
+
+            .header-date {
+                display: none;
+            }
+            .dashboard-title {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            .metric-grid {
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .metric-card {
+                padding: 20px;
+                min-height: 120px;
+            }
+            .metric-value {
+                font-size: 2.5rem;
+            }
+            .metric-card-header h2 {
+                font-size: 1rem;
+            }
+            .metric-card-header svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .section-grid {
+                gap: 20px;
+                margin-bottom: 25px;
+            }
+            .section-card {
+                padding: 20px;
+            }
+            .section-card h2 {
+                font-size: 1.6rem;
+                margin-bottom: 20px;
+            }
+
+            .activity-item, .request-item, .class-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 0;
+            }
+            .activity-icon {
+                margin-bottom: 8px;
+                margin-right: 0;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            .activity-details {
+                width: 100%; /* Ensure details take full width */
+            }
+            .activity-time, .class-students {
+                margin-left: 0;
+                margin-top: 5px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px; /* Very narrow sidebar on mobile */
+                padding: 15px 5px;
+            }
+
+            .sidebar-header .app-title {
+                display: none; /* Hide app title on mobile sidebar */
+            }
+            .sidebar-header img {
+                max-width: 50px; /* Smaller logo on mobile */
+                height: 50px;
+                margin-bottom: 10px;
+            }
+
+            .sidebar-nav-title {
+                display: none; /* Hide T-Code title */
+            }
+            .sidebar-tcode-input-section {
+                display: none; /* Hide T-Code input on mobile sidebar */
+            }
+
+            .sidebar-nav .tcode-item span {
+                display: none; /* Hide T-Code text */
+            }
+            .sidebar-nav .tcode-item {
+                justify-content: center; /* Center icons */
+                padding: 10px 5px;
+                margin-bottom: 5px;
+            }
+            .sidebar-nav .tcode-item i {
+                font-size: 1.2rem; /* Larger icon for visibility */
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px 15px;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .header-right {
+                width: 100%;
+                justify-content: flex-end; /* Right-align icons and user info */
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .dashboard-body {
+                padding: 20px;
+            }
+
+            .dashboard-title {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+
+            .metric-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Smaller cards on mobile */
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+            .metric-card {
+                padding: 15px;
+                min-height: 100px;
+            }
+            .metric-value {
+                font-size: 2.2rem;
+            }
+            .metric-card-header h2 {
+                font-size: 1rem;
+            }
+            .metric-card-header svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .section-grid {
+                gap: 20px;
+                margin-bottom: 25px;
+            }
+            .section-card {
+                padding: 20px;
+            }
+            .section-card h2 {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+            }
+
+            .activity-item, .request-item, .class-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px 0;
+            }
+            .activity-icon {
+                margin-bottom: 8px;
+                margin-right: 0;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            .activity-details {
+                width: 100%; /* Ensure details take full width */
+            }
+            .activity-time, .class-students {
+                margin-left: 0;
+                margin-top: 5px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* CSS for Full-screen Loading Overlay */
+        .full-screen-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dim black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Ensure it's on top of all other elements */
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* Fade effect */
+        }
+
+            .full-screen-loading-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        /* Large spinner for Full-screen Loading Overlay */
+        .full-screen-spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #fff;
+            border-radius: 50%;
+            width: 60px; /* Larger size */
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Custom Message Box Overlay */
+        .custom-message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-message-box-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-message-box-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: #333333;
+        }
+
+        .custom-message-box-content p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .custom-message-box-content button {
+            background-color: #4299e1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .custom-message-box-content button:hover {
+            background-color: #3182ce;
+        }
+    </style>
+</head>
+<body data-user-role="default">
+    <!-- Full-screen Loading Overlay -->
+    <div id="fullScreenLoadingOverlay" class="full-screen-loading-overlay">
+        <div class="full-screen-spinner"></div>
+    </div>
+
+    <!-- Custom Message Box Overlay for general messages -->
+    <div id="customMessageBoxOverlay" class="custom-message-box-overlay">
+        <div class="custom-message-box-content">
+            <p id="customMessageText"></p>
+            <button id="confirmCustomMessageBox" class="hidden bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md mr-2">Xác nhận</button>
+            <button id="cancelCustomMessageBox" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">Hủy</button>
+            <button id="closeCustomMessageBox" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <!-- Logo Image - Changed to a placeholder image. Replace with your actual logo URL. -->
+            <img src="https://placehold.co/120x120/2d3748/e2e8f0?text=LOGO" alt="Trung Tâm Ngoại Ngữ 68">
+            <span class="app-title">Trung Tâm Ngoại Ngữ 68</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-title">T-Codes</div>
+
+            <!-- T-Code input section in sidebar -->
+            <div class="sidebar-tcode-input-section">
+                <input type="text" id="tCodeInput" placeholder="Nhập T-Code..." />
+            </div>
+
+            <div id="tcodeList">
+                <!-- T-Codes will be dynamically loaded from mock data -->
+                <p class="text-center text-gray-500 py-4">Đang tải T-Codes...</p>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">Bảng Điều Khiển</div>
+                <div id="currentDate" class="header-date"></div>
+            </div>
+            <div class="header-right">
+                <div class="header-notification-wrapper">
+                    <div class="header-icons" id="notificationBellIcon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                        <div class="notification-badge" id="notificationCountBadge">0</div>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-dropdown-header">
+                            <h3>Thông báo</h3>
+                            <button id="clearNotificationsBtn">Xóa tất cả</button>
+                        </div>
+                        <ul id="notificationList" class="notification-list">
+                            <li class="text-gray-400 text-sm p-2">Không có thông báo mới.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- User Info and Dropdown -->
+                <div class="user-info" id="userInfo">
+                    <img src="https://placehold.co/36x36/1a202c/e2e8f0?text=U" alt="User Avatar" />
+                    <div class="user-details">
+                        <span class="user-name" id="employeeName">Đang tải...</span>
+                        <span class="user-title" id="employeeTitle"></span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" style="cursor: pointer; color: #a0aec0;">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button id="changePasswordBtn">Đổi Mật Khẩu</button>
+                        <button id="logoutBtn">Đăng Xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-body">
+            <h1 class="dashboard-title">Tổng Quan Hệ Thống</h1>
+
+            <!-- Metric Cards Grid -->
+            <div class="metric-grid" id="metricGrid">
+                <!-- Metrics will be dynamically loaded from mock data -->
+                <p class="text-center text-gray-500 py-4 col-span-full">Đang tải dữ liệu hệ thống...</p>
+            </div>
+
+
+            <!-- Activity Sections -->
+            <div class="section-grid" id="activitySections">
+                <!-- Daily Activities Card -->
+                <div class="section-card" id="dailyActivitiesCard">
+                    <h2>Hoạt động trong ngày</h2>
+                    <div class="activity-list">
+                        <!-- Content will be loaded dynamically here -->
+                        <p class="text-center text-gray-500 py-4">Đang tải hoạt động trong ngày...</p>
+                    </div>
+                </div>
+
+                <!-- Upcoming Activities Card -->
+                <div class="section-card" id="upcomingActivitiesCard">
+                    <h2>Lớp học sắp diễn ra</h2>
+                    <div class="class-list">
+                        <!-- Content will be loaded dynamically here -->
+                        <p class="text-center text-gray-500 py-4">Đang tải lớp học sắp diễn ra...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Requests Card -->
+            <div class="section-grid-full" id="pendingRequestsSection">
+                <div class="section-card">
+                    <h2>Yêu cầu chờ xử lý</h2>
+                    <div class="request-list">
+                        <!-- Content will be loaded dynamically here -->
+                        <p class="text-center text-gray-500 py-4">Đang tải yêu cầu chờ xử lý...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // BASE_API_URL: This constant is no longer used as API calls have been removed.
+        const BASE_API_URL = 'http://localhost:3000/api'; 
+
+        // Get reference to the loading overlay
+        const fullScreenLoadingOverlay = document.getElementById('fullScreenLoadingOverlay');
+        const customMessageBoxOverlay = document.getElementById('customMessageBoxOverlay');
+        const customMessageText = document.getElementById('customMessageText');
+        const closeCustomMessageBox = document.getElementById('closeCustomMessageBox');
+        const confirmCustomMessageBox = document.getElementById('confirmCustomMessageBox');
+        const cancelCustomMessageBox = document.getElementById('cancelCustomMessageBox');
+
+        // Store all fetched T-codes globally for permission checks
+        let allTCodes = [];
+        // Store the current user's role
+        let currentUserRole = 'default';
+
+        // Get references to dashboard content elements
+        const metricGrid = document.getElementById('metricGrid');
+        const dailyActivitiesCard = document.getElementById('dailyActivitiesCard');
+        const upcomingActivitiesCard = document.getElementById('upcomingActivitiesCard');
+        const pendingRequestsSection = document.getElementById('pendingRequestsSection');
+        const tcodeListDiv = document.getElementById('tcodeList');
+        const tCodeInput = document.getElementById('tCodeInput');
+        const notificationBellIcon = document.getElementById('notificationBellIcon'); // Changed from notificationIcon
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationCountBadge = document.getElementById('notificationCountBadge');
+        const notificationList = document.getElementById('notificationList'); // Changed from notificationItemsContainer
+        const clearNotificationsBtn = document.getElementById('clearNotificationsBtn'); // Changed from markAllReadBtn
+        const userInfo = document.getElementById('userInfo');
+        const userDropdown = document.getElementById('userDropdown');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Global array to hold current notifications
+        let activeNotifications = [];
+
+
+        /**
+         * Displays the full-screen loading overlay.
+         */
+        function showFullScreenLoading() {
+            console.log("Showing full screen loading.");
+            fullScreenLoadingOverlay.classList.add('active');
+        }
+
+        /**
+         * Hides the full-screen loading overlay.
+         */
+        function hideFullScreenLoading() {
+            console.log("Hiding full screen loading.");
+            fullScreenLoadingOverlay.classList.remove('active');
+        }
+
+        /**
+         * Displays a custom message instead of alert().
+         * @param {string} message - The message content.
+         * @param {boolean} [isConfirm=false] - True if it's a confirmation dialog.
+         * @param {function} [callback=null] - Callback function for confirmation dialog.
+         */
+        function showCustomMessageBox(message, isConfirm = false, callback = null) {
+            console.log("Showing custom message box:", message, "isConfirm:", isConfirm);
+            const overlay = document.getElementById('customMessageBoxOverlay');
+            const messageText = document.getElementById('customMessageText');
+            const closeButton = document.getElementById('closeCustomMessageBox');
+            const confirmButton = document.getElementById('confirmCustomMessageBox');
+            const cancelButton = document.getElementById('cancelCustomMessageBox');
+
+            messageText.textContent = message;
+
+            // Define handlers before removing/adding listeners
+            const closeHandler = () => { cleanup(); if (!isConfirm && callback) callback(); };
+            const confirmHandler = () => { cleanup(); if (callback) callback(true); };
+            const cancelHandler = () => { cleanup(); if (callback) callback(false); };
+            const overlayClickHandler = (event) => {
+                if (event.target === overlay) {
+                    cleanup();
+                    if (isConfirm && callback) callback(false); // Treat outside click as cancel for confirmation
+                    else if (!isConfirm && callback) callback(); // For simple messages
+                }
+            };
+
+            // Remove previous listeners to prevent multiple firings
+            closeButton.removeEventListener('click', closeHandler);
+            confirmButton.removeEventListener('click', confirmHandler);
+            cancelButton.removeEventListener('click', cancelHandler);
+            overlay.removeEventListener('click', overlayClickHandler); // Remove previous overlay listener
+
+
+            if (isConfirm) {
+                confirmButton.classList.remove('hidden');
+                cancelButton.classList.remove('hidden');
+                closeButton.classList.add('hidden'); // Hide the default close button for confirmation
+            } else {
+                confirmButton.classList.add('hidden');
+                cancelButton.classList.add('hidden');
+                closeButton.classList.remove('hidden'); // Show default close button
+            }
+
+            overlay.classList.add('show');
+
+            const cleanup = () => {
+                overlay.classList.remove('show');
+                closeButton.removeEventListener('click', closeHandler);
+                confirmButton.removeEventListener('click', confirmHandler);
+                cancelButton.removeEventListener('click', cancelHandler);
+                overlay.removeEventListener('click', overlayClickHandler);
+            };
+
+            closeButton.addEventListener('click', closeHandler);
+            confirmButton.addEventListener('click', confirmHandler);
+            cancelButton.addEventListener('click', cancelHandler);
+            overlay.addEventListener('click', overlayClickHandler);
+        }
+
+        // Initial setup for the default close button
+        if (closeCustomMessageBox) {
+            closeCustomMessageBox.addEventListener('click', () => {
+                // This will only be triggered if it's a simple message box
+                customMessageBoxOverlay.classList.remove('show');
+            });
+        }
+
+
+        // JavaScript to display current date and time
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('vi-VN', options);
+            }
+        }
+
+        /**
+         * Checks if two dates are on the same day.
+         * @param {Date} d1 - First date.
+         * @param {Date} d2 - Second date.
+         * @returns {boolean} - True if same day, false otherwise.
+         */
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        /**
+         * Determines the time category for a given notification date.
+         * @param {Date} notificationDate - The date of the notification.
+         * @returns {string} - The time category (e.g., 'Mới', 'Hôm nay', 'Hôm qua').
+         */
+        function getTimeCategory(notificationDate) {
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
+
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            // Normalize notification date for comparison (only consider day, month, year, hour, minute)
+            const normalizedNotificationDate = new Date(notificationDate.getFullYear(), notificationDate.getMonth(), notificationDate.getDate(), notificationDate.getHours(), notificationDate.getMinutes());
+
+
+            if (normalizedNotificationDate > oneHourAgo) {
+                return 'Mới';
+            } else if (isSameDay(normalizedNotificationDate, now)) {
+                return 'Hôm nay';
+            } else if (isSameDay(normalizedNotificationDate, yesterday)) {
+                return 'Hôm qua';
+            } else if (normalizedNotificationDate >= startOfWeek) {
+                return 'Tuần này';
+            } else if (normalizedNotificationDate >= startOfMonth) {
+                return 'Tháng này';
+            }
+            return 'Cũ hơn';
+        }
+
+        /**
+         * Formats a date into a human-readable "time ago" string.
+         * @param {Date} date - The date to format.
+         * @returns {string} - Formatted time string.
+         */
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            let interval = seconds / 31536000; // years
+            if (interval > 1) {
+                return Math.floor(interval) + " năm trước";
+            }
+            interval = seconds / 2592000; // months
+            if (interval > 1) {
+                return Math.floor(interval) + " tháng trước";
+            }
+            interval = seconds / 86400; // days
+            if (interval > 1) {
+                return Math.floor(interval) + " ngày trước";
+            }
+            interval = seconds / 3600; // hours
+            if (interval > 1) {
+                return Math.floor(interval) + " giờ trước";
+            }
+            interval = seconds / 60; // minutes
+            if (interval > 1) {
+                return Math.floor(interval) + " phút trước";
+            }
+            return Math.floor(seconds) + " giây trước";
+        }
+
+        /**
+         * Cập nhật số lượng thông báo trên huy hiệu.
+         * @param {number} count - Số lượng thông báo chưa đọc.
+         */
+        function updateNotificationCount(count) {
+            if (notificationCountBadge) {
+                notificationCountBadge.textContent = count > 99 ? '99+' : count; // Limit display to 99+
+                if (count > 0) {
+                    notificationCountBadge.style.display = 'block';
+                } else {
+                    notificationCountBadge.style.display = 'none';
+                }
+            }
+        }
+
+        /**
+         * Render notifications into the dropdown, grouped by time.
+         * @param {Array<Object>} notifications - Array of notification objects.
+         */
+        function renderNotifications(notifications) {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<li class="text-gray-400 text-sm p-2">Không có thông báo mới.</li>';
+                clearNotificationsBtn.style.display = 'none';
+                updateNotificationCount(0);
+                return;
+            }
+
+            clearNotificationsBtn.style.display = 'block';
+
+            // Sort notifications by date, newest first
+            notifications.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            const groupedNotifications = {
+                'Mới': [],
+                'Hôm nay': [],
+                'Hôm qua': [],
+                'Tuần này': [],
+                'Tháng này': [],
+                'Cũ hơn': []
+            };
+
+            notifications.forEach(notif => {
+                const category = getTimeCategory(notif.date);
+                // Ensure the category exists before pushing
+                if (!groupedNotifications[category]) {
+                    groupedNotifications[category] = [];
+                }
+                groupedNotifications[category].push(notif);
+            });
+
+            // Order of categories for rendering
+            const categoryOrder = ['Mới', 'Hôm nay', 'Hôm qua', 'Tuần này', 'Tháng này', 'Cũ hơn'];
+
+            categoryOrder.forEach(category => {
+                if (groupedNotifications[category].length > 0) {
+                    const categoryHeader = document.createElement('li'); // Changed to li for consistency with ul
+                    categoryHeader.classList.add('notification-dropdown-header');
+                    categoryHeader.innerHTML = `<h3>${category}</h3>`; // Added h3 for consistency
+                    notificationList.appendChild(categoryHeader);
+
+                    groupedNotifications[category].forEach(notif => {
+                        const notificationItem = document.createElement('li'); // Changed to li
+                        notificationItem.classList.add('notification-item');
+                        notificationItem.dataset.id = notif.id; // Assign a unique ID to each notification
+                        notificationItem.innerHTML = `
+                            <strong>${notif.title}:</strong> ${notif.message}
+                            <span class="time">${formatTimeAgo(notif.date)}</span>
+                        `;
+                        notificationList.appendChild(notificationItem);
+
+                        // Add click listener to each individual notification item
+                        notificationItem.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent dropdown from closing immediately
+                            markNotificationAsRead(notif.id);
+                        });
+                    });
+                }
+            });
+            updateNotificationCount(notifications.length);
+        }
+
+        /**
+         * Marks a single notification as read and updates the list.
+         * @param {string} id - The ID of the notification to mark as read.
+         */
+        function markNotificationAsRead(id) {
+            activeNotifications = activeNotifications.filter(notif => notif.id !== id);
+            renderNotifications(activeNotifications);
+            showCustomMessageBox(`Thông báo "${id}" đã được đánh dấu là đã đọc.`);
+            // Optionally, close the dropdown after marking one as read
+            notificationDropdown.classList.remove('show');
+        }
+
+        /**
+         * Checks if the current user has permission for a given T-Code.
+         * @param {string} tCode - The T-Code to check.
+         * @returns {boolean} - True if the user has permission, false otherwise.
+         */
+        function hasPermission(tCode) {
+            const tCodeItem = allTCodes.find(item => item.tcode === tCode);
+            if (!tCodeItem) {
+                return false; // T-Code not found
+            }
+            // Check if the current user's role is included in the required roles for this T-Code
+            return tCodeItem.requiredRole.includes(currentUserRole);
+        }
+
+        // Function to handle T-Code submission (from direct input)
+        function handleTCodeSubmission() {
+            const tCode = tCodeInput.value.trim();
+            if (tCode) {
+                if (hasPermission(tCode)) {
+                    showFullScreenLoading(); // Show loading
+                    // Send T-Code to Windows Forms app for processing (simulated)
+                    if (window.chrome && window.chrome.webview) {
+                        window.chrome.webview.postMessage(`TCode:${tCode}`);
+                        showCustomMessageBox(`T-Code "${tCode}" đã được gửi.`); // Temporary notification
+                        tCodeInput.value = ''; // Clear input after submission
+                    } else {
+                        showCustomMessageBox(`T-Code "${tCode}" đã được nhập. (Chỉ mô phỏng trong trình duyệt)`);
+                    }
+                    // Hide loading after a short delay, as there's no callback from native app
+                    setTimeout(hideFullScreenLoading, 1000);
+                } else {
+                    showCustomMessageBox(`Bạn không có quyền truy cập T-Code "${tCode}".`);
+                }
+            } else {
+                showCustomMessageBox('Vui lòng nhập T-Code.');
+            }
+        }
+
+        // Function to render T-codes based on user permissions
+        function renderPermittedTCodes() {
+            tcodeListDiv.innerHTML = ''; // Clear current list
+
+            const permittedTCodes = allTCodes.filter(item =>
+                item.requiredRole.includes(currentUserRole) // Filter by user permission
+            );
+
+            if (permittedTCodes.length > 0) {
+                permittedTCodes.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'tcode-item';
+                    div.dataset.tcode = item.tcode;
+                    // Add Font Awesome icon based on tcode
+                    let iconClass = 'fas fa-cogs'; // Default icon
+                    switch (item.tcode) {
+                        case 'STUDENT_VIEW': iconClass = 'fas fa-user-graduate'; break;
+                        case 'CLASS_SCHEDULE': iconClass = 'fas fa-calendar-alt'; break;
+                        case 'PAYMENT_INFO': iconClass = 'fas fa-money-bill-wave'; break;
+                        case 'HR_MANAGEMENT': iconClass = 'fas fa-users'; break;
+                        case 'COURSE_CATALOG': iconClass = 'fas fa-book-open'; break;
+                        case 'TEACHER_ASSIGN': iconClass = 'fas fa-chalkboard-teacher'; break;
+                        case 'EXAM_GRADING': iconClass = 'fas fa-marker'; break;
+                        case 'ATTENDANCE_TRACK': iconClass = 'fas fa-clipboard-check'; break;
+                        case 'BRANCH_MANAGEMENT': iconClass = 'fas fa-building'; break;
+                        case 'MAJOR_MANAGEMENT': iconClass = 'fas fa-university'; break;
+                        case 'LOG_VIEW': iconClass = 'fas fa-history'; break;
+                        case 'DOCUMENT_MANAGEMENT': iconClass = 'fas fa-file-alt'; break;
+                    }
+                    div.innerHTML = `<i class="${iconClass}"></i><span>${item.tcode}: ${item.description}</span>`;
+                    tcodeListDiv.appendChild(div);
+                });
+                // Re-attach event listeners for items
+                document.querySelectorAll('.tcode-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const tCode = item.dataset.tcode;
+                        if (hasPermission(tCode)) {
+                            showFullScreenLoading();
+                            if (window.chrome && window.chrome.webview) {
+                                window.chrome.webview.postMessage(`TCode:${tCode}`);
+                                showCustomMessageBox(`T-Code "${tCode}" đã được kích hoạt từ Sidebar.`);
+                            } else {
+                                showCustomMessageBox(`T-Code "${tCode}" đã được kích hoạt từ Sidebar. (Mô phỏng trong trình duyệt)`);
+                            }
+                            document.querySelectorAll('.tcode-item').forEach(el => el.classList.remove('active'));
+                            item.classList.add('active');
+                            setTimeout(hideFullScreenLoading, 1000);
+                        } else {
+                            showCustomMessageBox(`Bạn không có quyền truy cập T-Code "${tCode}".`);
+                        }
+                    });
+                });
+            } else {
+                tcodeListDiv.innerHTML = '<p class="text-center text-gray-500 py-4">Không có T-Code nào bạn có quyền truy cập.</p>';
+            }
+        }
+
+        /**
+         * Fetches T-Code list from mock data.
+         */
+        function fetchTCodes() {
+            tcodeListDiv.innerHTML = '<p class="text-center text-gray-500 py-4">Đang tải T-Codes...</p>'; // Show loading indicator
+            // Directly use mock data as there's no API
+            const mockTCodes = [
+                { "tcode": "STUDENT_VIEW", "description": "Xem thông tin học sinh", "requiredRole": ["admin", "teacher", "student"] },
+                { "tcode": "CLASS_SCHEDULE", "description": "Quản lý lịch học", "requiredRole": ["admin", "teacher"] },
+                { "tcode": "PAYMENT_INFO", "description": "Xem thông tin thanh toán", "requiredRole": ["admin", "hr", "student"] },
+                { "tcode": "HR_MANAGEMENT", "description": "Quản lý nhân sự", "requiredRole": ["admin", "hr"] },
+                { "tcode": "COURSE_CATALOG", "description": "Danh mục khóa học", "requiredRole": ["admin", "teacher", "student", "default"] },
+                { "tcode": "TEACHER_ASSIGN", "description": "Phân công giáo viên", "requiredRole": ["admin"] },
+                { "tcode": "EXAM_GRADING", "description": "Chấm điểm bài thi", "requiredRole": ["admin", "teacher"] },
+                { "tcode": "ATTENDANCE_TRACK", "description": "Theo dõi điểm danh", "requiredRole": ["admin", "teacher", "hr"] },
+                { "tcode": "BRANCH_MANAGEMENT", "description": "Quản lý chi nhánh", "requiredRole": ["admin", "manager"] },
+                { "tcode": "MAJOR_MANAGEMENT", "description": "Quản lý chuyên ngành", "requiredRole": ["admin", "manager"] },
+                { "tcode": "LOG_VIEW", "description": "Xem nhật ký hệ thống", "requiredRole": ["admin"] },
+                { "tcode": "DOCUMENT_MANAGEMENT", "description": "Quản lý tài liệu", "requiredRole": ["admin", "manager", "teacher", "hr"] }
+            ];
+            allTCodes = mockTCodes; // Store mock data
+            renderPermittedTCodes(); // Render initial list with mock data
+            showCustomMessageBox('Đang hiển thị T-Codes từ dữ liệu giả định.');
+        }
+
+        /**
+         * Fetches user information from mock data.
+         */
+        function fetchUserInfo() {
+            const employeeNameSpan = document.getElementById('employeeName');
+            const employeeTitleSpan = document.getElementById('employeeTitle');
+
+            // Directly use mock data as there's no API
+            const mockUserData = {
+                "name": "Người dùng Demo",
+                "title": "Quản lý",
+                "role": "admin" // Default to 'admin' for mock data to show more T-codes
+            };
+            employeeNameSpan.textContent = mockUserData.name;
+            employeeTitleSpan.textContent = mockUserData.title;
+            currentUserRole = mockUserData.role; // Set current user role
+            document.body.dataset.userRole = currentUserRole; // Set role for dashboard logic
+            showCustomMessageBox('Đang hiển thị thông tin người dùng từ dữ liệu giả định.');
+        }
+
+        /**
+         * Renders metric cards on the dashboard.
+         * @param {Array<Object>} metrics - Array of metric objects.
+         */
+        function renderMetrics(metrics) {
+            metricGrid.innerHTML = ''; // Clear existing content
+            if (metrics && metrics.length > 0) {
+                metrics.forEach(metric => {
+                    const changeClass = metric.change && metric.change.startsWith('+') ? 'positive' : 'negative';
+                    // You need to map SVG icons based on metric type.
+                    // This is a simple example, you can extend it.
+                    let iconSvg = '';
+                    switch (metric.title) {
+                        case 'Tổng số học sinh':
+                            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87l-1-.13a4 4 0 0 0-3 3.87v2" /><circle cx="16" cy="7" r="4" /></svg>';
+                            break;
+                        case 'Lớp học đang hoạt động':
+                            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>';
+                            break;
+                        case 'Tỷ lệ tham gia':
+                            iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-check"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></svg>';
+                            break;
+                        default:
+                            iconSvg = ''; // No default icon
+                    }
+
+                    metricGrid.innerHTML += `
+                            <div class="metric-card">
+                                <div class="metric-card-header flex justify-between items-center">
+                                    <h2>${metric.title}</h2>
+                                    ${iconSvg}
+                                </div>
+                                <div class="metric-value">${metric.value}</div>
+                                <div class="metric-change ${changeClass}">${metric.change}</div>
+                            </div>
+                        `;
+                });
+            } else {
+                metricGrid.innerHTML = '<p class="text-center text-gray-500 py-4 col-span-full">Không có dữ liệu hệ thống.</p>';
+            }
+        }
+
+        /**
+         * Renders a list of activities/classes/requests.
+         * @param {string} elementId - ID of the element containing the list.
+         * @param {Array<Object>} items - Array of data objects.
+         * @param {string} type - Type of list ('activity', 'class', 'request').
+         */
+        function renderActivityList(elementId, items, type) {
+            const listElement = document.getElementById(elementId).querySelector(`.${type}-list`);
+            listElement.innerHTML = ''; // Clear existing content
+
+            if (items && items.length > 0) {
+                items.forEach(item => {
+                    if (type === 'activity') {
+                        listElement.innerHTML += `
+                                <div class="activity-item">
+                                    <div class="activity-icon">${item.icon}</div>
+                                    <div class="activity-details">
+                                        <p>${item.details}</p>
+                                        <small>${item.time}</small>
+                                    </div>
+                                </div>
+                            `;
+                    } else if (type === 'class') {
+                        listElement.innerHTML += `
+                                <div class="class-item">
+                                    <div class="class-details">
+                                        <h3>${item.title}</h3>
+                                        <p>Giáo viên: ${item.instructor}</p>
+                                        <p>Lịch học: ${item.schedule}</p>
+                                    </div>
+                                    <div class="class-students">${item.students}</div>
+                                </div>
+                            `;
+                    } else if (type === 'request') {
+                        listElement.innerHTML += `
+                                <div class="request-item">
+                                    <div class="request-details">
+                                        <p>${item.details}</p>
+                                        <small>${item.time}</small>
+                                    </div>
+                                </div>
+                            `;
+                    }
+                });
+            } else {
+                listElement.innerHTML = `<p class="text-center text-gray-500">Không có dữ liệu hiển thị.</p>`;
+            }
+        }
+
+        /**
+         * Fetches dashboard data from mock data based on user role.
+         * @param {string} role - User role (e.g., 'default', 'teacher', 'hr').
+         */
+        function fetchDashboardData(role) {
+            // Directly use mock data as there's no API
+            const mockMetrics = [
+                { "title": "Tổng số học sinh", "value": "1200", "change": "+5%" },
+                { "title": "Lớp học đang hoạt động", "value": "45", "change": "+2" },
+                { "title": "Tỷ lệ tham gia", "value": "92%", "change": "-1%" }
+                // Removed "Doanh thu hàng tháng" metric
+            ];
+            renderMetrics(mockMetrics);
+
+            const mockDailyActivities = [
+                { "icon": "📝", "details": "Học sinh Nguyễn Văn A nộp bài tập.", "time": "10:30 AM" },
+                { "icon": "📞", "details": "Giáo viên Trần Thị B gọi điện cho phụ huynh.", "time": "09:00 AM" }
+            ];
+            renderActivityList('dailyActivitiesCard', mockDailyActivities, 'activity');
+
+            const mockUpcomingActivities = [
+                { "title": "Tiếng Anh Giao Tiếp Cấp Tốc", "instructor": "GV. Lê Thị C", "schedule": "Thứ 3, 18:00 - 20:00", "students": "25 học sinh" },
+                { "title": "Luyện Thi IELTS", "instructor": "GV. Phạm Văn D", "schedule": "Thứ 5, 19:00 - 21:00", "students": "18 học sinh" }
+            ];
+            renderActivityList('upcomingActivitiesCard', mockUpcomingActivities, 'class');
+
+            const mockPendingRequests = [
+                { "details": "Yêu cầu đổi lịch học từ học sinh E.", "time": "Hôm nay, 11:00 AM" },
+                { "details": "Yêu cầu cấp lại chứng chỉ cho học sinh F.", "time": "Hôm qua, 03:00 PM" }
+            ];
+            renderActivityList('pendingRequestsSection', mockPendingRequests, 'request');
+
+            showCustomMessageBox('Đang hiển thị dữ liệu bảng điều khiển từ dữ liệu giả định.');
+        }
+
+
+        /**
+         * Fetches T-Code list from mock data.
+         */
+        function fetchTCodes() {
+            tcodeListDiv.innerHTML = '<p class="text-center text-gray-500 py-4">Đang tải T-Codes...</p>'; // Show loading indicator
+            // Directly use mock data as there's no API
+            const mockTCodes = [
+                { "tcode": "STUDENT_VIEW", "description": "Xem thông tin học sinh", "requiredRole": ["admin", "teacher", "student"] },
+                { "tcode": "CLASS_SCHEDULE", "description": "Quản lý lịch học", "requiredRole": ["admin", "teacher"] },
+                { "tcode": "PAYMENT_INFO", "description": "Xem thông tin thanh toán", "requiredRole": ["admin", "hr", "student"] },
+                { "tcode": "HR_MANAGEMENT", "description": "Quản lý nhân sự", "requiredRole": ["admin", "hr"] },
+                { "tcode": "COURSE_CATALOG", "description": "Danh mục khóa học", "requiredRole": ["admin", "teacher", "student", "default"] },
+                { "tcode": "TEACHER_ASSIGN", "description": "Phân công giáo viên", "requiredRole": ["admin"] },
+                { "tcode": "EXAM_GRADING", "description": "Chấm điểm bài thi", "requiredRole": ["admin", "teacher"] },
+                { "tcode": "ATTENDANCE_TRACK", "description": "Theo dõi điểm danh", "requiredRole": ["admin", "teacher", "hr"] },
+                { "tcode": "BRANCH_MANAGEMENT", "description": "Quản lý chi nhánh", "requiredRole": ["admin", "manager"] },
+                { "tcode": "MAJOR_MANAGEMENT", "description": "Quản lý chuyên ngành", "requiredRole": ["admin", "manager"] },
+                { "tcode": "LOG_VIEW", "description": "Xem nhật ký hệ thống", "requiredRole": ["admin"] },
+                { "tcode": "DOCUMENT_MANAGEMENT", "description": "Quản lý tài liệu", "requiredRole": ["admin", "manager", "teacher", "hr"] }
+            ];
+            allTCodes = mockTCodes; // Store mock data
+            renderPermittedTCodes(); // Render initial list with mock data
+            showCustomMessageBox('Đang hiển thị T-Codes từ dữ liệu giả định.');
+        }
+
+        /**
+         * Fetches user information from mock data.
+         */
+        function fetchUserInfo() {
+            const employeeNameSpan = document.getElementById('employeeName');
+            const employeeTitleSpan = document.getElementById('employeeTitle');
+
+            // Directly use mock data as there's no API
+            const mockUserData = {
+                "name": "Người dùng Demo",
+                "title": "Quản lý",
+                "role": "admin" // Default to 'admin' for mock data to show more T-codes
+            };
+            employeeNameSpan.textContent = mockUserData.name;
+            employeeTitleSpan.textContent = mockUserData.title;
+            currentUserRole = mockUserData.role; // Set current user role
+            document.body.dataset.userRole = currentUserRole; // Set role for dashboard logic
+            showCustomMessageBox('Đang hiển thị thông tin người dùng từ dữ liệu giả định.');
+        }
+
+        /**
+         * Main function to initialize the dashboard.
+         */
+        async function initializeDashboard() {
+            updateCurrentDate();
+            showFullScreenLoading(); // Show loading while mock data is processed
+            // Use setTimeout to simulate asynchronous loading of data
+            setTimeout(() => {
+                fetchUserInfo(); // Get user info from mock data
+                fetchDashboardData(currentUserRole); // Get dashboard data from mock data
+                fetchTCodes(); // Get T-codes from mock data
+                hideFullScreenLoading(); // Hide loading after mock data is loaded
+            }, 500); // Simulate a small delay for loading
+        }
+
+        // Call main initialization function when page is loaded
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Event listeners for user and notification dropdowns
+        if (userInfo && userDropdown) {
+            userInfo.addEventListener('click', (event) => {
+                event.stopPropagation();
+                userDropdown.classList.toggle('show');
+                if (notificationDropdown.classList.contains('show')) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        if (notificationBellIcon && notificationDropdown) { // Changed notificationIcon to notificationBellIcon
+            notificationBellIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                notificationDropdown.classList.toggle('show');
+                if (userDropdown.classList.contains('show')) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        document.body.addEventListener('click', (event) => {
+            if (userDropdown.classList.contains('show') && !userInfo.contains(event.target)) {
+                userDropdown.classList.remove('show');
+            }
+            if (notificationDropdown.classList.contains('show') && !notificationBellIcon.contains(event.target) && !notificationDropdown.contains(event.target)) { // Changed notificationIcon to notificationBellIcon
+                notificationDropdown.classList.remove('show');
+            }
+        });
+
+        // Handle "Change Password" and "Logout" buttons
+        if (changePasswordBtn) {
+            changePasswordBtn.addEventListener('click', () => {
+                showFullScreenLoading();
+                // Simulate WebView2 postMessage for change password
+                showCustomMessageBox('Chức năng đổi mật khẩu chỉ khả dụng trong ứng dụng Windows Forms.');
+                userDropdown.classList.remove('show');
+                setTimeout(hideFullScreenLoading, 1000);
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                // Simulate WebView2 postMessage for logout
+                showCustomMessageBox('Bạn đã đăng xuất thành công.');
+                userDropdown.classList.remove('show');
+            });
+        }
+
+        // Handle T-Code input with Enter key
+        if (tCodeInput) {
+            tCodeInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleTCodeSubmission();
+                }
+            });
+        }
+
+        // Handle "Clear all" button (Changed from "Mark all read")
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', () => {
+                activeNotifications = [];
+                renderNotifications(activeNotifications);
+                notificationDropdown.classList.remove('show');
+                showCustomMessageBox('Tất cả thông báo đã được đánh dấu là đã đọc.');
+            });
+        }
+
+
+        // Initial mock notifications with Date objects
+        activeNotifications = [
+            { id: 'notif1', title: 'Thông báo 1', message: 'Học viên mới đã đăng ký.', date: new Date(Date.now() - 30 * 60 * 1000) },
+            { id: 'notif2', title: 'Thông báo 2', message: 'Lịch học sắp tới.', date: new Date(Date.now() - 5 * 60 * 60 * 1000) },
+            { id: 'notif3', title: 'Thông báo 3', message: 'Yêu cầu hỗ trợ mới.', date: new Date(Date.now() - 24 * 60 * 60 * 1000 - 2 * 60 * 60 * 1000) },
+            { id: 'notif4', title: 'Thông báo 4', message: 'Khóa học mới được thêm.', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) },
+            { id: 'notif5', title: 'Thông báo 5', message: 'Cập nhật hệ thống.', date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) },
+            { id: 'notif6', title: 'Thông báo 6', message: 'Báo cáo hàng tháng đã sẵn sàng.', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) },
+        ];
+        renderNotifications(activeNotifications); // Render initial notifications
+    </script>
+</body>
+</html>

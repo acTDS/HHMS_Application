@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Lớp Học - Trung Tâm Ngoại Ngữ 68</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link Font Awesome for icons (Using CDN for reliability) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General font and background settings */
+        html, body { /* Ensure html and body take full height */
+            height: 100%;
+            margin: 0;
+            padding: 0; /* Remove overall padding for body */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Lighter background color */
+            color: #333333; /* Default text color */
+            display: flex;
+            flex-direction: column; /* Ensure main content stacks vertically */
+        }
+
+        /* Main content area - Now full width */
+        .main-content {
+            flex-grow: 1; /* Allow to expand to fill remaining space */
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* White background for synchronized main content */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Soft shadow synchronized */
+            border-radius: 0; /* Remove border-radius to fill the page */
+            width: 100%; /* Ensure it takes full width */
+            max-width: none; /* Remove max width limit */
+            margin: 0; /* Remove auto margin */
+            overflow: hidden; /* Ensure content doesn't overflow */
+        }
+
+        /* Header */
+        .header {
+            background-color: #2d3748;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Synchronized shadow */
+            border-radius: 0; /* Remove border-radius to fill the page */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 30px; /* Increased gap between logo and title */
+            flex-grow: 1; /* Allow this element to expand to fill space */
+            justify-content: flex-start; /* Keep content left-aligned */
+        }
+
+        .header-logo img {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .header-date {
+            font-size: 1rem;
+            color: #a0aec0;
+            white-space: nowrap;
+            margin-right: 20px; /* Space between date and icon */
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-icons {
+            position: relative; /* Add position relative for notification dropdown alignment */
+        }
+
+        .header-icons svg {
+            width: 24px;
+            height: 24px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .header-icons svg:hover {
+            color: #ffffff;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px; /* Adjust as needed */
+            right: -5px; /* Adjust as needed */
+            background-color: #f00; /* Red color */
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            min-width: 18px; /* Ensure it's round for single digits */
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            display: none; /* Hidden by default, show with JS if count > 0 */
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Distance from notification icon */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 280px; /* Slightly wider */
+            max-height: 300px; /* Height limit */
+            overflow-y: auto; /* Add scrollbar if too long */
+            display: none;
+            flex-direction: column;
+            padding: 0; /* Changed to 0, inner elements will have padding */
+            margin-top: 5px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .notification-dropdown.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Notification Dropdown Header */
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #4a5568; /* Slightly lighter background for header */
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #667eea;
+        }
+
+        .notification-dropdown-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .notification-dropdown-header button {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .notification-dropdown-header button:hover {
+            color: #ffffff;
+        }
+
+        /* Notification List */
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notification-list li {
+            padding: 10px 15px;
+            color: #e2e8f0;
+            border-bottom: 1px solid #4a5568;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .notification-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notification-list li:hover {
+            background-color: #4a5568;
+        }
+
+        .notification-list li strong {
+            color: #ffffff;
+        }
+
+        .notification-list li .time {
+            display: block;
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 2px;
+        }
+
+        .notification-dropdown .no-notifications {
+            padding: 10px 15px;
+            color: #a0aec0;
+            text-align: center;
+            font-style: italic;
+            display: none; /* Hidden by default, shown by JS */
+        }
+
+        /* User Info and Dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .user-info img {
+            width: 36px; /* Slightly larger avatar size */
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4299e1; /* Prominent blue border */
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Left-align user info */
+            white-space: nowrap;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .user-details .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details .user-title {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Distance from user-info */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 160px; /* Slightly wider */
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .user-dropdown.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .user-dropdown button {
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border-radius: 0;
+            font-size: 0.95rem;
+        }
+
+        .user-dropdown button:hover {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+
+        /* Dashboard Body - Contains the class details */
+        .dashboard-body {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #ffffff; /* White background for the body part */
+            border-bottom-left-radius: 0; /* Remove bottom border-radius to match main-content */
+            border-bottom-right-radius: 0; /* Remove bottom border-radius to match main-content */
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem; /* Larger title */
+            font-weight: 700;
+            color: #2c3e50; /* Darker black color */
+            margin-bottom: 30px;
+            text-align: center; /* Center title */
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db; /* More prominent bottom border */
+        }
+
+        /* Card Section (for class details) */
+        .card-section {
+            background-color: #fdfdfd; /* Near-white background synchronized */
+            padding: 25px; /* Increased padding synchronized */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); /* Lighter shadow synchronized */
+            border: 1px solid #e0e0e0; /* Lighter border synchronized */
+            margin-bottom: 25px; /* Space between cards/sections */
+        }
+
+        .card-section h2 {
+            color: #2c3e50; /* Synchronized black text */
+            margin-bottom: 25px; /* Increased margin-bottom synchronized */
+            font-size: 1.8em;
+            text-align: center;
+            border-bottom: 2px solid #f39c12;
+            padding-bottom: 12px; /* Increased padding-bottom synchronized */
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; /* Synchronized gap */
+        }
+
+        .detail-item label {
+            display: block;
+            margin-bottom: 8px; /* Space with input synchronized */
+            font-weight: 600;
+            color: #555555; /* Darker label color synchronized */
+            font-size: 0.95em; /* Synchronized font size */
+        }
+
+        .detail-item p {
+            background-color: #fcfcfc; /* Very light input background synchronized */
+            color: #333333; /* Synchronized black input text */
+            border: 1px solid #ced4da; /* More distinct input border synchronized */
+            border-radius: 8px; /* Synchronized border-radius */
+            padding: 12px 15px; /* Synchronized padding */
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        /* Tab Navigation Styles */
+        .tab-navigation {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            gap: 5px; /* Khoảng cách giữa các tab */
+            overflow-x: auto; /* Cho phép cuộn ngang nếu có nhiều tab */
+            -webkit-overflow-scrolling: touch; /* Hỗ trợ cuộn mượt trên iOS */
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666666;
+            background-color: #f0f0f0;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap; /* Ngăn chữ bị xuống dòng */
+        }
+
+        .tab-button:hover {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .tab-button.active {
+            background-color: #ffffff;
+            color: #2d3748;
+            border-color: #f39c12; /* Màu cam nổi bật */
+            border-bottom: 2px solid #ffffff; /* Tạo hiệu ứng "nổi" */
+            transform: translateY(2px); /* Nhấn nhẹ xuống */
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            z-index: 2; /* Đảm bảo tab active nằm trên đường kẻ */
+        }
+
+        /* Tab Content Styles */
+        .tab-content {
+            display: none; /* Mặc định ẩn */
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 0 0 10px 10px; /* Bo góc dưới */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: -2px; /* Dịch lên để khớp với border của tab */
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-content.active {
+            display: block; /* Hiển thị tab active */
+        }
+
+        /* Editable Sections within tabs */
+        .editable-section .table-container {
+            overflow-x: auto;
+            max-height: 400px; /* Giới hạn chiều cao cho bảng */
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #dee2e6; /* Stronger overall table border synchronized */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Lighter shadow synchronized */
+            margin-top: 20px; /* Adjust margin for tables inside tabs */
+        }
+
+        .editable-section table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px; /* Đảm bảo bảng không quá nhỏ */
+        }
+
+        .editable-section th, .editable-section td {
+            padding: 15px 20px; /* Increased padding for larger cells synchronized */
+            text-align: left;
+            border: 1px solid #e9ecef; /* More distinct cell borders synchronized */
+            color: #343a40; /* Synchronized black text */
+            white-space: nowrap;
+            font-size: 0.95em; /* Slightly increased font size synchronized */
+        }
+
+        .editable-section th {
+            background-color: #e9ecef; /* Lighter table header background synchronized */
+            font-weight: 600;
+            position: relative; /* Changed to relative for absolute positioning of delete button */
+            z-index: 1;
+            color: #495057; /* Darker text for headers synchronized */
+            text-transform: uppercase; /* Uppercase text synchronized */
+            letter-spacing: 0.05em; /* Letter spacing synchronized */
+        }
+
+        .editable-section tbody tr:nth-child(even) { /* Add zebra striping synchronized */
+            background-color: #f8f9fa;
+        }
+
+        .editable-section tbody tr:hover {
+            background-color: #e2f0fe; /* Lighter hover effect synchronized */
+            cursor: pointer;
+        }
+
+        .editable-section input[type="text"],
+        .editable-section input[type="number"],
+        .editable-section select,
+        .editable-section textarea {
+            width: 100%;
+            background-color: #fcfcfc; /* Very light input background synchronized */
+            color: #333333; /* Synchronized black input text */
+            border: 1px solid #ced4da; /* More distinct input border synchronized */
+            border-radius: 8px; /* Synchronized border-radius */
+            padding: 12px 15px; /* Synchronized padding */
+            font-size: 1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .editable-section input[type="text"]:focus,
+        .editable-section input[type="number"]:focus,
+        .editable-section select:focus,
+        .editable-section textarea:focus {
+            border-color: #007bff; /* Synchronized focus color */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Synchronized focus box-shadow */
+        }
+
+        .editable-section input[type="checkbox"] {
+            transform: scale(1.2);
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .editable-section .status-select {
+            width: auto; /* Allow select to size based on content */
+            min-width: 120px;
+        }
+
+        .form-actions {
+            margin-top: 30px; /* Increased margin-top synchronized */
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Synchronized gap */
+        }
+
+        .form-actions button {
+            padding: 12px 25px; /* Increased padding synchronized */
+            font-size: 1em;
+            border-radius: 8px; /* Synchronized border-radius */
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Synchronized shadow */
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s; /* Synchronized transition */
+            background-color: #28a745; /* Green for Save */
+            color: white;
+        }
+
+        .form-actions button:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* CSS cho Full-screen Loading Overlay - Nhất quán */
+        .full-screen-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001; /* Adjusted z-index to be above modals */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .full-screen-loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .full-screen-spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #fff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom Message Box Overlay - Nhất quán */
+        .custom-message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-message-box-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-message-box-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: #333333;
+        }
+
+        .custom-message-box-content p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .custom-message-box-content button {
+            background-color: #4299e1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .custom-message-box-content button:hover {
+            background-color: #3182ce;
+        }
+
+        /* New CSS for delete button hover */
+        .editable-section th .delete-test-column-btn {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            background: none; /* Ensure no background for the button itself */
+            border: none;
+            padding: 0; /* Remove padding */
+            margin-left: 5px; /* Small margin to separate from text */
+            cursor: pointer;
+            font-size: 0.8em; /* Make the icon smaller */
+            vertical-align: middle; /* Align with text */
+            position: absolute; /* Position absolutely within the th */
+            top: 50%; /* Center vertically */
+            right: 5px; /* Position from the right edge */
+            transform: translateY(-50%); /* Adjust for vertical centering */
+        }
+
+        .editable-section th:hover .delete-test-column-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ensure the contenteditable span takes up available space */
+        .editable-section th .test-header-name {
+            display: inline-block; /* Allow it to shrink to content but respect padding */
+            padding-right: 25px; /* Space for the delete button */
+        }
+
+        /* Style for contenteditable topic in progress table */
+        .progress-topic-name {
+            display: inline-block;
+            width: calc(100% - 30px); /* Adjust width to make space for delete button */
+            min-width: 100px; /* Minimum width for editing */
+            padding: 5px;
+            border: 1px solid transparent; /* Transparent border normally */
+            border-radius: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .progress-topic-name:focus {
+            border-color: #007bff; /* Blue border on focus */
+            outline: none;
+        }
+
+        /* Styles for delete button in progress table */
+        .progress-session-number-cell {
+            position: relative; /* Make cell relative for absolute positioning of button */
+            padding-right: 30px; /* Add padding for the button */
+        }
+
+        .progress-session-number-cell .delete-progress-entry-btn {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font-size: 0.8em;
+            position: absolute;
+            top: 50%;
+            right: 5px; /* Position from the right edge of the cell */
+            transform: translateY(-50%);
+            color: #ef4444; /* Red color */
+        }
+
+        .editable-section tbody tr:hover .delete-progress-entry-btn { /* Show on row hover for progress */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Điều chỉnh responsive */
+        @media (max-width: 1024px) {
+            .header-date {
+                display: none;
+            }
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+            .card-section h2 {
+                font-size: 1.5em;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr; /* Stack details vertically */
+            }
+            body {
+                padding: 0; /* Remove overall padding on tablet */
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                padding: 0; /* Remove overall padding on mobile */
+            }
+
+            .main-content {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px 15px;
+                border-radius: 0;
+            }
+
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .header-right {
+                width: 100%;
+                justify-content: flex-end; /* Right-align icons and user info */
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .user-info {
+                margin-top: 10px;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .dashboard-body {
+                padding: 15px;
+            }
+
+            .dashboard-title {
+                font-size: 1.6rem;
+                margin-bottom: 20px;
+            }
+
+            .card-section {
+                padding: 15px;
+            }
+
+            .card-section h2 {
+                font-size: 1.5em;
+            }
+
+            .tab-navigation {
+                flex-wrap: wrap; /* Cho phép các tab xuống dòng */
+                justify-content: center;
+            }
+
+            .tab-button {
+                flex-basis: 48%; /* Hai tab mỗi hàng */
+                margin-bottom: 5px;
+            }
+
+            .editable-section th, .editable-section td {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .editable-section table {
+                min-width: unset; /* Remove min-width on mobile */
+            }
+        }
+    </style>
+</head>
+<body data-user-role="default">
+    <!-- Full-screen Loading Overlay -->
+    <div id="fullScreenLoadingOverlay" class="full-screen-loading-overlay">
+        <div class="full-screen-spinner"></div>
+    </div>
+
+    <!-- Custom Message Box Overlay for general messages -->
+    <div id="customMessageBoxOverlay" class="custom-message-box-overlay">
+        <div class="custom-message-box-content">
+            <p id="customMessageText"></p>
+            <button id="confirmCustomMessageBox" class="hidden bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md mr-2">Xác nhận</button>
+            <button id="cancelCustomMessageBox" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">Hủy</button>
+            <button id="closeCustomMessageBox" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-logo">
+                    <img src="https://placehold.co/100x100/2d3748/e2e8f0?text=LOGO" alt="Trung Tâm Ngoại Ngữ 68">
+                </div>
+                <div class="header-title">Trung Tâm Ngoại Ngữ 68</div>
+            </div>
+            <div class="header-right">
+                <div id="currentDate" class="header-date"></div>
+                <div class="header-icons">
+                    <!-- Notification icon -->
+                    <svg id="notificationIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                    <span id="notificationCountBadge" class="notification-badge">3</span>
+                    <!-- Notification Dropdown -->
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="notification-dropdown-header">
+                            <h3>Thông báo</h3>
+                            <button id="clearNotificationsBtn">Xóa tất cả</button>
+                        </div>
+                        <ul id="notificationList" class="notification-list">
+                            <!-- Notifications will be rendered here -->
+                            <li class="no-notifications">Không có thông báo mới.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- User Info and Dropdown -->
+                <div class="user-info" id="userInfo">
+                    <img src="https://placehold.co/36x36/1a202c/e2e8f0?text=U" alt="User Avatar" />
+                    <div class="user-details">
+                        <span class="user-name" id="employeeName">Đang tải...</span>
+                        <span class="user-title" id="employeeTitle"></span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" style="cursor: pointer; color: #a0aec0;">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button id="changePasswordBtn">Đổi Mật Khẩu</button>
+                        <button id="logoutBtn">Đăng Xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung chính của trang Chi Tiết Lớp Học -->
+        <div class="dashboard-body">
+            <div class="card-section">
+                <h2>Thông Tin Chung</h2>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Mã Lớp:</label>
+                        <p id="detailClassId"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Tên Lớp:</label>
+                        <p id="detailClassName"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Chuyên ngành:</label>
+                        <p id="detailMajorName"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Giáo viên chính:</label>
+                        <p id="detailMainTeacherName"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Trợ giảng:</label>
+                        <p id="detailAssistantName"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Phòng học:</label>
+                        <p id="detailRoom"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Sĩ số:</label>
+                        <p id="detailClassSize"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Ngày bắt đầu:</label>
+                        <p id="detailStartDate"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Ngày kết thúc dự kiến:</label>
+                        <p id="detailExpectedEndDate"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label>Trạng thái:</label>
+                        <p id="detailStatusName"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="attendance">Điểm Danh Học Viên</button>
+                <button class="tab-button" data-tab="grades">Điểm và Đánh Giá</button>
+                <button class="tab-button" data-tab="progress">Tiến Độ Đào Tạo</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="attendanceTab" class="tab-content active">
+                <div class="editable-section">
+                    <h2>Điểm Danh Học Viên</h2>
+                    <div class="mb-4 flex items-center">
+                        <label for="sessionSelector" class="mr-2 font-semibold text-gray-700">Chọn Buổi Học:</label>
+                        <select id="sessionSelector" class="px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <span id="selectedSessionDate" class="ml-4 font-semibold text-gray-700"></span>
+                    </div>
+                    <div class="table-container">
+                        <table id="attendanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Tên học viên</th>
+                                    <th>Có mặt</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Dữ liệu điểm danh sẽ được tải động -->
+                                <tr><td colspan="3" class="text-center text-gray-500 py-4">Vui lòng chọn một buổi học.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gradesTab" class="tab-content">
+                <div class="editable-section">
+                    <h2>Điểm và Đánh Giá</h2>
+                    <div class="mb-4 text-right">
+                        <button id="addTestColumnBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-200 ease-in-out">
+                            Thêm cột điểm kiểm tra
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="gradesTable">
+                            <thead>
+                                <tr id="gradesTableHeaderRow">
+                                    <th>Tên học viên</th>
+                                    <!-- Dynamic test score headers will go here -->
+                                    <th>Đánh giá cuối khóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradesTableBody">
+                                <!-- Dữ liệu điểm và đánh giá sẽ được tải động -->
+                                <tr><td colspan="20" class="text-center text-gray-500 py-4">Đang tải dữ liệu điểm...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progressTab" class="tab-content">
+                <div class="editable-section">
+                    <h2>Tiến Độ Đào Tạo</h2>
+                    <div class="mb-4 text-right">
+                        <button id="addProgressEntryBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-200 ease-in-out">
+                            Thêm buổi học
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="progressTable">
+                            <thead>
+                                <tr>
+                                    <th>Buổi học</th>
+                                    <th>Chủ đề</th>
+                                    <th>Trạng thái hoàn thành</th>
+                                    <!-- Removed the "Thao tác" column header -->
+                                </tr>
+                            </thead>
+                            <tbody id="progressTableBody">
+                                <!-- Dữ liệu tiến độ đào tạo sẽ được tải động -->
+                                <tr><td colspan="3" class="text-center text-gray-500 py-4">Đang tải dữ liệu tiến độ...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="saveAllChangesBtn">Lưu Tất Cả Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log("Script execution started.");
+
+        const fullScreenLoadingOverlay = document.getElementById('fullScreenLoadingOverlay');
+        const customMessageBoxOverlay = document.getElementById('customMessageBoxOverlay');
+        const customMessageText = document.getElementById('customMessageText');
+        const closeCustomMessageBox = document.getElementById('closeCustomMessageBox');
+        const confirmCustomMessageBox = document.getElementById('confirmCustomMessageBox');
+        const cancelCustomMessageBox = document.getElementById('cancelCustomMessageBox');
+
+        /**
+         * Hiển thị overlay loading toàn màn hình.
+         */
+        function showFullScreenLoading() {
+            console.log("Showing full screen loading.");
+            fullScreenLoadingOverlay.classList.add('active');
+        }
+
+        /**
+         * Ẩn overlay loading toàn màn hình.
+         */
+        function hideFullScreenLoading() {
+            console.log("Hiding full screen loading.");
+            fullScreenLoadingOverlay.classList.remove('active');
+        }
+
+        /**
+         * Hiển thị một thông báo tùy chỉnh thay vì alert().
+         * @param {string} message - Nội dung thông báo.
+         * @param {boolean} [isConfirm=false] - True nếu là hộp thoại xác nhận.
+         * @param {function} [callback=null] - Callback function cho hộp thoại xác nhận.
+         */
+        function showCustomMessageBox(message, isConfirm = false, callback = null) {
+            console.log("Showing custom message box:", message, "isConfirm:", isConfirm);
+            const overlay = document.getElementById('customMessageBoxOverlay');
+            const messageText = document.getElementById('customMessageText');
+            const closeButton = document.getElementById('closeCustomMessageBox');
+            const confirmButton = document.getElementById('confirmCustomMessageBox');
+            const cancelButton = document.getElementById('cancelCustomMessageBox');
+
+            messageText.textContent = message;
+
+            // Define handlers before removing/adding listeners
+            const closeHandler = () => { cleanup(); if (!isConfirm && callback) callback(); };
+            const confirmHandler = () => { cleanup(); if (callback) callback(true); };
+            const cancelHandler = () => { cleanup(); if (callback) callback(false); };
+            const overlayClickHandler = (event) => {
+                if (event.target === overlay) {
+                    cleanup();
+                    if (isConfirm && callback) callback(false); // Treat outside click as cancel for confirmation
+                    else if (!isConfirm && callback) callback(); // For simple messages
+                }
+            };
+
+            // Remove previous listeners to prevent multiple firings
+            closeButton.removeEventListener('click', closeHandler);
+            confirmButton.removeEventListener('click', confirmHandler);
+            cancelButton.removeEventListener('click', cancelHandler);
+            overlay.removeEventListener('click', overlayClickHandler); // Remove previous overlay listener
+
+
+            if (isConfirm) {
+                confirmButton.classList.remove('hidden');
+                cancelButton.classList.remove('hidden');
+                closeButton.classList.add('hidden'); // Hide the default close button for confirmation
+            } else {
+                confirmButton.classList.add('hidden');
+                cancelButton.classList.add('hidden');
+                closeButton.classList.remove('hidden'); // Show default close button
+            }
+
+            overlay.classList.add('show');
+
+            const cleanup = () => {
+                overlay.classList.remove('show');
+                closeButton.removeEventListener('click', closeHandler);
+                confirmButton.removeEventListener('click', confirmHandler);
+                cancelButton.removeEventListener('click', cancelHandler);
+                overlay.removeEventListener('click', overlayClickHandler);
+            };
+
+            closeButton.addEventListener('click', closeHandler);
+            confirmButton.addEventListener('click', confirmHandler);
+            cancelButton.addEventListener('click', cancelHandler);
+            overlay.addEventListener('click', overlayClickHandler);
+        }
+
+        // Initial setup for the default close button
+        closeCustomMessageBox.addEventListener('click', () => {
+            showCustomMessageBox(''); // Call with empty message to just close
+        });
+
+
+        // JavaScript để hiển thị ngày và giờ hiện tại
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('vi-VN', options);
+            }
+        }
+        setInterval(updateCurrentDate, 60000);
+
+        // JavaScript để xử lý dropdown người dùng
+        function setupUserInfoDropdown() {
+            const userInfo = document.getElementById('userInfo');
+            const userDropdown = document.getElementById('userDropdown');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (userInfo && userDropdown) {
+                userInfo.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                    // Close notification dropdown if open
+                    if (notificationDropdown.classList.contains('show')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    if (userDropdown.classList.contains('show') && !userInfo.contains(event.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            if (changePasswordBtn) {
+                changePasswordBtn.addEventListener('click', () => {
+                    showFullScreenLoading();
+                    // Simulate WebView2 postMessage for change password
+                    showCustomMessageBox('Chức năng đổi mật khẩu đang được phát triển.');
+                    userDropdown.classList.remove('show');
+                    setTimeout(hideFullScreenLoading, 1000);
+                });
+            }
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    // Simulate WebView2 postMessage for logout
+                    showCustomMessageBox('Bạn đã đăng xuất thành công.');
+                    userDropdown.classList.remove('show');
+                });
+            }
+        }
+
+        async function fetchEmployeeInfo() {
+            const employeeNameSpan = document.getElementById('employeeName');
+            const employeeTitleSpan = document.getElementById('employeeTitle');
+            const userRole = document.body.dataset.userRole;
+
+            if (employeeNameSpan && employeeTitleSpan) {
+                // Simulate API call
+                showFullScreenLoading();
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+                    if (userRole === 'admin') {
+                        employeeNameSpan.textContent = 'Admin';
+                        employeeTitleSpan.textContent = 'Quản trị viên';
+                    } else {
+                        employeeNameSpan.textContent = 'Nhân Viên';
+                        employeeTitleSpan.textContent = 'Nhân viên hệ thống';
+                    }
+                } catch (error) {
+                    console.error('Error fetching employee info:', error);
+                    employeeNameSpan.textContent = 'Lỗi';
+                    employeeTitleSpan.textContent = 'Không xác định';
+                } finally {
+                    hideFullScreenLoading();
+                }
+            }
+        }
+
+        // JavaScript để xử lý dropdown thông báo
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationCountBadge = document.getElementById('notificationCountBadge');
+        const notificationList = document.getElementById('notificationList');
+        const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
+
+        // Global array to hold current notifications
+        let activeNotifications = [];
+
+        /**
+         * Cập nhật số lượng thông báo trên huy hiệu.
+         * @param {number} count - Số lượng thông báo chưa đọc.
+         */
+        function updateNotificationCount(count) {
+            if (notificationCountBadge) {
+                notificationCountBadge.textContent = count > 99 ? '99+' : count; // Limit display to 99+
+                if (count > 0) {
+                    notificationCountBadge.style.display = 'block';
+                } else {
+                    notificationCountBadge.style.display = 'none';
+                }
+            }
+        }
+
+        /**
+         * Checks if two dates are on the same day.
+         * @param {Date} d1 - First date.
+         * @param {Date} d2 - Second date.
+         * @returns {boolean} - True if same day, false otherwise.
+         */
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        /**
+         * Determines the time category for a given notification date.
+         * @param {Date} notificationDate - The date of the notification.
+         * @returns {string} - The time category (e.g., 'Mới', 'Hôm nay', 'Hôm qua').
+         */
+        function getTimeCategory(notificationDate) {
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
+
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            notificationDate.setSeconds(0, 0); // Normalize notification date for comparison
+
+            if (notificationDate > oneHourAgo) {
+                return 'Mới';
+            } else if (isSameDay(notificationDate, now)) {
+                return 'Hôm nay';
+            } else if (isSameDay(notificationDate, yesterday)) {
+                return 'Hôm qua';
+            } else if (notificationDate >= startOfWeek) {
+                return 'Tuần này';
+            } else if (notificationDate >= startOfMonth) {
+                return 'Tháng này';
+            }
+            return 'Cũ hơn';
+        }
+
+        /**
+         * Formats a date into a human-readable "time ago" string.
+         * @param {Date} date - The date to format.
+         * @returns {string} - Formatted time string.
+         */
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            let interval = seconds / 31536000; // years
+            if (interval > 1) {
+                return Math.floor(interval) + " năm trước";
+            }
+            interval = seconds / 2592000; // months
+            if (interval > 1) {
+                return Math.floor(interval) + " tháng trước";
+            }
+            interval = seconds / 86400; // days
+            if (interval > 1) {
+                return Math.floor(interval) + " ngày trước";
+            }
+            interval = seconds / 3600; // hours
+            if (interval > 1) {
+                return Math.floor(interval) + " giờ trước";
+            }
+            interval = seconds / 60; // minutes
+            if (interval > 1) {
+                return Math.floor(interval) + " phút trước";
+            }
+            return Math.floor(seconds) + " giây trước";
+        }
+
+        /**
+         * Render notifications into the dropdown, grouped by time.
+         * @param {Array<Object>} notifications - Array of notification objects.
+         */
+        function renderNotifications(notifications) {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<li class="no-notifications">Không có thông báo mới.</li>';
+                clearNotificationsBtn.style.display = 'none';
+                updateNotificationCount(0);
+                return;
+            }
+
+            clearNotificationsBtn.style.display = 'block';
+
+            // Sort notifications by date, newest first
+            notifications.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            const groupedNotifications = {
+                'Mới': [],
+                'Hôm nay': [],
+                'Hôm qua': [],
+                'Tuần này': [],
+                'Tháng này': [],
+                'Cũ hơn': []
+            };
+
+            notifications.forEach(notif => {
+                const category = getTimeCategory(notif.date);
+                // Ensure the category exists before pushing
+                if (!groupedNotifications[category]) {
+                    groupedNotifications[category] = [];
+                }
+                groupedNotifications[category].push(notif);
+            });
+
+            // Order of categories for rendering
+            const categoryOrder = ['Mới', 'Hôm nay', 'Hôm qua', 'Tuần này', 'Tháng này', 'Cũ hơn'];
+
+            categoryOrder.forEach(category => {
+                if (groupedNotifications[category].length > 0) {
+                    const categoryHeader = document.createElement('li'); // Changed to li for list
+                    categoryHeader.classList.add('notification-dropdown-header'); // Re-using existing style for category
+                    categoryHeader.innerHTML = `<h3>${category}</h3>`; // Added h3 for consistent styling
+                    notificationList.appendChild(categoryHeader);
+
+                    groupedNotifications[category].forEach(notif => {
+                        const notificationItem = document.createElement('li'); // Changed to li
+                        notificationItem.classList.add('notification-item');
+                        notificationItem.dataset.id = notif.id; // Assign a unique ID to each notification
+                        notificationItem.innerHTML = `
+                            <strong>${notif.title}:</strong> ${notif.message}
+                            <span class="time">${formatTimeAgo(notif.date)}</span>
+                        `;
+                        notificationList.appendChild(notificationItem);
+
+                        // Add click listener to each individual notification item
+                        notificationItem.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent dropdown from closing immediately
+                            markNotificationAsRead(notif.id);
+                        });
+                    });
+                }
+            });
+            updateNotificationCount(notifications.length);
+        }
+
+        /**
+         * Marks a single notification as read and updates the list.
+         * @param {string} id - The ID of the notification to mark as read.
+         */
+        function markNotificationAsRead(id) {
+            activeNotifications = activeNotifications.filter(notif => notif.id !== id);
+            renderNotifications(activeNotifications);
+            showCustomMessageBox(`Thông báo "${id}" đã được đánh dấu là đã đọc.`);
+            // Optionally, close the dropdown after marking one as read
+            notificationDropdown.classList.remove('show');
+        }
+
+        // Initial mock notifications with Date objects
+        activeNotifications = [
+            { id: 'notif1', title: 'Thông báo 1', message: 'Học viên mới đã đăng ký.', date: new Date(Date.now() - 30 * 60 * 1000) }, // 30 mins ago (Mới)
+            { id: 'notif2', title: 'Thông báo 2', message: 'Lịch học sắp tới.', date: new Date(Date.now() - 5 * 60 * 60 * 1000) }, // 5 hours ago (Hôm nay)
+            { id: 'notif3', title: 'Thông báo 3', message: 'Yêu cầu hỗ trợ mới.', date: new Date(Date.now() - 24 * 60 * 60 * 1000 - 2 * 60 * 60 * 1000) }, // Yesterday (Hôm qua)
+            { id: 'notif4', title: 'Thông báo 4', message: 'Khóa học mới được thêm.', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) }, // 3 days ago (Tuần này)
+            { id: 'notif5', title: 'Thông báo 5', message: 'Cập nhật hệ thống.', date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) }, // 15 days ago (Tháng này)
+            { id: 'notif6', title: 'Thông báo 6', message: 'Báo cáo hàng tháng đã sẵn sàng.', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) }, // 40 days ago (Cũ hơn)
+        ];
+        renderNotifications(activeNotifications); // Render initial notifications
+
+        if (notificationIcon && notificationDropdown) {
+            notificationIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click event from propagating to body
+                notificationDropdown.classList.toggle('show');
+            });
+
+            document.body.addEventListener('click', (event) => {
+                // Close notification dropdown if clicked outside
+                if (notificationDropdown.classList.contains('show') && !notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Handle "Mark all read" button
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', () => {
+                activeNotifications = []; // Clear all notifications
+                renderNotifications(activeNotifications); // Re-render to show "No notifications"
+                notificationDropdown.classList.remove('show'); // Close dropdown
+                showCustomMessageBox('Tất cả thông báo đã được đánh dấu là đã đọc.');
+            });
+        }
+
+        function setLoggedInUserName(name) {
+            const userNameSpan = document.getElementById('employeeName');
+            if (userNameSpan) {
+                userNameSpan.textContent = name;
+            }
+        }
+
+        function setLoggedInUserTitle(title) {
+            const userTitleSpan = document.getElementById('employeeTitle');
+            if (userTitleSpan) {
+                userTitleSpan.textContent = title;
+            }
+        }
+
+        // Elements for class details (view-only)
+        const detailClassId = document.getElementById('detailClassId');
+        const detailClassName = document.getElementById('detailClassName');
+        const detailMajorName = document.getElementById('detailMajorName');
+        const detailMainTeacherName = document.getElementById('detailMainTeacherName');
+        const detailAssistantName = document.getElementById('detailAssistantName');
+        const detailRoom = document.getElementById('detailRoom');
+        const detailClassSize = document.getElementById('detailClassSize');
+        const detailStartDate = document.getElementById('detailStartDate');
+        const detailExpectedEndDate = document.getElementById('detailExpectedEndDate');
+        const detailStatusName = document.getElementById('detailStatusName');
+
+        // Elements for editable tables
+        const attendanceTableBody = document.getElementById('attendanceTableBody');
+        const gradesTableHeaderRow = document.getElementById('gradesTableHeaderRow'); // New
+        const gradesTableBody = document.getElementById('gradesTableBody');
+        const progressTableBody = document.getElementById('progressTableBody');
+        const saveAllChangesBtn = document.getElementById('saveAllChangesBtn');
+        const addTestColumnBtn = document.getElementById('addTestColumnBtn'); // New button
+        const addProgressEntryBtn = document.getElementById('addProgressEntryBtn'); // New button for progress
+
+        // Attendance specific elements
+        const sessionSelector = document.getElementById('sessionSelector');
+        const selectedSessionDateSpan = document.getElementById('selectedSessionDate');
+
+        let currentClassId = null; // To store the class ID being viewed/edited
+        let allStudentsInClass = []; // All students in the class
+        let allClassSessions = []; // All sessions for the class
+        let allAttendanceData = []; // All attendance records across all sessions
+
+        let numberOfTests = 0; // New: Number of test columns
+        let testColumnNames = []; // New: Stores custom names for test columns
+        let allGradesData = []; // All grades data (studentId, testNumber, score)
+        let allEndOfCourseEvaluations = []; // Stores final evaluation for each student
+
+        let allProgressEntries = []; // Stores all progress entries
+        let progressStatusOptions = []; // Stores options for progress status dropdown
+
+        // --- Tab Functionality ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+
+                // Remove 'active' class from all buttons and content
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add 'active' class to the clicked button and its corresponding content
+                button.classList.add('active');
+                document.getElementById(tabId + 'Tab').classList.add('active');
+            });
+        });
+
+        /**
+         * Điền thông tin chi tiết lớp học vào các trường chỉ xem.
+         * @param {object} classData - Dữ liệu chi tiết của lớp học.
+         */
+        function populateClassDetails(classData) {
+            detailClassId.textContent = classData.classId || 'N/A';
+            detailClassName.textContent = classData.className || 'N/A';
+            detailMajorName.textContent = classData.majorName || 'N/A';
+            detailMainTeacherName.textContent = classData.mainTeacherName || 'N/A';
+            detailAssistantName.textContent = classData.assistantName || 'N/A';
+            detailRoom.textContent = classData.room || 'N/A';
+            detailClassSize.textContent = classData.classSize || 'N/A';
+            detailStartDate.textContent = classData.startDate || 'N/A';
+            detailExpectedEndDate.textContent = classData.expectedEndDate || 'N/A';
+            detailStatusName.textContent = classData.statusName || 'N/A';
+        }
+
+        /**
+         * Populates the session selector dropdown and sets up its change listener.
+         */
+        function populateSessionSelector() {
+            sessionSelector.innerHTML = ''; // Clear existing options
+            if (allClassSessions.length === 0) {
+                sessionSelector.innerHTML = '<option value="">Không có buổi học</option>';
+                sessionSelector.disabled = true;
+                selectedSessionDateSpan.textContent = '';
+                attendanceTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500 py-4">Không có dữ liệu buổi học.</td></tr>';
+                return;
+            }
+
+            sessionSelector.disabled = false;
+            // Sort sessions by sessionNumber
+            allClassSessions.sort((a, b) => a.sessionNumber - b.sessionNumber);
+
+            allClassSessions.forEach(session => {
+                const option = document.createElement('option');
+                option.value = session.sessionId;
+                option.textContent = `Buổi ${session.sessionNumber} (${session.sessionDate})`;
+                sessionSelector.appendChild(option);
+            });
+
+            // Set up change listener
+            sessionSelector.removeEventListener('change', displaySessionAttendance); // Prevent multiple listeners
+            sessionSelector.addEventListener('change', displaySessionAttendance);
+
+            // Automatically select the first session and display its attendance
+            if (allClassSessions.length > 0) {
+                sessionSelector.value = allClassSessions[0].sessionId;
+                displaySessionAttendance();
+            }
+        }
+
+        /**
+         * Displays attendance for the currently selected session.
+         */
+        function displaySessionAttendance() {
+            const selectedSessionId = parseInt(sessionSelector.value, 10);
+            const selectedSession = allClassSessions.find(s => s.sessionId === selectedSessionId);
+
+            if (selectedSession) {
+                selectedSessionDateSpan.textContent = `Ngày: ${selectedSession.sessionDate}`;
+            } else {
+                selectedSessionDateSpan.textContent = '';
+            }
+
+            const attendanceForSelectedSession = [];
+            // For each student in the class, find their attendance record for the selected session
+            allStudentsInClass.forEach(student => {
+                const existingRecord = allAttendanceData.find(
+                    record => record.sessionId === selectedSessionId && record.studentId === student.studentId
+                );
+
+                if (existingRecord) {
+                    attendanceForSelectedSession.push({ ...existingRecord }); // Push a copy
+                } else {
+                    // If no record exists, create a default one
+                    attendanceForSelectedSession.push({
+                        sessionId: selectedSessionId,
+                        studentId: student.studentId,
+                        studentName: student.studentName,
+                        isPresent: false,
+                        note: ''
+                    });
+                }
+            });
+
+            // Sort by student name for consistent display
+            attendanceForSelectedSession.sort((a, b) => a.studentName.localeCompare(b.studentName));
+
+            renderAttendanceTable(attendanceForSelectedSession);
+        }
+
+        /**
+         * Hiển thị dữ liệu điểm danh vào bảng.
+         * @param {Array<object>} attendanceList - Mảng dữ liệu điểm danh cho buổi học đã chọn.
+         */
+        function renderAttendanceTable(attendanceList) {
+            attendanceTableBody.innerHTML = '';
+            if (attendanceList && attendanceList.length > 0) {
+                attendanceList.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.studentName || 'N/A'}</td>
+                        <td>
+                            <input type="checkbox" class="attendance-checkbox"
+                                data-session-id="${item.sessionId}"
+                                data-student-id="${item.studentId}"
+                                ${item.isPresent ? 'checked' : ''}>
+                        </td>
+                        <td>
+                            <input type="text" class="attendance-note"
+                                data-session-id="${item.sessionId}"
+                                data-student-id="${item.studentId}"
+                                value="${item.note || ''}" placeholder="Ghi chú">
+                        </td>
+                    `;
+                    attendanceTableBody.appendChild(row);
+                });
+            } else {
+                attendanceTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500 py-4">Không có học viên nào trong buổi học này.</td></tr>';
+            }
+        }
+
+        /**
+         * Hiển thị dữ liệu điểm và đánh giá vào bảng.
+         * @param {Array<object>} studentsInClass - Danh sách tất cả học viên trong lớp.
+         * @param {number} numTests - Số lượng cột điểm kiểm tra.
+         * @param {Array<object>} gradesData - Dữ liệu điểm chi tiết cho từng bài kiểm tra.
+         * @param {Array<object>} endOfCourseEvaluationsData - Dữ liệu đánh giá cuối khóa.
+         */
+        function renderGradesTable(studentsInClass, numTests, gradesData, endOfCourseEvaluationsData) {
+            gradesTableHeaderRow.innerHTML = '<th>Tên học viên</th>'; // Clear and add student name header
+            gradesTableBody.innerHTML = ''; // Clear existing rows
+
+            if (studentsInClass.length === 0) {
+                gradesTableBody.innerHTML = '<tr><td colspan="20" class="text-center text-gray-500 py-4">Không có học viên nào trong lớp.</td></tr>';
+                return;
+            }
+
+            // Build dynamic test score headers
+            for (let i = 1; i <= numTests; i++) {
+                const testHeader = document.createElement('th');
+                const testName = testColumnNames[i - 1] || `Điểm kiểm tra lần ${i}`; // Use custom name or default
+                testHeader.innerHTML = `
+                    <span contenteditable="true" class="test-header-name" data-test-number="${i}">${testName}</span>
+                    <button class="delete-test-column-btn text-red-500 hover:text-red-700" data-test-number="${i}" title="Xóa cột này">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                `;
+                gradesTableHeaderRow.appendChild(testHeader);
+            }
+            // Add the single end-of-course evaluation header
+            gradesTableHeaderRow.innerHTML += `<th>Đánh giá cuối khóa</th>`;
+
+
+            // Build table body
+            studentsInClass.forEach(student => {
+                const row = document.createElement('tr');
+                const studentNameCell = document.createElement('td');
+                studentNameCell.textContent = student.studentName;
+                row.appendChild(studentNameCell);
+
+                // Render score inputs for each test
+                for (let i = 1; i <= numTests; i++) {
+                    const gradeRecord = gradesData.find(
+                        g => g.studentId === student.studentId && g.testNumber === i
+                    );
+
+                    const scoreCell = document.createElement('td');
+                    const scoreInput = document.createElement('input');
+                    scoreInput.type = 'number';
+                    scoreInput.className = 'grade-score';
+                    scoreInput.dataset.studentId = student.studentId;
+                    scoreInput.dataset.testNumber = i; // Use testNumber
+                    scoreInput.min = "0";
+                    scoreInput.max = "10";
+                    scoreInput.step = "0.1";
+                    scoreInput.placeholder = "Điểm";
+                    scoreInput.value = gradeRecord && gradeRecord.score !== null ? gradeRecord.score : '';
+                    scoreCell.appendChild(scoreInput);
+                    row.appendChild(scoreCell);
+                }
+
+                // Render single end-of-course evaluation dropdown
+                const finalEvaluationCell = document.createElement('td');
+                const finalEvaluationSelect = document.createElement('select');
+                finalEvaluationSelect.className = 'final-evaluation-select status-select';
+                finalEvaluationSelect.dataset.studentId = student.studentId;
+
+                const optionPass = document.createElement('option');
+                optionPass.value = 'true';
+                optionPass.textContent = 'Đạt';
+                finalEvaluationSelect.appendChild(optionPass);
+
+                const optionFail = document.createElement('option');
+                optionFail.value = 'false';
+                optionFail.textContent = 'Không đạt';
+                finalEvaluationSelect.appendChild(optionFail);
+
+                const studentFinalEvaluation = endOfCourseEvaluationsData.find(
+                    e => e.studentId === student.studentId
+                );
+                if (studentFinalEvaluation && studentFinalEvaluation.evaluation !== null) {
+                    finalEvaluationSelect.value = studentFinalEvaluation.evaluation.toString();
+                } else {
+                    finalEvaluationSelect.value = 'false'; // Default to "Không đạt"
+                }
+                finalEvaluationCell.appendChild(finalEvaluationSelect);
+                row.appendChild(finalEvaluationCell);
+
+                gradesTableBody.appendChild(row);
+            });
+
+            // Attach event listeners to newly created delete buttons
+            document.querySelectorAll('.delete-test-column-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const testNumber = parseInt(event.currentTarget.dataset.testNumber, 10);
+                    deleteTestColumn(testNumber);
+                });
+            });
+
+            // Attach event listeners for contenteditable headers
+            document.querySelectorAll('.test-header-name').forEach(span => {
+                span.addEventListener('blur', (event) => {
+                    const testNumber = parseInt(event.target.dataset.testNumber, 10);
+                    const newName = event.target.textContent.trim();
+                    if (testNumber && newName) {
+                        testColumnNames[testNumber - 1] = newName;
+                        console.log(`Cột kiểm tra ${testNumber} đổi tên thành: ${newName}`);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Xóa một cột điểm kiểm tra và cập nhật bảng.
+         * @param {number} testNumberToDelete - Số thứ tự của cột kiểm tra cần xóa.
+         */
+        function deleteTestColumn(testNumberToDelete) {
+            if (testNumberToDelete > numberOfTests || testNumberToDelete < 1) {
+                showCustomMessageBox('Số cột kiểm tra không hợp lệ để xóa.');
+                return;
+            }
+
+            showCustomMessageBox(`Bạn có chắc chắn muốn xóa cột "${testColumnNames[testNumberToDelete - 1]}"?`, true, (confirmed) => {
+                if (confirmed) {
+                    // Remove grades associated with this testNumber
+                    allGradesData = allGradesData.filter(g => g.testNumber !== testNumberToDelete);
+
+                    // Remove the column name
+                    testColumnNames.splice(testNumberToDelete - 1, 1);
+
+                    // Re-index subsequent test numbers in allGradesData and testColumnNames
+                    allGradesData.forEach(g => {
+                        if (g.testNumber > testNumberToDelete) {
+                            g.testNumber--;
+                        }
+                    });
+
+                    numberOfTests--; // Decrement the total count
+
+                    // Re-render the grades table to reflect the change
+                    renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations);
+                    showCustomMessageBox(`Đã xóa cột "Điểm kiểm tra lần ${testNumberToDelete}".`);
+                }
+            });
+        }
+
+
+        /**
+         * Hiển thị dữ liệu tiến độ đào tạo vào bảng.
+         * @param {Array<object>} progressList - Mảng dữ liệu tiến độ đào tạo.
+         * @param {Array<object>} statusOptions - Tùy chọn trạng thái (value, text)
+         */
+        function renderTrainingProgress(progressList, statusOptions) {
+            progressTableBody.innerHTML = '';
+            if (progressList && progressList.length > 0) {
+                // Sort by sessionNumber to ensure correct display order
+                progressList.sort((a, b) => a.sessionNumber - b.sessionNumber);
+
+                progressList.forEach(item => {
+                    const row = document.createElement('tr');
+                    // Ensure sessionNumber is displayed and updated
+                    const sessionNumberCell = document.createElement('td');
+                    sessionNumberCell.classList.add('progress-session-number-cell'); // Add class for styling
+                    sessionNumberCell.textContent = item.sessionNumber;
+
+                    // Delete button inside the session number cell
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-progress-entry-btn text-red-500 hover:text-red-700';
+                    deleteButton.dataset.id = item.id;
+                    deleteButton.title = 'Xóa buổi học này';
+                    deleteButton.innerHTML = '<i class="fas fa-times-circle"></i>';
+                    deleteButton.addEventListener('click', (event) => {
+                        const idToDelete = parseInt(event.currentTarget.dataset.id, 10);
+                        deleteProgressEntry(idToDelete);
+                    });
+                    sessionNumberCell.appendChild(deleteButton);
+                    row.appendChild(sessionNumberCell);
+
+                    // Make topic editable
+                    const topicCell = document.createElement('td');
+                    const topicSpan = document.createElement('span');
+                    topicSpan.contentEditable = "true";
+                    topicSpan.className = "progress-topic-name";
+                    topicSpan.dataset.id = item.id; // Use unique ID for the entry
+                    topicSpan.textContent = item.sessionTopic || '';
+                    topicSpan.addEventListener('blur', (event) => {
+                        const updatedId = event.target.dataset.id;
+                        const newTopic = event.target.textContent.trim();
+                        const entry = allProgressEntries.find(p => p.id == updatedId);
+                        if (entry) {
+                            entry.sessionTopic = newTopic;
+                            console.log(`Chủ đề của buổi học ${entry.sessionNumber} (ID: ${updatedId}) đã đổi thành: ${newTopic}`);
+                        }
+                    });
+                    topicCell.appendChild(topicSpan);
+                    row.appendChild(topicCell);
+
+                    // Status dropdown
+                    const statusCell = document.createElement('td');
+                    const statusSelect = document.createElement('select');
+                    statusSelect.className = 'progress-status-select status-select';
+                    statusSelect.dataset.id = item.id;
+
+                    statusOptions.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.text;
+                        if (item.statusId == option.value) {
+                            opt.selected = true;
+                        }
+                        statusSelect.appendChild(opt);
+                    });
+                    statusSelect.addEventListener('change', (event) => {
+                        const updatedId = event.target.dataset.id;
+                        const newStatusId = parseInt(event.target.value, 10);
+                        const entry = allProgressEntries.find(p => p.id == updatedId);
+                        if (entry) {
+                            entry.statusId = newStatusId;
+                            entry.statusName = statusOptions.find(o => o.value === newStatusId)?.text || '';
+                            console.log(`Trạng thái của buổi học ${entry.sessionNumber} (ID: ${updatedId}) đã đổi thành: ${entry.statusName}`);
+                        }
+                    });
+                    statusCell.appendChild(statusSelect);
+                    row.appendChild(statusCell);
+
+                    // Removed the separate actionCell
+
+                    progressTableBody.appendChild(row);
+                });
+            } else {
+                progressTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500 py-4">Không có dữ liệu tiến độ đào tạo.</td></tr>';
+            }
+        }
+
+        /**
+         * Thêm một buổi học mới vào danh sách tiến độ.
+         */
+        function addProgressEntry() {
+            const newId = Date.now(); // Simple unique ID for mock data
+            const nextSessionNumber = allProgressEntries.length > 0 ? Math.max(...allProgressEntries.map(p => p.sessionNumber)) + 1 : 1;
+            const defaultStatus = progressStatusOptions.length > 0 ? progressStatusOptions[0].value : 1; // Default to first status option
+
+            const newEntry = {
+                id: newId,
+                sessionNumber: nextSessionNumber,
+                sessionTopic: `Chủ đề mới buổi ${nextSessionNumber}`,
+                statusId: defaultStatus,
+                statusName: progressStatusOptions.find(o => o.value === defaultStatus)?.text || ''
+            };
+            allProgressEntries.push(newEntry);
+            renderTrainingProgress(allProgressEntries, progressStatusOptions);
+            showCustomMessageBox(`Đã thêm buổi học mới: "Chủ đề mới buổi ${nextSessionNumber}".`);
+        }
+
+        /**
+         * Xóa một buổi học khỏi danh sách tiến độ.
+         * @param {number} idToDelete - ID của buổi học cần xóa.
+         */
+        function deleteProgressEntry(idToDelete) {
+            showCustomMessageBox(`Bạn có chắc chắn muốn xóa buổi học này?`, true, (confirmed) => {
+                if (confirmed) {
+                    allProgressEntries = allProgressEntries.filter(entry => entry.id !== idToDelete);
+                    // Re-index session numbers after deletion
+                    allProgressEntries.sort((a, b) => a.sessionNumber - b.sessionNumber); // Sort first
+                    allProgressEntries.forEach((entry, index) => {
+                        entry.sessionNumber = index + 1;
+                    });
+                    renderTrainingProgress(allProgressEntries, progressStatusOptions);
+                    showCustomMessageBox('Đã xóa buổi học thành công.');
+                }
+            });
+        }
+
+
+        /**
+         * Thu thập tất cả dữ liệu từ các bảng có thể chỉnh sửa và gửi về C#.
+         */
+        function saveAllChanges() {
+            showFullScreenLoading();
+
+            // --- Collect Attendance Data ---
+            const updatedAttendance = [];
+            document.querySelectorAll('#attendanceTableBody tr').forEach(row => {
+                const sessionId = parseInt(row.querySelector('.attendance-checkbox')?.dataset.sessionId, 10);
+                const studentId = parseInt(row.querySelector('.attendance-checkbox')?.dataset.studentId, 10);
+                const isPresent = row.querySelector('.attendance-checkbox')?.checked;
+                const note = row.querySelector('.attendance-note')?.value;
+
+                if (sessionId && studentId) {
+                    updatedAttendance.push({
+                        sessionId: sessionId,
+                        studentId: studentId,
+                        isPresent: isPresent,
+                        note: note
+                    });
+                }
+            });
+
+            // Update the global allAttendanceData with the changes from the currently displayed session
+            const selectedSessionIdToUpdate = parseInt(sessionSelector.value, 10);
+            allAttendanceData = allAttendanceData.filter(record => record.sessionId !== selectedSessionIdToUpdate);
+            updatedAttendance.forEach(newRecord => {
+                // Find session details for new records
+                const sessionDetail = allClassSessions.find(s => s.sessionId === newRecord.sessionId);
+                const studentDetail = allStudentsInClass.find(s => s.studentId === newRecord.studentId);
+                if (sessionDetail && studentDetail) {
+                    allAttendanceData.push({
+                        sessionId: newRecord.sessionId,
+                        sessionNumber: sessionDetail.sessionNumber,
+                        sessionDate: sessionDetail.sessionDate,
+                        studentId: newRecord.studentId,
+                        studentName: studentDetail.studentName,
+                        isPresent: newRecord.isPresent,
+                        note: newRecord.note
+                    });
+                }
+            });
+
+
+            // --- Collect Grades Data (Individual Test Scores) ---
+            const updatedGrades = [];
+            allStudentsInClass.forEach(student => { // Iterate through all students
+                for (let i = 1; i <= numberOfTests; i++) { // For each test number
+                    const scoreInput = document.querySelector(`#gradesTableBody tr [data-student-id="${student.studentId}"][data-test-number="${i}"].grade-score`);
+
+                    if (scoreInput) {
+                        const score = parseFloat(scoreInput.value);
+                        updatedGrades.push({
+                            studentId: student.studentId,
+                            testNumber: i, // Use testNumber
+                            score: isNaN(score) ? null : score,
+                        });
+                    }
+                }
+            });
+            allGradesData = updatedGrades; // Update global grades data
+
+
+            // --- Collect End-of-Course Evaluations ---
+            const updatedEndOfCourseEvaluations = [];
+            document.querySelectorAll('#gradesTableBody tr').forEach(row => {
+                const studentId = parseInt(row.querySelector('.final-evaluation-select')?.dataset.studentId, 10);
+                const finalEvaluationSelect = row.querySelector(`.final-evaluation-select[data-student-id="${studentId}"]`);
+
+                if (finalEvaluationSelect) {
+                    const evaluation = finalEvaluationSelect.value === 'true'; // Convert to boolean
+                    updatedEndOfCourseEvaluations.push({
+                        studentId: studentId,
+                        evaluation: evaluation
+                    });
+                }
+            });
+            allEndOfCourseEvaluations = updatedEndOfCourseEvaluations; // Update global end-of-course evaluations
+
+
+            // --- Collect Progress Data (from allProgressEntries) ---
+            // allProgressEntries is already updated by blur/change listeners
+            // No need to re-collect from DOM, just use the global array
+            const updatedProgressDataForSave = allProgressEntries.map(entry => ({
+                id: entry.id,
+                sessionNumber: entry.sessionNumber,
+                sessionTopic: entry.sessionTopic,
+                statusId: entry.statusId
+            }));
+
+
+            const allUpdatedData = {
+                classId: currentClassId,
+                attendance: allAttendanceData,
+                grades: allGradesData,
+                endOfCourseEvaluations: allEndOfCourseEvaluations, // Include new data
+                progress: updatedProgressDataForSave, // Use the updated global array
+                numberOfTests: numberOfTests, // Save the current number of tests
+                testColumnNames: testColumnNames, // Save the custom column names
+                progressStatusOptions: progressStatusOptions // Ensure status options are passed back if needed by backend
+            };
+
+            console.log('Dữ liệu cập nhật gửi về C#:', allUpdatedData);
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({
+                    type: 'saveClassDetailsChanges',
+                    data: allUpdatedData
+                }));
+            } else {
+                showCustomMessageBox('Chức năng lưu chỉ hoạt động trong môi trường WebView2.');
+                hideFullScreenLoading();
+                // Simulate success for browser testing
+                setTimeout(() => {
+                    showCustomMessageBox('Simulated: Lưu thay đổi thành công!');
+                    // Re-render attendance for current session after simulated save
+                    displaySessionAttendance();
+                    renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations); // Re-render grades table with new data
+                    renderTrainingProgress(allProgressEntries, progressStatusOptions); // Re-render progress table
+                }, 1500);
+            }
+        }
+
+        // Gắn sự kiện cho nút "Lưu Tất Cả Thay Đổi"
+        if (saveAllChangesBtn) {
+            saveAllChangesBtn.addEventListener('click', saveAllChanges);
+        }
+
+        // Add Test Column Button functionality
+        if (addTestColumnBtn) {
+            addTestColumnBtn.addEventListener('click', () => {
+                numberOfTests++; // Increment the number of tests
+                testColumnNames.push(`Điểm kiểm tra lần ${numberOfTests}`); // Add default name for new column
+                renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations);
+                showCustomMessageBox(`Đã thêm cột "Điểm kiểm tra lần ${numberOfTests}".`);
+            });
+        }
+
+        // Add Progress Entry Button functionality
+        if (addProgressEntryBtn) {
+            addProgressEntryBtn.addEventListener('click', addProgressEntry);
+        }
+
+
+        // Lắng nghe thông báo từ C#
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.addEventListener('message', event => {
+                const message = JSON.parse(event.data);
+                if (message.type === 'classDetailsData') {
+                    currentClassId = message.classData.classId; // Store class ID
+                    populateClassDetails(message.classData);
+                    // Assuming C# sends all necessary data for mock setup
+                    allStudentsInClass = message.studentsInClass || [];
+                    allClassSessions = message.classSessions || [];
+                    allAttendanceData = message.attendanceData || [];
+                    numberOfTests = message.numberOfTests !== undefined ? message.numberOfTests : 0; // Initialize numberOfTests
+                    // Initialize testColumnNames from message or create defaults
+                    testColumnNames = message.testColumnNames || Array.from({ length: numberOfTests }, (_, i) => `Điểm kiểm tra lần ${i + 1}`);
+                    allGradesData = message.gradesData || []; // Populate all grades
+                    allEndOfCourseEvaluations = message.endOfCourseEvaluations || []; // Populate end of course evaluations
+
+                    allProgressEntries = message.progressData || []; // Populate all progress entries
+                    progressStatusOptions = message.progressStatusOptions || []; // Populate progress status options
+
+                    populateSessionSelector(); // Populate session dropdown and trigger initial attendance display
+                    renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations); // Render grades table with full data
+                    renderTrainingProgress(allProgressEntries, progressStatusOptions);
+                    hideFullScreenLoading();
+                } else if (message.type === 'loggedInUserName') {
+                    setLoggedInUserName(message.name);
+                    setLoggedInUserTitle(message.title);
+                } else if (message.type === 'saveClassDetailsStatus') {
+                    hideFullScreenLoading();
+                    if (message.success) {
+                        showCustomMessageBox('Lưu thay đổi thành công!');
+                        // Optionally, request fresh data after saving
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ type: 'requestClassDetailsData', classId: currentClassId }));
+                        }
+                    } else {
+                        showCustomMessageBox('Lỗi khi lưu thay đổi: ' + message.error);
+                    }
+                }
+            });
+        }
+
+        // Yêu cầu C# cung cấp dữ liệu ban đầu khi trang tải xong
+        document.addEventListener('DOMContentLoaded', function() {
+            showFullScreenLoading();
+            updateCurrentDate();
+            fetchEmployeeInfo();
+            setupUserInfoDropdown();
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({ type: 'requestLoggedInUserName' }));
+                // In a real application, C# would send 'classDetailsData' based on navigation
+                // For now, we'll simulate it after a delay if no WebView2 message is received.
+                setTimeout(() => {
+                    if (!currentClassId) { // Only load mock data if no real data has been received
+                        const dummyClassData = {
+                            classId: 101,
+                            className: 'NN68AV001',
+                            majorName: 'Anh Văn Giao Tiếp',
+                            mainTeacherName: 'Nguyễn Văn A',
+                            assistantName: 'Trần Thị B',
+                            room: 'P203',
+                            classSize: 20,
+                            startDate: '2025-07-01',
+                            expectedEndDate: '2025-09-30',
+                            statusName: 'Đang hoạt động'
+                        };
+
+                        // All students in this class
+                        allStudentsInClass = [
+                            { studentId: 1, studentName: 'Lê Văn C' },
+                            { studentId: 2, studentName: 'Phạm Thị D' },
+                            { studentId: 3, studentName: 'Nguyễn Đình E' },
+                            { studentId: 4, studentName: 'Trần Thu F' },
+                        ];
+
+                        // All attendance records across all sessions for this class
+                        allAttendanceData = [
+                            { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                            { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 2, studentName: 'Phạm Thị D', isPresent: false, note: 'Nghỉ ốm' },
+                            { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 3, studentName: 'Nguyễn Đình E', isPresent: true, note: '' },
+                            { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                            { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 2, studentName: 'Phạm Thị D', isPresent: true, note: '' },
+                            { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 3, studentName: 'Nguyễn Đình E', isPresent: true, note: '' },
+                            { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                            { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05', studentId: 2, studentName: 'Phạm Thị D', isPresent: false, note: 'Đi trễ' },
+                        ];
+
+                        // Unique session details for the dropdown
+                        allClassSessions = [
+                            { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01' },
+                            { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03' },
+                            { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05' },
+                            { sessionId: 4, sessionNumber: 4, sessionDate: '2025-07-07' }, // A session with no attendance yet
+                        ];
+
+                        numberOfTests = 3; // Initial number of test columns
+                        testColumnNames = ['Điểm kiểm tra lần 1', 'Điểm kiểm tra giữa kỳ', 'Điểm kiểm tra cuối khóa']; // Initial custom names
+
+                        // All grades data (studentId, testNumber, score)
+                        allGradesData = [
+                            { studentId: 1, testNumber: 1, score: 8.5 },
+                            { studentId: 2, testNumber: 1, score: 7.0 },
+                            { studentId: 3, testNumber: 1, score: 9.0 },
+                            { studentId: 4, testNumber: 1, score: 6.5 },
+
+                            { studentId: 1, testNumber: 2, score: 9.2 },
+                            { studentId: 2, testNumber: 2, score: 7.5 },
+                            { studentId: 3, testNumber: 2, score: 8.8 },
+                            // Student 4 has no grade for test 2 yet
+
+                            { studentId: 1, testNumber: 3, score: null }, // No score yet
+                            // Other students have no grades for test 3 yet
+                        ];
+
+                        // All end-of-course evaluations
+                        allEndOfCourseEvaluations = [
+                            { studentId: 1, evaluation: true }, // Lê Văn C - Đạt
+                            { studentId: 2, evaluation: false }, // Phạm Thị D - Không đạt
+                            { studentId: 3, evaluation: true }, // Nguyễn Đình E - Đạt
+                            // Student 4 has no final evaluation yet, will default to false
+                        ];
+
+                        allProgressEntries = [
+                            { id: 1, sessionNumber: 1, sessionTopic: 'Giới thiệu & Bài 1', statusId: 1 },
+                            { id: 2, sessionNumber: 2, sessionTopic: 'Bài 2: Ngữ pháp cơ bản', statusId: 1 },
+                            { id: 3, sessionNumber: 3, sessionTopic: 'Bài 3: Từ vựng & Đàm thoại', statusId: 2 },
+                            { id: 4, sessionNumber: 4, sessionTopic: 'Bài 4: Luyện nghe', statusId: 3 }
+                        ];
+
+                        progressStatusOptions = [
+                            { value: 1, text: 'Hoàn thành' },
+                            { value: 2, text: 'Đang tiến hành' },
+                            { value: 3, text: 'Chưa bắt đầu' }
+                        ];
+
+                        currentClassId = dummyClassData.classId;
+                        populateClassDetails(dummyClassData);
+                        populateSessionSelector(); // Populate session dropdown and trigger initial attendance display
+                        renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations); // Render grades table with full data
+                        renderTrainingProgress(allProgressEntries, progressStatusOptions);
+                        hideFullScreenLoading();
+                    }
+                }, 1500); // Adjust delay as needed
+            } else {
+                // Dữ liệu giả lập cho môi trường trình duyệt nếu không có WebView2
+                const dummyClassData = {
+                    classId: 101,
+                    className: 'NN68AV001',
+                    majorName: 'Anh Văn Giao Tiếp',
+                    mainTeacherName: 'Nguyễn Văn A',
+                    assistantName: 'Trần Thị B',
+                    room: 'P203',
+                    classSize: 20,
+                    startDate: '2025-07-01',
+                    expectedEndDate: '2025-09-30',
+                    statusName: 'Đang hoạt động'
+                };
+
+                allStudentsInClass = [
+                    { studentId: 1, studentName: 'Lê Văn C' },
+                    { studentId: 2, studentName: 'Phạm Thị D' },
+                    { studentId: 3, studentName: 'Nguyễn Đình E' },
+                    { studentId: 4, studentName: 'Trần Thu F' },
+                ];
+
+                allAttendanceData = [
+                    { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                    { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 2, studentName: 'Phạm Thị D', isPresent: false, note: 'Nghỉ ốm' },
+                    { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01', studentId: 3, studentName: 'Nguyễn Đình E', isPresent: true, note: '' },
+                    { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                    { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 2, studentName: 'Phạm Thị D', isPresent: true, note: '' },
+                    { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03', studentId: 3, studentName: 'Nguyễn Đình E', isPresent: true, note: '' },
+                    { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05', studentId: 1, studentName: 'Lê Văn C', isPresent: true, note: '' },
+                    { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05', studentId: 2, studentName: 'Phạm Thị D', isPresent: false, note: 'Đi trễ' },
+                ];
+
+                allClassSessions = [
+                    { sessionId: 1, sessionNumber: 1, sessionDate: '2025-07-01' },
+                    { sessionId: 2, sessionNumber: 2, sessionDate: '2025-07-03' },
+                    { sessionId: 3, sessionNumber: 3, sessionDate: '2025-07-05' },
+                    { sessionId: 4, sessionNumber: 4, sessionDate: '2025-07-07' },
+                ];
+
+                numberOfTests = 3;
+                testColumnNames = ['Điểm kiểm tra lần 1', 'Điểm kiểm tra giữa kỳ', 'Điểm kiểm tra cuối khóa'];
+
+                allGradesData = [
+                    { studentId: 1, testNumber: 1, score: 8.5 },
+                    { studentId: 2, testNumber: 1, score: 7.0 },
+                    { studentId: 3, testNumber: 1, score: 9.0 },
+                    { studentId: 4, testNumber: 1, score: 6.5 },
+
+                    { studentId: 1, testNumber: 2, score: 9.2 },
+                    { studentId: 2, testNumber: 2, score: 7.5 },
+                    { studentId: 3, testNumber: 2, score: 8.8 },
+
+                    { studentId: 1, testNumber: 3, score: null },
+                ];
+
+                allEndOfCourseEvaluations = [
+                    { studentId: 1, evaluation: true },
+                    { studentId: 2, evaluation: false },
+                    { studentId: 3, evaluation: true },
+                ];
+
+                allProgressEntries = [
+                    { id: 1, sessionNumber: 1, sessionTopic: 'Giới thiệu & Bài 1', statusId: 1 },
+                    { id: 2, sessionNumber: 2, sessionTopic: 'Bài 2: Ngữ pháp cơ bản', statusId: 1 },
+                    { id: 3, sessionNumber: 3, sessionTopic: 'Bài 3: Từ vựng & Đàm thoại', statusId: 2 },
+                    { id: 4, sessionNumber: 4, sessionTopic: 'Bài 4: Luyện nghe', statusId: 3 }
+                ];
+
+                progressStatusOptions = [
+                    { value: 1, text: 'Hoàn thành' },
+                    { value: 2, text: 'Đang tiến hành' },
+                    { value: 3, text: 'Chưa bắt đầu' }
+                ];
+
+                currentClassId = dummyClassData.classId;
+                populateClassDetails(dummyClassData);
+                populateSessionSelector();
+                renderGradesTable(allStudentsInClass, numberOfTests, allGradesData, allEndOfCourseEvaluations);
+                renderTrainingProgress(allProgressEntries, progressStatusOptions);
+                hideFullScreenLoading();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Hợp Yêu Cầu Chờ Xử Lý - Trung Tâm Ngoại Ngữ 68</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Liên kết Font Awesome để sử dụng các biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Thiết lập font và màu nền chung */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Màu nền nhẹ nhàng hơn */
+            color: #333333; /* Màu chữ mặc định */
+            display: flex;
+            flex-direction: column; /* Đảm bảo nội dung chính xếp chồng dọc */
+        }
+
+        /* Khu vực nội dung chính */
+        .main-content {
+            flex-grow: 1; /* Cho phép mở rộng để lấp đầy không gian còn lại */
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* Nền trắng cho nội dung chính đồng bộ */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ nhàng đồng bộ */
+            border-radius: 0; /* Loại bỏ bo góc để lấp đầy trang */
+            width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+            max-width: none; /* Loại bỏ giới hạn chiều rộng tối đa */
+            margin: 0; /* Loại bỏ margin tự động */
+            overflow-y: auto; /* Cho phép cuộn nếu nội dung form tràn */
+        }
+
+        /* Tiêu đề (Header) */
+        .header {
+            background-color: #2d3748;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 0; /* Loại bỏ bo góc để lấp đầy trang */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 30px; /* Tăng khoảng cách giữa logo và tiêu đề */
+            flex-grow: 1; /* Cho phép phần tử này mở rộng để lấp đầy không gian */
+            justify-content: flex-start; /* Giữ nội dung căn trái */
+        }
+
+        .header-logo img {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .header-date {
+            font-size: 1rem;
+            color: #a0aec0;
+            white-space: nowrap;
+            margin-right: 20px; /* Khoảng cách giữa ngày tháng và icon */
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Notification specific styles from Tusision.html */
+        .header-notification-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-icons svg {
+            width: 24px;
+            height: 24px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .header-icons svg:hover {
+            color: #ffffff;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            line-height: 1;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 0 0 2px #2d3748;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 250px;
+            max-width: 350px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+
+        .notification-dropdown.show {
+            display: flex;
+        }
+
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px 10px;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .notification-dropdown-header h3 {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .notification-dropdown-header button {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .notification-dropdown-header button:hover {
+            color: #ffffff;
+        }
+
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .notification-list li {
+            color: #e2e8f0;
+            padding: 10px 15px;
+            border-bottom: 1px solid #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .notification-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notification-list li:hover {
+            background-color: #4a5568;
+        }
+
+        /* Thông tin người dùng và dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .user-info img {
+            width: 36px; /* Kích thước avatar lớn hơn một chút */
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4299e1; /* Viền xanh nổi bật */
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Căn trái thông tin người dùng */
+            white-space: nowrap;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .user-details .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details .user-title {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Khoảng cách với user-info */
+            right: 0;
+            background-color: #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            min-width: 160px; /* Rộng hơn một chút */
+            display: none;
+            flex-direction: column;
+            padding: 10px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .user-dropdown.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .user-dropdown button {
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border-radius: 0;
+            font-size: 0.95rem;
+        }
+
+        .user-dropdown button:hover {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+
+        /* Nội dung chính của Bảng Tổng Hợp */
+        .dashboard-body {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #ffffff;
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .filter-section {
+            background-color: #fdfdfd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1 1 200px; /* Allows items to grow and shrink, with a base width */
+            min-width: 150px; /* Minimum width for filter items */
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555555;
+            font-size: 0.9em;
+        }
+
+        .filter-group select,
+        .filter-group input[type="text"] {
+            width: 100%;
+            background-color: #fcfcfc;
+            color: #333333;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-buttons button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-buttons button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .requests-table-container {
+            overflow-x: auto; /* Allows horizontal scrolling for tables on small screens */
+            background-color: #fdfdfd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .requests-table th,
+        .requests-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .requests-table th {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        .requests-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .requests-table .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-pending { background-color: #ffc107; color: #333; } /* Vàng */
+        .status-approved { background-color: #28a745; } /* Xanh lá */
+        .status-rejected { background-color: #dc3545; } /* Đỏ */
+        .status-in-appraisal { background-color: #17a2b8; } /* Xanh dương nhạt */
+        .status-in-approval { background-color: #6f42c1; } /* Tím */
+        .status-appraised { background-color: #00bcd4; } /* Xanh lam */
+
+
+        .requests-table .action-button {
+            background-color: #4299e1;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.2s;
+        }
+
+        .requests-table .action-button:hover {
+            background-color: #3182ce;
+        }
+
+        .no-requests-message {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.1em;
+            color: #6c757d;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh; /* Limit modal height */
+            overflow-y: auto; /* Allow scrolling within modal */
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s;
+        }
+
+        .modal-close-button:hover {
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .modal-info-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-info-group label {
+            display: block;
+            font-weight: 600;
+            color: #555555;
+            margin-bottom: 5px;
+        }
+
+        .modal-info-group p {
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            color: #333333;
+            word-wrap: break-word; /* Ensure long text wraps */
+        }
+
+        .modal-info-group .status-badge {
+            /* Reuse existing status-badge styles */
+        }
+
+        .modal-actions {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px; /* Ensure buttons have minimum width */
+            justify-content: center;
+        }
+
+        .modal-actions .btn-appraise {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .modal-actions .btn-appraise:hover {
+            background-color: #e0a800;
+            transform: translateY(-1px);
+        }
+
+        .modal-actions .btn-approve {
+            background-color: #28a745;
+            color: white;
+        }
+        .modal-actions .btn-approve:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        .modal-actions .btn-reject {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal-actions .btn-reject:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .modal-actions .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #cccccc;
+            color: #666666;
+        }
+        .modal-actions .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal-comment-section {
+            margin-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+
+        .modal-comment-section label {
+            display: block;
+            font-weight: 600;
+            color: #555555;
+            margin-bottom: 8px;
+        }
+
+        .modal-comment-section textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-comment-section textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+
+        /* Điều chỉnh responsive */
+        @media (max-width: 1024px) {
+            .header-date {
+                display: none;
+            }
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .filter-buttons {
+                flex-direction: column;
+            }
+            .filter-buttons button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .main-content {
+                padding: 20px;
+                border-radius: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .dashboard-title {
+                font-size: 1.6rem;
+                margin-bottom: 20px;
+            }
+
+            .filter-section {
+                padding: 15px;
+            }
+
+            .requests-table th,
+            .requests-table td {
+                padding: 8px 10px;
+                font-size: 0.8em;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .modal-title {
+                font-size: 1.5rem;
+            }
+            .modal-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Full-screen Loading Overlay -->
+    <div id="fullScreenLoadingOverlay" class="full-screen-loading-overlay">
+        <div class="full-screen-spinner"></div>
+    </div>
+
+    <!-- Khu vực nội dung chính -->
+    <div class="main-content">
+        <!-- Tiêu đề -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-logo">
+                    <img src="https://placehold.co/100x100/1a202c/e2e8f0?text=Logo" alt="Trung Tâm Ngoại Ngữ 68">
+                </div>
+                <div class="header-title">Trung Tâm Ngoại Ngữ 68</div>
+            </div>
+            <div class="header-right">
+                <div id="currentDate" class="header-date"></div>
+                <div class="header-notification-wrapper">
+                    <div class="header-icons" id="notificationBellIcon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucude-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                        <div class="notification-badge" id="notificationCountBadge">0</div>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-dropdown-header">
+                            <h3>Thông báo</h3>
+                            <button id="clearNotificationsBtn">Xóa tất cả</button>
+                        </div>
+                        <ul id="notificationList" class="notification-list">
+                            <li class="text-gray-400 text-sm p-2">Không có thông báo mới.</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Thông tin người dùng và Dropdown -->
+                <div class="user-info" id="userInfo">
+                    <img src="https://placehold.co/36x36/1a202c/e2e8f0?text=U" alt="User Avatar" />
+                    <div class="user-details">
+                        <span class="user-name" id="employeeName">Đang tải...</span>
+                        <span class="user-title" id="employeeTitle"></span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor: pointer; color: #a0aec0;"><path d="m6 9 6 6 6-6" /></svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button id="changePasswordBtn">Đổi Mật Khẩu</button>
+                        <button id="logoutBtn">Đăng Xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung chính của Bảng Tổng Hợp -->
+        <div class="dashboard-body">
+            <h1 class="dashboard-title">Tổng Hợp Yêu Cầu Chờ Xử Lý</h1>
+
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="filterRequestType">Loại Yêu Cầu:</label>
+                    <select id="filterRequestType">
+                        <option value="">Tất cả</option>
+                        <option value="student_request">Yêu cầu Học viên</option>
+                        <option value="staff_request">Yêu cầu Nhân sự</option>
+                        <option value="finance_request">Yêu cầu Tài chính</option>
+                        <option value="class_request">Yêu cầu Lớp học</option>
+                        <option value="document_request">Yêu cầu Tài liệu</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus">Trạng thái:</label>
+                    <select id="filterStatus">
+                        <option value="">Tất cả</option>
+                        <option value="Đang chờ thẩm định">Đang chờ thẩm định</option>
+                        <option value="Đang chờ phê duyệt">Đang chờ phê duyệt</option>
+                        <option value="Đã thẩm định">Đã thẩm định</option>
+                        <option value="Đã phê duyệt">Đã phê duyệt</option>
+                        <option value="Đã từ chối">Đã từ chối</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterRequester">Người tạo yêu cầu:</label>
+                    <input type="text" id="filterRequester" placeholder="Tìm theo tên người tạo...">
+                </div>
+                <div class="filter-group">
+                    <label for="filterApprover">Người phê duyệt:</label>
+                    <input type="text" id="filterApprover" placeholder="Tìm theo tên người phê duyệt...">
+                </div>
+                <div class="filter-buttons">
+                    <button id="applyFiltersBtn">
+                        <i class="fas fa-filter mr-2"></i>Áp dụng bộ lọc
+                    </button>
+                    <button id="resetFiltersBtn">
+                        <i class="fas fa-redo mr-2"></i>Đặt lại
+                    </button>
+                </div>
+            </div>
+
+            <div class="requests-table-container">
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Yêu Cầu</th>
+                            <th>Loại Yêu Cầu</th>
+                            <th>Mô tả</th>
+                            <th>Người tạo</th>
+                            <th>Người thẩm định</th>
+                            <th>Người phê duyệt</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày gửi</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <!-- Request rows will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="noRequestsFound" class="no-requests-message" style="display: none;">
+                    Không tìm thấy yêu cầu nào phù hợp với bộ lọc.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div id="requestDetailModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeModalBtn">&times;</button>
+            <h2 class="modal-title">Chi Tiết Yêu Cầu</h2>
+
+            <div class="modal-info-group">
+                <label>Mã Yêu Cầu:</label>
+                <p id="modalRequestId"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Loại Yêu Cầu:</label>
+                <p id="modalRequestType"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Mô tả:</label>
+                <p id="modalRequestDescription"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Người tạo:</label>
+                <p id="modalRequester"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Người thẩm định:</label>
+                <p id="modalAppraiser"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Người phê duyệt:</label>
+                <p id="modalApprover"></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Trạng thái:</label>
+                <p><span id="modalRequestStatus" class="status-badge"></span></p>
+            </div>
+            <div class="modal-info-group">
+                <label>Ngày gửi:</label>
+                <p id="modalSubmissionDate"></p>
+            </div>
+
+            <div class="modal-comment-section">
+                <label for="modalComment">Ghi chú/Lý do:</label>
+                <textarea id="modalComment" placeholder="Nhập ghi chú hoặc lý do cho hành động..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button id="appraiseRequestBtn" class="btn-appraise">
+                    <i class="fas fa-gavel mr-2"></i>Thẩm định
+                </button>
+                <button id="approveRequestBtn" class="btn-approve">
+                    <i class="fas fa-check-circle mr-2"></i>Phê duyệt
+                </button>
+                <button id="rejectRequestBtn" class="btn-reject">
+                    <i class="fas fa-times-circle mr-2"></i>Từ chối
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fullScreenLoadingOverlay = document.getElementById('fullScreenLoadingOverlay');
+        
+        function showFullScreenLoading() {
+            fullScreenLoadingOverlay.classList.add('active');
+        }
+
+        function hideFullScreenLoading() {
+            fullScreenLoadingOverlay.classList.remove('active');
+        }
+
+        // JavaScript để hiển thị ngày và giờ hiện tại
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+        updateCurrentDate();
+        setInterval(updateCurrentDate, 60000);
+
+        // JavaScript để xử lý dropdown người dùng
+        const userInfo = document.getElementById('userInfo');
+        const userDropdown = document.getElementById('userDropdown');
+
+        if (userInfo && userDropdown) {
+            userInfo.addEventListener('click', (event) => {
+                event.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+
+            document.body.addEventListener('click', (event) => {
+                if (userDropdown.classList.contains('show') && !userInfo.contains(event.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // JavaScript để xử lý dropdown thông báo
+        const notificationBellIcon = document.getElementById('notificationBellIcon');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationCountBadge = document.getElementById('notificationCountBadge');
+        const notificationList = document.getElementById('notificationList');
+        const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
+
+        let activeNotifications = [];
+
+        /**
+         * Cập nhật số lượng thông báo trên huy hiệu.
+         * @param {number} count - Số lượng thông báo chưa đọc.
+         */
+        function updateNotificationCount(count) {
+            if (notificationCountBadge) {
+                notificationCountBadge.textContent = count > 99 ? '99+' : count;
+                if (count > 0) {
+                    notificationCountBadge.style.display = 'block';
+                } else {
+                    notificationCountBadge.style.display = 'none';
+                }
+            }
+        }
+
+        /**
+         * Checks if two dates are on the same day.
+         * @param {Date} d1 - First date.
+         * @param {Date} d2 - Second date.
+         * @returns {boolean} - True if same day, false otherwise.
+         */
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        /**
+         * Determines the time category for a given notification date.
+         * @param {Date} notificationDate - The date of the notification.
+         * @returns {string} - The time category (e.g., 'Mới', 'Hôm nay', 'Hôm qua').
+         */
+        function getTimeCategory(notificationDate) {
+            const now = new Date();
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0); // Normalize to start of day for accurate comparison
+
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            // Normalize notification date for comparison (only consider day, month, year, hour, minute)
+            const normalizedNotificationDate = new Date(notificationDate.getFullYear(), notificationDate.getMonth(), notificationDate.getDate(), notificationDate.getHours(), notificationDate.getMinutes());
+
+
+            if (normalizedNotificationDate > oneHourAgo) {
+                return 'Mới';
+            } else if (isSameDay(normalizedNotificationDate, now)) {
+                return 'Hôm nay';
+            } else if (isSameDay(normalizedNotificationDate, yesterday)) {
+                return 'Hôm qua';
+            } else if (normalizedNotificationDate >= startOfWeek) {
+                return 'Tuần này';
+            } else if (normalizedNotificationDate >= startOfMonth) {
+                return 'Tháng này';
+            }
+            return 'Cũ hơn';
+        }
+
+        /**
+         * Formats a date into a human-readable "time ago" string.
+         * @param {Date} date - The date to format.
+         * @returns {string} - Formatted time string.
+         */
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            let interval = seconds / 31536000; // years
+            if (interval > 1) {
+                return Math.floor(interval) + " năm trước";
+            }
+            interval = seconds / 2592000; // months
+            if (interval > 1) {
+                return Math.floor(interval) + " tháng trước";
+            }
+            interval = seconds / 86400; // days
+            if (interval > 1) {
+                return Math.floor(interval) + " ngày trước";
+            }
+            interval = seconds / 3600; // hours
+            if (interval > 1) {
+                return Math.floor(interval) + " giờ trước";
+            }
+            interval = seconds / 60; // minutes
+            if (interval > 1) {
+                return Math.floor(interval) + " phút trước";
+            }
+            return Math.floor(seconds) + " giây trước";
+        }
+
+        /**
+         * Render notifications into the dropdown, grouped by time.
+         * @param {Array<Object>} notifications - Array of notification objects.
+         */
+        function renderNotifications(notifications) {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<li class="text-gray-400 text-sm p-2">Không có thông báo mới.</li>';
+                clearNotificationsBtn.style.display = 'none';
+                updateNotificationCount(0);
+                return;
+            }
+
+            clearNotificationsBtn.style.display = 'block';
+
+            // Sort notifications by date, newest first
+            notifications.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            const groupedNotifications = {
+                'Mới': [],
+                'Hôm nay': [],
+                'Hôm qua': [],
+                'Tuần này': [],
+                'Tháng này': [],
+                'Cũ hơn': []
+            };
+
+            notifications.forEach(notif => {
+                const category = getTimeCategory(notif.date);
+                // Ensure the category exists before pushing
+                if (!groupedNotifications[category]) {
+                    groupedNotifications[category] = [];
+                }
+                groupedNotifications[category].push(notif);
+            });
+
+            // Order of categories for rendering
+            const categoryOrder = ['Mới', 'Hôm nay', 'Hôm qua', 'Tuần này', 'Tháng này', 'Cũ hơn'];
+
+            categoryOrder.forEach(category => {
+                if (groupedNotifications[category].length > 0) {
+                    const categoryHeader = document.createElement('li');
+                    categoryHeader.classList.add('notification-dropdown-header');
+                    categoryHeader.innerHTML = `<h3>${category}</h3>`;
+                    notificationList.appendChild(categoryHeader);
+
+                    groupedNotifications[category].forEach(notif => {
+                        const notificationItem = document.createElement('li');
+                        notificationItem.classList.add('notification-item');
+                        notificationItem.dataset.id = notif.id; // Assign a unique ID to each notification
+                        notificationItem.innerHTML = `
+                            <strong>${notif.title}:</strong> ${notif.message}
+                            <span class="time">${formatTimeAgo(notif.date)}</span>
+                        `;
+                        notificationList.appendChild(notificationItem);
+
+                        // Add click listener to each individual notification item
+                        notificationItem.addEventListener('click', (event) => {
+                            event.stopPropagation(); // Prevent dropdown from closing immediately
+                            markNotificationAsRead(notif.id);
+                        });
+                    });
+                }
+            });
+            updateNotificationCount(notifications.length);
+        }
+
+        /**
+         * Marks a single notification as read and updates the list.
+         * @param {string} id - The ID of the notification to mark as read.
+         */
+        function markNotificationAsRead(id) {
+            activeNotifications = activeNotifications.filter(notif => notif.id !== id);
+            renderNotifications(activeNotifications);
+            notificationDropdown.classList.remove('show');
+        }
+
+        // Initial mock notifications with Date objects
+        activeNotifications = [
+            { id: 'notif1', title: 'Thông báo 1', message: 'Học viên mới đã đăng ký.', date: new Date(Date.now() - 30 * 60 * 1000) }, // 30 mins ago (Mới)
+            { id: 'notif2', title: 'Thông báo 2', message: 'Lịch học sắp tới.', date: new Date(Date.now() - 5 * 60 * 60 * 1000) }, // 5 hours ago (Hôm nay)
+            { id: 'notif3', title: 'Thông báo 3', message: 'Yêu cầu hỗ trợ mới.', date: new Date(Date.now() - 24 * 60 * 60 * 1000 - 2 * 60 * 60 * 1000) }, // Yesterday (Hôm qua)
+            { id: 'notif4', title: 'Thông báo 4', message: 'Khóa học mới được thêm.', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) }, // 3 days ago (Tuần này)
+            { id: 'notif5', title: 'Thông báo 5', message: 'Cập nhật hệ thống.', date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) }, // 15 days ago (Tháng này)
+            { id: 'notif6', title: 'Thông báo 6', message: 'Báo cáo hàng tháng đã sẵn sàng.', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) }, // 40 days ago (Cũ hơn)
+        ];
+        renderNotifications(activeNotifications); // Render initial notifications
+
+        if (notificationBellIcon && notificationDropdown) {
+            notificationBellIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Ngăn chặn sự kiện click lan ra body
+                notificationDropdown.classList.toggle('show');
+            });
+
+            document.body.addEventListener('click', (event) => {
+                // Đóng dropdown thông báo nếu click ra ngoài
+                if (notificationDropdown.classList.contains('show') && !notificationBellIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                    notificationDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Xử lý nút "Đánh dấu tất cả đã đọc"
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', () => {
+                activeNotifications = []; // Clear all notifications
+                renderNotifications(activeNotifications); // Re-render to show "No notifications"
+                notificationDropdown.classList.remove('show'); // Đóng dropdown
+            });
+        }
+
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        if (changePasswordBtn) {
+            changePasswordBtn.addEventListener('click', () => {
+                showFullScreenLoading();
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(JSON.stringify({ type: 'ShowChangePasswordDialog' }));
+                }
+                userDropdown.classList.remove('show');
+                setTimeout(hideFullScreenLoading, 1000);
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(JSON.stringify({ type: 'Logout' }));
+                }
+                userDropdown.classList.remove('show');
+            });
+        }
+
+        const employeeNameSpan = document.getElementById('employeeName');
+        const employeeTitleSpan = document.getElementById('employeeTitle');
+
+        function setLoggedInUserName(name) {
+            if (employeeNameSpan) {
+                employeeNameSpan.textContent = name;
+            }
+        }
+
+        function setLoggedInUserTitle(title) {
+            if (employeeTitleSpan) {
+                employeeTitleSpan.textContent = title;
+            }
+        }
+
+        // --- Dashboard Logic ---
+        const requestsTableBody = document.getElementById('requestsTableBody');
+        const noRequestsFoundMessage = document.getElementById('noRequestsFound');
+        const filterRequestTypeSelect = document.getElementById('filterRequestType');
+        const filterStatusSelect = document.getElementById('filterStatus');
+        const filterRequesterInput = document.getElementById('filterRequester');
+        const filterApproverInput = document.getElementById('filterApprover');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+        // Mock data for requests
+        const allRequests = [
+            {
+                id: 'REQ001',
+                type: 'student_request',
+                description: 'Đăng ký học viên mới Nguyễn Văn A',
+                requester: 'Nguyễn Thị B',
+                appraiser: 'Lê Văn C',
+                approver: 'Phạm Thị D',
+                status: 'Đang chờ thẩm định',
+                submissionDate: '2024-07-15'
+            },
+            {
+                id: 'REQ002',
+                type: 'class_request',
+                description: 'Yêu cầu mở lớp Tiếng Anh giao tiếp cơ bản',
+                requester: 'Trần Văn E',
+                appraiser: null, // No appraiser
+                approver: 'Nguyễn Văn G',
+                status: 'Đang chờ phê duyệt',
+                submissionDate: '2024-07-16'
+            },
+            {
+                id: 'REQ003',
+                type: 'finance_request',
+                description: 'Đề xuất chi tiền mua thiết bị văn phòng',
+                requester: 'Hoàng Thị H',
+                appraiser: 'Lê Văn C',
+                approver: 'Phạm Thị D',
+                status: 'Đã thẩm định',
+                submissionDate: '2024-07-14'
+            },
+            {
+                id: 'REQ004',
+                type: 'staff_request',
+                description: 'Yêu cầu tuyển dụng nhân viên tư vấn',
+                requester: 'Nguyễn Thị B',
+                appraiser: 'Phạm Văn Quản Lý',
+                approver: 'Nguyễn Văn Giám Đốc',
+                status: 'Đang chờ thẩm định',
+                submissionDate: '2024-07-17'
+            },
+            {
+                id: 'REQ005',
+                type: 'document_request',
+                description: 'Yêu cầu cập nhật giáo trình IELTS',
+                requester: 'Trần Văn E',
+                appraiser: null,
+                approver: 'Nguyễn Văn G',
+                status: 'Đang chờ phê duyệt',
+                submissionDate: '2024-07-18'
+            },
+            {
+                id: 'REQ006',
+                type: 'finance_request',
+                description: 'Yêu cầu thanh toán lương tháng 6',
+                requester: 'Hoàng Thị H',
+                appraiser: 'Lê Văn C',
+                approver: 'Phạm Thị D',
+                status: 'Đã phê duyệt',
+                submissionDate: '2024-07-10'
+            },
+            {
+                id: 'REQ007',
+                type: 'student_request',
+                description: 'Yêu cầu chuyển lớp cho học viên Nguyễn Thị K',
+                requester: 'Nguyễn Thị B',
+                appraiser: 'Lê Văn C',
+                captured: {
+                    comment: "Học viên cần chuyển lớp vì lý do sức khỏe.",
+                    action: "Appraised"
+                },
+                approver: 'Phạm Thị D',
+                status: 'Đã từ chối',
+                submissionDate: '2024-07-12'
+            },
+        ];
+
+        /**
+         * Renders the requests table based on filtered data.
+         * @param {Array} requests - The array of request objects to render.
+         */
+        function renderRequestsTable(requests) {
+            requestsTableBody.innerHTML = ''; // Clear existing rows
+            if (requests.length === 0) {
+                noRequestsFoundMessage.style.display = 'block';
+                return;
+            }
+            noRequestsFoundMessage.style.display = 'none';
+
+            requests.forEach(request => {
+                const row = document.createElement('tr');
+
+                // Map status to a CSS class for styling
+                let statusClass = '';
+                switch (request.status) {
+                    case 'Đang chờ thẩm định':
+                        statusClass = 'status-in-appraisal';
+                        break;
+                    case 'Đang chờ phê duyệt':
+                        statusClass = 'status-in-approval';
+                        break;
+                    case 'Đã thẩm định':
+                        statusClass = 'status-appraised'; // New class for 'Đã thẩm định'
+                        break;
+                    case 'Đã phê duyệt':
+                        statusClass = 'status-approved';
+                        break;
+                    case 'Đã từ chối':
+                        statusClass = 'status-rejected';
+                        break;
+                    default:
+                        statusClass = '';
+                }
+
+                row.innerHTML = `
+                    <td>${request.id}</td>
+                    <td>${getRequestTypeDisplayName(request.type)}</td>
+                    <td>${request.description}</td>
+                    <td>${request.requester}</td>
+                    <td>${request.appraiser || 'N/A'}</td>
+                    <td>${request.approver}</td>
+                    <td><span class="status-badge ${statusClass}">${request.status}</span></td>
+                    <td>${request.submissionDate}</td>
+                    <td>
+                        <button class="action-button" onclick="viewRequestDetails('${request.id}')">
+                            <i class="fas fa-eye"></i> Xem chi tiết
+                        </button>
+                    </td>
+                `;
+                requestsTableBody.appendChild(row);
+            });
+        }
+
+        /**
+         * Helper function to get display name for request type.
+         * @param {string} type - The internal request type.
+         * @returns {string} The display name.
+         */
+        function getRequestTypeDisplayName(type) {
+            switch (type) {
+                case 'student_request': return 'Yêu cầu Học viên';
+                case 'staff_request': return 'Yêu cầu Nhân sự';
+                case 'finance_request': return 'Yêu cầu Tài chính';
+                case 'class_request': return 'Yêu cầu Lớp học';
+                case 'document_request': return 'Yêu cầu Tài liệu';
+                default: return type;
+            }
+        }
+
+        /**
+         * Filters the requests based on selected criteria.
+         */
+        function filterRequests() {
+            showFullScreenLoading();
+            const typeFilter = filterRequestTypeSelect.value;
+            const statusFilter = filterStatusSelect.value;
+            const requesterFilter = filterRequesterInput.value.toLowerCase().trim();
+            const approverFilter = filterApproverInput.value.toLowerCase().trim();
+
+            const filtered = allRequests.filter(request => {
+                const matchesType = typeFilter === '' || request.type === typeFilter;
+                const matchesStatus = statusFilter === '' || request.status === statusFilter;
+                const matchesRequester = requesterFilter === '' || request.requester.toLowerCase().includes(requesterFilter);
+                const matchesApprover = approverFilter === '' || (request.approver && request.approver.toLowerCase().includes(approverFilter));
+                return matchesType && matchesStatus && matchesRequester && matchesApprover;
+            });
+
+            setTimeout(() => { // Simulate loading delay
+                renderRequestsTable(filtered);
+                hideFullScreenLoading();
+            }, 500);
+        }
+
+        /**
+         * Resets all filter fields and re-renders the table.
+         */
+        function resetFilters() {
+            filterRequestTypeSelect.value = '';
+            filterStatusSelect.value = '';
+            filterRequesterInput.value = '';
+            filterApproverInput.value = '';
+            filterRequests(); // Re-apply filters with empty values
+        }
+
+        // --- Modal Logic ---
+        const requestDetailModal = document.getElementById('requestDetailModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalRequestId = document.getElementById('modalRequestId');
+        const modalRequestType = document.getElementById('modalRequestType');
+        const modalRequestDescription = document.getElementById('modalRequestDescription');
+        const modalRequester = document.getElementById('modalRequester');
+        const modalAppraiser = document.getElementById('modalAppraiser');
+        const modalApprover = document.getElementById('modalApprover');
+        const modalRequestStatus = document.getElementById('modalRequestStatus');
+        const modalSubmissionDate = document.getElementById('modalSubmissionDate');
+        const modalComment = document.getElementById('modalComment');
+
+        const appraiseRequestBtn = document.getElementById('appraiseRequestBtn');
+        const approveRequestBtn = document.getElementById('approveRequestBtn');
+        const rejectRequestBtn = document.getElementById('rejectRequestBtn');
+
+        let currentRequestBeingViewed = null; // To store the request object being viewed
+
+        /**
+         * Displays the request detail modal.
+         * @param {string} requestId - The ID of the request to display.
+         */
+        function viewRequestDetails(requestId) {
+            const request = allRequests.find(req => req.id === requestId);
+            if (!request) {
+                return;
+            }
+
+            currentRequestBeingViewed = request; // Store the current request
+
+            // Populate modal fields
+            modalRequestId.textContent = request.id;
+            modalRequestType.textContent = getRequestTypeDisplayName(request.type);
+            modalRequestDescription.textContent = request.description;
+            modalRequester.textContent = request.requester;
+            modalAppraiser.textContent = request.appraiser || 'N/A';
+            modalApprover.textContent = request.approver;
+            modalSubmissionDate.textContent = request.submissionDate;
+            modalComment.value = ''; // Clear previous comments
+
+            // Set status badge
+            modalRequestStatus.textContent = request.status;
+            modalRequestStatus.className = 'status-badge'; // Reset classes
+            switch (request.status) {
+                case 'Đang chờ thẩm định':
+                    modalRequestStatus.classList.add('status-in-appraisal');
+                    break;
+                case 'Đang chờ phê duyệt':
+                    modalRequestStatus.classList.add('status-in-approval');
+                    break;
+                case 'Đã thẩm định':
+                    modalRequestStatus.classList.add('status-appraised');
+                    break;
+                case 'Đã phê duyệt':
+                    modalRequestStatus.classList.add('status-approved');
+                    break;
+                case 'Đã từ chối':
+                    modalRequestStatus.classList.add('status-rejected');
+                    break;
+            }
+
+            // Enable/Disable action buttons based on status and appraiser
+            appraiseRequestBtn.classList.remove('btn-disabled');
+            approveRequestBtn.classList.remove('btn-disabled');
+            rejectRequestBtn.classList.remove('btn-disabled');
+
+            appraiseRequestBtn.onclick = () => handleAppraise(request.id);
+            approveRequestBtn.onclick = () => handleApprove(request.id);
+            rejectRequestBtn.onclick = () => handleReject(request.id);
+
+
+            if (request.status === 'Đang chờ thẩm định' && request.appraiser) {
+                appraiseRequestBtn.style.display = 'inline-flex';
+                approveRequestBtn.style.display = 'none'; // Hide approve until appraised
+            } else if (request.status === 'Đang chờ phê duyệt' || (request.status === 'Đã thẩm định' && request.appraiser)) {
+                appraiseRequestBtn.style.display = 'none'; // Appraise is done or skipped
+                approveRequestBtn.style.display = 'inline-flex';
+            } else {
+                // If already approved/rejected, or no appraiser/approver needed for current user's role
+                appraiseRequestBtn.style.display = 'none';
+                approveRequestBtn.style.display = 'none';
+            }
+
+            // Always show reject button for pending requests
+            if (request.status === 'Đã phê duyệt' || request.status === 'Đã từ chối') {
+                rejectRequestBtn.style.display = 'none';
+            } else {
+                rejectRequestBtn.style.display = 'inline-flex';
+            }
+
+
+            requestDetailModal.classList.add('show');
+        }
+
+        // Close modal functionality
+        closeModalBtn.addEventListener('click', () => {
+            requestDetailModal.classList.remove('show');
+        });
+
+        requestDetailModal.addEventListener('click', (event) => {
+            if (event.target === requestDetailModal) {
+                requestDetailModal.classList.remove('show');
+            }
+        });
+
+        /**
+         * Handles the appraise action for a request.
+         * @param {string} requestId - The ID of the request to appraise.
+         */
+        function handleAppraise(requestId) {
+            const requestIndex = allRequests.findIndex(req => req.id === requestId);
+            if (requestIndex > -1) {
+                const comment = modalComment.value.trim();
+                allRequests[requestIndex].status = 'Đã thẩm định';
+                // In a real app, you'd send this to a backend API
+                console.log(`Yêu cầu ${requestId} đã được thẩm định. Ghi chú: ${comment}`);
+                requestDetailModal.classList.remove('show');
+                filterRequests(); // Re-render table to reflect status change
+            }
+        }
+
+        /**
+         * Handles the approve action for a request.
+         * @param {string} requestId - The ID of the request to approve.
+         */
+        function handleApprove(requestId) {
+            const requestIndex = allRequests.findIndex(req => req.id === requestId);
+            if (requestIndex > -1) {
+                const comment = modalComment.value.trim();
+                allRequests[requestIndex].status = 'Đã phê duyệt';
+                // In a real app, you'd send this to a backend API
+                console.log(`Yêu cầu ${requestId} đã được phê duyệt. Ghi chú: ${comment}`);
+                requestDetailModal.classList.remove('show');
+                filterRequests(); // Re-render table to reflect status change
+            }
+        }
+
+        /**
+         * Handles the reject action for a request.
+         * @param {string} requestId - The ID of the request to reject.
+         */
+        function handleReject(requestId) {
+            const requestIndex = allRequests.findIndex(req => req.id === requestId);
+            if (requestIndex > -1) {
+                const comment = modalComment.value.trim();
+                if (!comment) {
+                    return;
+                }
+                allRequests[requestIndex].status = 'Đã từ chối';
+                // In a real app, you'd send this to a backend API
+                console.log(`Yêu cầu ${requestId} đã bị từ chối. Lý do: ${comment}`);
+                requestDetailModal.classList.remove('show');
+                filterRequests(); // Re-render table to reflect status change
+            }
+        }
+
+
+        // Event Listeners for filters
+        applyFiltersBtn.addEventListener('click', filterRequests);
+        resetFiltersBtn.addEventListener('click', resetFilters);
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', function() {
+            setLoggedInUserName("Người dùng Test"); // Placeholder
+            setLoggedInUserTitle("Vai trò Test"); // Placeholder
+            filterRequests(); // Initial render of all requests
+        });
+    </script>
+</body>
+</html>
