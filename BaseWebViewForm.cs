@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Core;
+using HHMS_Application.Forms;
 
 namespace HHMS_Application
 {
@@ -46,6 +47,9 @@ namespace HHMS_Application
                 // Initialize WebView2 core
                 await webView.EnsureCoreWebView2Async();
 
+                // Handle messages from web content (for t-code navigation)
+                webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
+
                 // Get the path to the HTML file
                 string htmlPath = Path.Combine(Application.StartupPath, "UI", htmlFileName);
                 
@@ -74,6 +78,89 @@ namespace HHMS_Application
             catch (Exception ex)
             {
                 MessageBox.Show($"Error initializing WebView2: {ex.Message}", "Error", 
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            try
+            {
+                string message = e.TryGetWebMessageAsString();
+                
+                // Handle t-code navigation messages
+                if (message.StartsWith("TCode:"))
+                {
+                    string tCode = message.Substring(6); // Remove "TCode:" prefix
+                    OpenFormByTCode(tCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error handling web message: {ex.Message}", "Error", 
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void OpenFormByTCode(string tCode)
+        {
+            try
+            {
+                Form? formToOpen = null;
+
+                // Map t-codes to corresponding forms
+                switch (tCode)
+                {
+                    case "STUDENT_VIEW":
+                        formToOpen = new StudentListForm();
+                        break;
+                    case "CLASS_SCHEDULE":
+                        formToOpen = new ClassListForm();
+                        break;
+                    case "PAYMENT_INFO":
+                        formToOpen = new FinancialDashBoardForm();
+                        break;
+                    case "HR_MANAGEMENT":
+                        formToOpen = new StaffListForm();
+                        break;
+                    case "COURSE_CATALOG":
+                        formToOpen = new ClassDescriptionForm();
+                        break;
+                    case "TEACHER_ASSIGN":
+                        formToOpen = new TeacherEditShiftLearnForm();
+                        break;
+                    case "EXAM_GRADING":
+                        formToOpen = new ReportCreateForm();
+                        break;
+                    case "ATTENDANCE_TRACK":
+                        formToOpen = new KeepingtimeForm();
+                        break;
+                    case "BRANCH_MANAGEMENT":
+                        formToOpen = new BranchManagementForm();
+                        break;
+                    case "MAJOR_MANAGEMENT":
+                        formToOpen = new MajorListForm();
+                        break;
+                    case "LOG_VIEW":
+                        formToOpen = new LogForm();
+                        break;
+                    case "DOCUMENT_MANAGEMENT":
+                        formToOpen = new DocumentListForm();
+                        break;
+                    default:
+                        MessageBox.Show($"T-Code '{tCode}' không được hỗ trợ.", "T-Code không hợp lệ", 
+                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                }
+
+                if (formToOpen != null)
+                {
+                    formToOpen.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi mở form cho T-Code '{tCode}': {ex.Message}", "Lỗi", 
                               MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
