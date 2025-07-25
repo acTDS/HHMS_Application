@@ -1,0 +1,17 @@
+# Visual Studio Solution User Settings
+# This file contains user-specific settings for the Visual Studio solution
+
+# Startup project
+StartupProject = HHMS_Application
+
+# Default build configuration
+Configuration = Debug
+
+# Default platform
+Platform = Any CPU
+
+# Enable solution-wide IntelliCode suggestions
+IntelliCodeEnabled = true
+
+# Enable solution-wide code analysis
+CodeAnalysisEnabled = true

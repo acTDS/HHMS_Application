@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HHMS_Application", "HHMS_Application.csproj", "{A1B2C3D4-E5F6-7890-1234-567890ABCDEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HHMS_Application", "HHMS_Application.csproj", "{66BD5876-4D13-4800-BEBD-B5C6955CA090}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +10,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1B2C3D4-E5F6-7890-1234-567890ABCDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-1234-567890ABCDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-1234-567890ABCDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-E5F6-7890-1234-567890ABCDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66BD5876-4D13-4800-BEBD-B5C6955CA090}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66BD5876-4D13-4800-BEBD-B5C6955CA090}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66BD5876-4D13-4800-BEBD-B5C6955CA090}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66BD5876-4D13-4800-BEBD-B5C6955CA090}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
