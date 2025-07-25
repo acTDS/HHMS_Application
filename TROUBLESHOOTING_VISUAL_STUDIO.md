@@ -28,22 +28,7 @@ Clear-Package-Cache
 Update-Package -Reinstall
 ```
 
-### 2. Lỗi Debug và Runtime
-
-#### Lỗi: "The debug executable 'HHMS_Application.exe' specified in the 'HHMS_Application (Debug)' debug profile does not exist"
-**Nguyên nhân**: Executable chưa được tạo ra do chưa build project hoặc build thất bại
-**Cách khắc phục**:
-1. **Build project trước khi debug**:
-   - Right-click project → Build
-   - Hoặc: Build → Build Solution (Ctrl+Shift+B)
-2. **Chạy script kiểm tra**: `pre-debug-check.bat`
-3. **Kiểm tra lỗi build**:
-   ```
-   dotnet restore
-   dotnet build --configuration Debug
-   ```
-4. **Verify executable được tạo**: Kiểm tra thư mục `bin\Debug\net6.0-windows\`
-5. **Nếu vẫn lỗi**: Clean Solution → Rebuild Solution
+### 2. Lỗi Runtime
 
 #### Lỗi: "System.ComponentModel.Win32Exception: The system cannot find the file specified"
 **Nguyên nhân**: Thiếu dependencies hoặc đường dẫn không đúng
@@ -119,23 +104,7 @@ Update-Package -Reinstall
 2. Sử dụng Visual Studio Merge Tool để resolve
 3. Hoặc sử dụng external tool như Beyond Compare
 
-### 7. Công Cụ Hỗ Trợ
-
-#### Script Kiểm Tra Trước Debug
-Chạy `pre-debug-check.bat` để kiểm tra project sẵn sàng debug:
-```cmd
-# Chạy từ thư mục project
-pre-debug-check.bat
-```
-
-Script này sẽ:
-- Kiểm tra .NET SDK
-- Restore NuGet packages  
-- Build project
-- Verify debug executable tồn tại
-- Báo lỗi cụ thể nếu có vấn đề
-
-#### Các Lệnh Hữu Ích
+### 6. Các Lệnh Hữu Ích
 
 #### Package Manager Console Commands
 ```powershell
@@ -164,7 +133,7 @@ dotnet restore
 dotnet --list-sdks
 ```
 
-### 8. Kiểm Tra Hệ Thống
+### 7. Kiểm Tra Hệ Thống
 
 #### Script PowerShell Kiểm Tra Requirements
 ```powershell
@@ -199,7 +168,7 @@ if ($webview2) {
 Write-Host "=== Kiểm tra hoàn tất ===" -ForegroundColor Green
 ```
 
-### 9. Liên Hệ Hỗ Trợ
+### 8. Liên Hệ Hỗ Trợ
 
 Nếu vẫn gặp vấn đề:
 1. **Tạo issue mới** trên GitHub repository với thông tin:

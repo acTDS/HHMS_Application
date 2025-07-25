@@ -5,17 +5,9 @@ This document provides step-by-step instructions for setting up and running the 
 ## Quick Start
 
 1. **Prerequisites**: Ensure you have Visual Studio 2022 with .NET 6.0 SDK installed
-2. **Pre-Debug Check**: Run `pre-debug-check.bat` to verify setup
-3. **Open Solution**: Open `HHMS_Application.sln` in Visual Studio
-4. **Restore Packages**: Right-click solution → "Restore NuGet Packages"
-5. **Run**: Press F5 to build and run the application
-
-### Troubleshooting Quick Start Issues
-
-If you encounter the error "The debug executable does not exist":
-1. Run `pre-debug-check.bat` from the project folder
-2. Fix any issues reported by the script
-3. Try debugging again in Visual Studio
+2. **Open Solution**: Open `HHMS_Application.sln` in Visual Studio
+3. **Restore Packages**: Right-click solution → "Restore NuGet Packages"
+4. **Run**: Press F5 to build and run the application
 
 ## System Requirements
 
