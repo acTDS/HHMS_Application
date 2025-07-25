@@ -2,7 +2,7 @@ using System;
 
 namespace HHMS_Application.Forms
 {
-    public partial class DashBoardForm : BaseWebViewForm
+    public class DashBoardForm : BaseWebViewForm
     {
         public DashBoardForm() : base("DashBoard.html", "Bảng Điều Khiển - Trung Tâm Ngoại Ngữ 68")
         {

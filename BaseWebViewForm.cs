@@ -7,7 +7,7 @@ using HHMS_Application.Forms;
 
 namespace HHMS_Application
 {
-    public partial class BaseWebViewForm : Form
+    public class BaseWebViewForm : Form
     {
         protected WebView2 webView;
         private string htmlFileName;

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
-    <PackageReference Include="Microsoft.WindowsDesktop.App" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

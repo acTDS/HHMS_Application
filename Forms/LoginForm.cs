@@ -2,7 +2,7 @@ using System;
 
 namespace HHMS_Application.Forms
 {
-    public partial class LoginForm : BaseWebViewForm
+    public class LoginForm : BaseWebViewForm
     {
         public LoginForm() : base("Login.html", "Đăng nhập - Trung Tâm Ngoại Ngữ 68")
         {
